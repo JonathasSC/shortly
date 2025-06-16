@@ -1,0 +1,89 @@
+{% extends 'shared/base.html'%}
+
+{% load widget_tweaks %}
+{% load static %};
+{% load i18n %};
+
+{% block header %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div>
+    <form method="post" class="flex gap-5 flex-col">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <div class="mb-4 flex flex-col items-center gap-2">
+        <label for="id_image" class="cursor-pointer">
+            <img
+            id="profile-preview"
+            src="{% static 'account/images/default.png' %}"
+            alt="Imagem padrão"
+            class="w-24 h-24 rounded-full object-cover border hover:opacity-80 transition"
+            />
+        </label>
+
+
+        {{ form.image }}
+        {{ form.image.errors }}
+        </div>
+
+      <div class="mb-4">
+          {{ form.username.label_tag }}
+          {{ form.username|add_class:"w-full px-3 py-2 border rounded" }}
+          {% for error in form.username.errors %}
+            <p class="text-red-500 text-sm">{{ error }}</p>
+          {% endfor %}
+      </div>
+
+        <div class="mb-4">
+            {{ form.email.label_tag }}
+            {{ form.email|add_class:"w-full px-3 py-2 border rounded" }}
+            {{ form.email.errors }}
+        </div>
+
+        <div class="mb-4">
+            {{ form.password.label_tag }}
+            {{ form.password|add_class:"w-full px-3 py-2 border rounded" }}
+            {% for error in form.password.errors %}
+              <p class="text-red-500 text-sm">{{ error }}</p>
+            {% endfor %}
+        </div>
+
+        <div class="mb-4">
+            {{ form.confirm_password.label_tag }}
+            {{ form.confirm_password|add_class:"w-full px-3 py-2 border rounded" }}
+            {% for error in form.confirm_password.errors %}
+              <p class="text-red-500 text-sm">{{ error }}</p>
+            {% endfor %}
+        </div>
+
+        <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+            {% trans "Register" %}
+        </button>
+    </form>
+</div>
+
+<style>
+  input[type="file"] {
+    display: none;
+  }
+</style>
+
+<script>
+  const input = document.getElementById("id_image");
+  const preview = document.getElementById("profile-preview");
+
+  input.addEventListener("change", function () {
+    const file = this.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        preview.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+</script>
+
+{% endblock %}
