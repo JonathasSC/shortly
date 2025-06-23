@@ -109,6 +109,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
+
 APPEND_SLASH = True
 ROOT_URLCONF = 'core.urls'
 
@@ -118,7 +120,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            BASE_DIR / 'templates',
+            os.path.join(BASE_DIR, 'templates'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
