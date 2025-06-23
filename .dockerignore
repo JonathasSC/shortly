@@ -1,0 +1,45 @@
+# Local venvs
+venv/
+env/
+.venv/
+requirements.txt
+
+# Local settings
+*.env
+*.local
+*.DS_Store
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+
+# Pip cache
+pip-wheel-metadata/
+*.egg-info/
+dist/
+build/
+.eggs/
+*.whl
+
+# Local database
+*.sqlite3
+
+# Local log files 
+*.log
+
+# Test files
+.coverage
+htmlcov/
+.tox/
+.nox/
+.pytest_cache/
+tests/__pycache__/
+
+# IDE Settings
+.vscode/
+.idea/
+
+# Old docker files
+docker-compose.override.yml
+docker-compose.dev.yml
+*.bak

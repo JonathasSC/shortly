@@ -14,6 +14,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='userprofile',
             name='profile_picture',
-            field=models.ImageField(default=apps.account.utils.ProfileUtils.get_random_profile_image, upload_to=apps.account.utils.ProfileUtils.generate_image_path),
+            field=models.ImageField(default=apps.account.utils.ProfileUtils.get_random_profile_image,
+                                    upload_to=apps.account.utils.ProfileUtils.generate_image_path),
         ),
     ]

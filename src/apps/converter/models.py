@@ -1,7 +1,7 @@
 from django.db import models
 from .utils import ShortCodeGenerator
 from django.core.validators import URLValidator
-
+from django.contrib.auth import get_user_model
 
 short_code_generator: ShortCodeGenerator = ShortCodeGenerator(length=8)
 
@@ -21,6 +21,19 @@ class Url(models.Model):
 
     created_at = models.DateTimeField(
         auto_now_add=True
+    )
+    
+    created_by = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
+
+    created_by_ip = models.GenericIPAddressField(
+        null=True,
+        blank=True,
+        help_text="IP do usuário anônimo que criou a URL"
     )
 
     def save(self, *args, **kwargs):

@@ -1,17 +1,21 @@
 <header class="fixed top-0 left-0 w-full bg-white z-50">
   <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-    <!-- Nome da marca -->
-    <span class="text-xl font-bold text-gray-800">URLLify</span>
+    <span class="text-xl font-bold text-gray-800">Shortly</span>
 
-    <!-- Link Entrar -->
     <div class="flex gap-5">
-        <a href="#" class="text-blue-600 py-2 rounded px-4 hover:underline font-medium">
-        Entrar
-        </a>
+        {% if not user.is_authenticated %}
+          <a href="{% url 'login' %}" class="text-blue-600 py-2 rounded px-4 hover:underline font-medium">
+            {% trans "Login" %}
+          </a>
 
-        <a href="{% url 'register' %}" class="text-white py-2 rounded px-4 hover:underline font-medium bg-blue-600">
-        Criar conta
-        </a>
+          <a href="{% url 'register' %}" class="text-white py-2 rounded px-4 hover:underline font-medium bg-blue-600">
+            {% trans "Create Account" %}
+          </a>
+        {% else %}
+            <a href="{% url 'logout' %}" class="text-red-600 py-2 rounded px-4 hover:underline font-medium">
+                {% trans "Logout" %}
+            </a>
+        {% endif %}
     </div>
   </div>
 </header>

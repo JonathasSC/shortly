@@ -10,26 +10,27 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
-from pathlib import Path
 import os
+from pathlib import Path
+from dotenv import load_dotenv as loadenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+env_file = os.environ.get('DJANGO_ENV_FILE')
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
+if not env_file:
+    loadenv(dotenv_path=BASE_DIR / 'prod.env')
+loadenv(dotenv_path=env_file)
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-k$l_h-$1afzzo5fx2(-rkef)(&w*0i*of)zhz!(n_ea3rxgc+0'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
+DEBUG = True if os.environ.get('DJANGO_DEBUG') == 'TRUE' else False
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+ALLOWED_HOSTS = [host for host in os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',') if host]
+CSRF_TRUSTED_ORIGINS = [origin for origin in os.environ.get('DJANGO_CSRF_TRUSTED_ORIGINS', '').split(',') if origin]
 
-ALLOWED_HOSTS = []
-
-
-# Application definition
+LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO").upper()
+LOG_DIR = os.environ.get("LOG_DIR", "logs")
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -40,12 +41,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'widget_tweaks',
-
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
-
 
     'apps.converter',
     'apps.account'
@@ -60,10 +55,9 @@ MIDDLEWARE = [
     'django.middleware.locale.LocaleMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
-    'allauth.account.middleware.AccountMiddleware',
 ]
 
+APPEND_SLASH = True
 ROOT_URLCONF = 'core.urls'
 
 SITE_ID = 1
@@ -95,14 +89,32 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
-
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    } 
+else:
+    DB_USER = os.getenv('DB_USER', '')
+    DB_NAME = os.getenv('DB_NAME', '')
+    DB_HOST = os.getenv('DB_HOST', '')
+    DB_PORT = os.getenv('DB_PORT', '')
+    DB_ENGINE = os.getenv('DB_ENGINE', '')
+    DB_PASSWORD = os.getenv('DB_PASSWORD', '')
+    
+    
+    DATABASES = {
+        'default': {
+            'ENGINE'  : 'django.db.backends.' + DB_ENGINE,
+            'NAME'    : DB_NAME,
+            'USER'    : DB_USER,
+            'PASSWORD': DB_PASSWORD,
+            'HOST'    : DB_HOST,
+            'PORT'    : DB_PORT,
+        }
+    } 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
@@ -128,9 +140,8 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = 'pt-BR'
 
 LANGUAGES = (
-    ('pt-br', u'Português'),
-    ('en', u'Inglês'),
-    ('es', u'Espanhol'),
+    ('pt-br', 'Português'),
+    ('en', 'English'),
 )
 
 TIME_ZONE = 'America/Recife'
@@ -143,17 +154,21 @@ LOCALE_PATHS = [
     BASE_DIR / 'locale',
 ]
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
 STATIC_URL = '/static/'
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
+
+STATICFILES_DIRS = [
+    BASE_DIR / 'shared' / 'static',
+]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',
+    # 'allauth.account.auth_backends.AuthenticationBackend',
 ]
+
+ACCOUNT_FORMS = {
+    'login': 'apps.account.forms.CustomLoginForm',
+}
+
+STATIC_ROOT = 'staticfiles/'

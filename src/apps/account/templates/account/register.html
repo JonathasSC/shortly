@@ -1,33 +1,29 @@
 {% extends 'shared/base.html'%}
 
 {% load widget_tweaks %}
-{% load static %};
-{% load i18n %};
+{% load static %}
+{% load i18n %}
 
 {% block header %}{% endblock %}
 {% block footer %}{% endblock %}
 
 {% block content %}
 <div>
-    <form method="post" class="flex gap-5 flex-col">
-        {% csrf_token %}
-        {{ form.non_field_errors }}
+    <form method="post" class="border p-10 w-90">
+      <h1 class="text-blue-500 text-xl mb-2 font-semibold">
+          {% trans "Create your account!" %}
+      </h1>
 
-        <div class="mb-4 flex flex-col items-center gap-2">
-        <label for="id_image" class="cursor-pointer">
-            <img
-            id="profile-preview"
-            src="{% static 'account/images/default.png' %}"
-            alt="Imagem padrão"
-            class="w-24 h-24 rounded-full object-cover border hover:opacity-80 transition"
-            />
-        </label>
+      <p class="text-zinc-400 mb-10">
+          {% trans "Join us! Create your account today" %}
+      </p>
+    
+      {% csrf_token %}
 
-
-        {{ form.image }}
-        {{ form.image.errors }}
-        </div>
-
+      <p class="text-red-400 w-full mb-10">
+          {{ form.non_field_errors }}
+      </p>
+        
       <div class="mb-4">
           {{ form.username.label_tag }}
           {{ form.username|add_class:"w-full px-3 py-2 border rounded" }}
@@ -58,32 +54,17 @@
             {% endfor %}
         </div>
 
-        <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+        <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">
             {% trans "Register" %}
         </button>
+        
+        <p class="text-center mt-2">
+          Já possui uma conta?
+          <a href="{% url 'login' %}" class="text-blue-500">
+            Clique aqui
+          </a>
+        </p>
     </form>
 </div>
-
-<style>
-  input[type="file"] {
-    display: none;
-  }
-</style>
-
-<script>
-  const input = document.getElementById("id_image");
-  const preview = document.getElementById("profile-preview");
-
-  input.addEventListener("change", function () {
-    const file = this.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        preview.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
-  });
-</script>
 
 {% endblock %}

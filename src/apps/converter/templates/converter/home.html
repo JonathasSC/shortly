@@ -1,6 +1,7 @@
-{% extends 'shared/base.html'%}
+{% extends 'shared/base.html' %}
+
 {% block content %}
-  <div class="p-8 rounded-lg w-full max-w-md">
+  <div class="p-4 rounded-lg w-full max-w-md">
     <h1 class="text-2xl font-bold mb-6 text-center">Encurtador de URL</h1>
 
     <form method="post" class="space-y-4">
@@ -10,12 +11,43 @@
         Encurtar
       </button>
     </form>
-
-    {% if short_url %}
-      <div class="mt-6 text-center">
-        <p class="text-gray-700">URL encurtada:</p>
-        <a href="{{ short_url }}" class="text-blue-500 underline">{{ short_url }}</a>
-      </div>
-    {% endif %}
   </div>
+
+  {% if messages %}
+    <div class="my-4 space-y-2">
+      {% for message in messages %}
+        <div class="rounded">
+          {{ message|safe }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const copyButton = document.getElementById('copyButton');
+      const copyButtonLabel = document.getElementById('copyButtonLabel');
+      const shortUrlLink = document.getElementById('shortUrlLink');
+
+      if (copyButton && shortUrlLink) {
+        copyButton.addEventListener('click', function() {
+          const url = shortUrlLink.href;
+          navigator.clipboard.writeText(url)
+            .then(() => {
+              copyButtonLabel.textContent = 'Copiado!';
+              copyButton.classList.add('bg-green-200', 'text-green-800');
+              setTimeout(() => {
+                copyButtonLabel.textContent = 'Copiar';
+                copyButton.classList.remove('bg-green-200', 'text-green-800');
+              }, 2000);
+            })
+            .catch(err => {
+              console.error('Erro ao copiar:', err);
+            });
+        });
+      }
+    });
+  </script>
 {% endblock %}
