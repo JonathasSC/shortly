@@ -1,6 +1,4 @@
-
-
-.errorlist {
+.errorlist li {
     color: rgb(192, 26, 26);
     margin-bottom: 24px;
     border-radius: 4px;

@@ -142,6 +142,7 @@ dependencies = [
     { name = "psycopg2-binary" },
     { name = "python-dotenv" },
     { name = "uuid6" },
+    { name = "whitenoise" },
 ]
 
 [package.metadata]
@@ -152,6 +153,7 @@ requires-dist = [
     { name = "psycopg2-binary", specifier = ">=2.9.10" },
     { name = "python-dotenv", specifier = ">=1.1.0" },
     { name = "uuid6", specifier = ">=2025.0.0" },
+    { name = "whitenoise", specifier = ">=6.9.0" },
 ]
 
 [[package]]
@@ -179,4 +181,13 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/3f/49/06a089c184580f510e20226d9a081e4323d13db2fbc92d566697b5395c1e/uuid6-2025.0.0.tar.gz", hash = "sha256:bb78aa300e29db89b00410371d0c1f1824e59e29995a9daa3dedc8033d1d84ec", size = 13941, upload-time = "2025-06-11T20:02:05.324Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/0a/50/4da47101af45b6cfa291559577993b52ee4399b3cd54ba307574a11e4f3a/uuid6-2025.0.0-py3-none-any.whl", hash = "sha256:2c73405ff5333c7181443958c6865e0d1b9b816bb160549e8d80ba186263cb3a", size = 7001, upload-time = "2025-06-11T20:02:04.521Z" },
+]
+
+[[package]]
+name = "whitenoise"
+version = "6.9.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/b9/cf/c15c2f21aee6b22a9f6fc9be3f7e477e2442ec22848273db7f4eb73d6162/whitenoise-6.9.0.tar.gz", hash = "sha256:8c4a7c9d384694990c26f3047e118c691557481d624f069b7f7752a2f735d609", size = 25920, upload-time = "2025-02-06T22:16:34.957Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/64/b2/2ce9263149fbde9701d352bda24ea1362c154e196d2fda2201f18fc585d7/whitenoise-6.9.0-py3-none-any.whl", hash = "sha256:c8a489049b7ee9889617bb4c274a153f3d979e8f51d2efd0f5b403caf41c57df", size = 20161, upload-time = "2025-02-06T22:16:32.589Z" },
 ]

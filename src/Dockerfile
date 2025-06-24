@@ -30,9 +30,9 @@ COPY pyproject.toml .
 RUN uv pip install . --system --no-build-isolation
 
 # Copia o restante da aplicação
-COPY . .
+COPY . /usr/src
 
-RUN python manage.py collectstatic --noinput
+RUN uv run manage.py collectstatic --noinput --clear
 
 EXPOSE 80
 
