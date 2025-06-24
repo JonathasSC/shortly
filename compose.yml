@@ -11,6 +11,7 @@ services:
     restart: always
     volumes:
       - ./src/logs:/usr/src/logs
+      - static_volume:/usr/share/nginx/html
     expose:
       - "80" 
     networks:
@@ -18,12 +19,15 @@ services:
 
   nginx:
     container_name: nginx
-    image: nginx:latest
+    build: 
+      context: ./nginx
+      dockerfile: Dockerfile
     restart: always
     ports:
-      - "80:80"    # expõe a porta 80 para o host
+      - "80:80"
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/default.conf:/etc/nginx/nginx.conf
+      - static_volume:/usr/share/nginx/html
     depends_on:
       - shortly
     networks:
@@ -32,3 +36,6 @@ services:
 networks:
   shortly_net:
     driver: bridge
+
+volumes:
+  static_volume:
