@@ -32,7 +32,7 @@ RUN uv pip install . --system --no-build-isolation
 # Copia o restante da aplicação
 COPY . /usr/src
 
-RUN uv run manage.py collectstatic --noinput --clear
+RUN python3 manage.py collectstatic --noinput --clear
 
 EXPOSE 80
 

@@ -206,7 +206,7 @@ MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 STATIC_URL = 'static/'
-STATIC_ROOT = '/etc/vol/staticfiles'
+STATIC_ROOT = '/usr/share/nginx/html'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
