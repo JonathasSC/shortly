@@ -109,7 +109,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
+SECURE_CROSS_ORIGIN_OPENER_POLICY = None
 
 APPEND_SLASH = True
 ROOT_URLCONF = 'core.urls'
