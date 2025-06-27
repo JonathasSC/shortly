@@ -1,4 +1,7 @@
+
 {% extends 'shared/base.html' %}
+
+{% load static %}
 
 {% block content %}
   <div class="p-4 rounded-lg w-full max-w-md">
@@ -25,6 +28,7 @@
 {% endblock %}
 
 {% block scripts %}
+  <script src="{% static 'converter/utils.js' %}"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       const copyButton = document.getElementById('copyButton');
@@ -33,19 +37,15 @@
 
       if (copyButton && shortUrlLink) {
         copyButton.addEventListener('click', function() {
-          const url = shortUrlLink.href;
-          navigator.clipboard.writeText(url)
-            .then(() => {
-              copyButtonLabel.textContent = 'Copiado!';
-              copyButton.classList.add('bg-green-200', 'text-green-800');
-              setTimeout(() => {
-                copyButtonLabel.textContent = 'Copiar';
-                copyButton.classList.remove('bg-green-200', 'text-green-800');
-              }, 2000);
-            })
-            .catch(err => {
-              console.error('Erro ao copiar:', err);
-            });
+          const utils = new TextUtils();
+          utils.copyText('shortUrlLink');
+
+          copyButtonLabel.textContent = 'Copiado!';
+          copyButton.classList.add('bg-green-200', 'text-green-800');
+          setTimeout(() => {
+            copyButtonLabel.textContent = 'Copiar';
+            copyButton.classList.remove('bg-green-200', 'text-green-800');
+          }, 2000);
         });
       }
     });
