@@ -47,14 +47,6 @@ pull_latest_code() {
     log_success "Código atualizado com sucesso"
 }
 
-verify_ubuntu_version() {
-    UBUNTU_VERSION=$(lsb_release -cs)
-    log "Versão do Ubuntu: $UBUNTU_VERSION"
-    if [ "$UBUNTU_VERSION" = "focal" ]; then
-        DOCKER_COMPOSE="docker-compose"
-    fi
-}
-
 check_docker() {
     if ! command -v docker &>/dev/null; then
         log_error "Docker não está instalado. Abortando."
@@ -62,6 +54,13 @@ check_docker() {
     fi
     if ! docker info &>/dev/null; then
         log_error "Docker não está em execução. Inicie o serviço e tente novamente."
+        exit 1
+    fi
+}
+
+check_docker_compose() {
+    if ! command -v $DOCKER_COMPOSE &>/dev/null && ! docker compose version &>/dev/null; then
+        log_error "Docker Compose não está instalado corretamente. Abortando."
         exit 1
     fi
 }
@@ -99,8 +98,8 @@ create_superuser_if_not_exists() {
 run_start() {
     print_header "Iniciando processo de Deploy"
     check_docker
-    verify_ubuntu_version
-    # pull_latest_code
+    check_docker_compose
+    pull_latest_code
     stop_oldest_containers
     build_containers
     up_containers
