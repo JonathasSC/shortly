@@ -198,7 +198,6 @@ STATIC_ROOT = '/usr/share/nginx/html'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
-    '/usr/src/static',
 ]
 
 STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
