@@ -1,7 +1,8 @@
 #!/bin/bash
 
+ENV_FILE="./src/prod.env"
 DOCKER_COMPOSE="docker compose"
-SERVICE_NAME="shortly"  # Altere conforme o nome do seu serviço
+SERVICE_NAME="shortly"
 ADMIN_COMMAND="create_admin"
 
 # Cores
@@ -9,6 +10,20 @@ GREEN="\033[0;32m"
 RED="\033[0;31m"
 YELLOW="\033[1;33m"
 RESET="\033[0m"
+
+load_env_vars() {
+  log "Carregando variáveis de ambiente do $ENV_FILE"
+  set -a
+  source "$ENV_FILE"
+  set +a
+}
+
+
+validate_env_vars() {
+  log "Verificando variáveis obrigatórias"
+  : "${SSL_EMAIL:?Variável SSL_EMAIL não definida}"
+}
+
 
 # Log helpers
 log() {
@@ -38,6 +53,38 @@ print_header() {
 }
 
 # Funções principais
+
+obtain_ssl_certificates() {
+    print_header "Obtendo certificados SSL com Certbot"
+
+    if [ -f "./data/certbot/conf/live/sh0rtly.com/fullchain.pem" ]; then
+        log_warn "Certificados já existem. Pulando passo do Certbot."
+        return
+    fi
+
+    log "Subindo Nginx em modo HTTP para validação ACME..."
+    $DOCKER_COMPOSE up -d nginx
+    sleep 5
+
+    docker compose run --rm certbot certonly -v \
+        --webroot -w /var/www/certbot \
+        --email $SSL_EMAIL \
+        --agree-tos \
+        --no-eff-email \
+        -d sh0rtly.com
+
+    if [ $? -eq 0 ]; then
+        log_success "Certificados SSL obtidos com sucesso"
+    else
+        log_error "Falha ao obter certificados SSL"
+        exit 1
+    fi
+
+    log "Reiniciando Nginx com suporte SSL..."
+    $DOCKER_COMPOSE down
+}
+
+
 pull_latest_code() {
     log "Atualizando código-fonte via git pull..."
     if ! git pull; then
@@ -97,12 +144,29 @@ create_superuser_if_not_exists() {
 
 run_start() {
     print_header "Iniciando processo de Deploy"
+    load_env_vars
+    validate_env_vars
     check_docker
     check_docker_compose
     pull_latest_code
     stop_oldest_containers
-    build_containers
-    up_containers
+
+    print_header "Build e up do Nginx (HTTP apenas)"
+    $DOCKER_COMPOSE build nginx
+    $DOCKER_COMPOSE up -d nginx
+
+    obtain_ssl_certificates
+    
+    print_header "Parando Nginx (modo HTTP)"
+    $DOCKER_COMPOSE down nginx
+
+    $DOCKER_COMPOSE build nginx
+    $DOCKER_COMPOSE up -d nginx
+
+    print_header "Build e up dos demais containers"
+    $DOCKER_COMPOSE build shortly
+    $DOCKER_COMPOSE up -d shortly
+
     apply_migrations
     create_superuser_if_not_exists
     print_header "Deploy Finalizado com Sucesso 🎉"
