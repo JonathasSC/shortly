@@ -66,7 +66,7 @@ obtain_ssl_certificates() {
     $DOCKER_COMPOSE up -d nginx
     sleep 5
 
-    docker compose run --rm certbot certonly \
+    docker compose run --rm certbot certonly -v \
         --webroot -w /var/www/certbot \
         --email $SSL_EMAIL \
         --agree-tos \
@@ -150,9 +150,23 @@ run_start() {
     check_docker_compose
     pull_latest_code
     stop_oldest_containers
-    build_containers
+
+    print_header "Build e up do Nginx (HTTP apenas)"
+    $DOCKER_COMPOSE build nginx
+    $DOCKER_COMPOSE up -d nginx
+
     obtain_ssl_certificates
-    up_containers
+    
+    print_header "Parando Nginx (modo HTTP)"
+    $DOCKER_COMPOSE down nginx
+
+    $DOCKER_COMPOSE build nginx
+    $DOCKER_COMPOSE up -d nginx
+
+    print_header "Build e up dos demais containers"
+    $DOCKER_COMPOSE build shortly
+    $DOCKER_COMPOSE up -d shortly
+
     apply_migrations
     create_superuser_if_not_exists
     print_header "Deploy Finalizado com Sucesso 🎉"
