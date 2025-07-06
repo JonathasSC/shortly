@@ -26,12 +26,9 @@ services:
     ports:
       - "80:80"
       - "443:443"
-    env_file:
-      - ./nginx/prod.env
-    environment:               
-      ADMIN_IP: ${ADMIN_IP}
     volumes:
-      - ./nginx/nginx.conf.template:/etc/nginx/nginx.conf.template
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/whitelist.conf:/etc/nginx/whitelist.conf:ro
       - ./data/certbot/conf:/etc/letsencrypt
       - ./data/certbot/www:/var/www/certbot
       - static_volume:/usr/share/nginx/html
@@ -39,13 +36,7 @@ services:
       - shortly
     networks:
       - shortly_net
-    command: >
-      /bin/sh -c "
-        envsubst '\$ADMIN_IP' \
-          < /etc/nginx/nginx.conf.template \
-          > /etc/nginx/nginx.conf \
-        && nginx -g 'daemon off;'
-      "
+
   certbot:
     image: certbot/certbot:latest
     volumes:
