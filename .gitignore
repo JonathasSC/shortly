@@ -146,3 +146,4 @@ GitHub.sublime-settings
 .history
 
 data/
+whitelist.conf
