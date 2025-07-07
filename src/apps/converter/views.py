@@ -48,7 +48,7 @@ class HomeView(View):
 
             MAX_IP_PER_DAY = 5
             if count_today >= MAX_IP_PER_DAY:
-                messages.error(request, mark_safe(f'''
+                messages.error(request, mark_safe('''
                     <p class="text-center bg-yellow-100 px-4 py-2 w-80 rounded text-yellow-600">
                         Você atingiu o limite de 5 links por dia. Tente novamente amanhã ou faça login para continuar.
                     </p>
