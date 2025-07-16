@@ -1,7 +1,6 @@
-from django.urls import reverse_lazy, reverse
+from django.urls import reverse_lazy
 from .forms import CustomRegisterForm, CustomLoginForm
 from django.views.generic.edit import CreateView, FormView
-from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth import login, logout
 from django.shortcuts import redirect
 from django.views import View

@@ -1,7 +1,8 @@
 from django import forms
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate
 from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.forms import AuthenticationForm
+
 
 class CustomRegisterForm(forms.ModelForm):
     username = forms.CharField(
@@ -46,45 +47,5 @@ class CustomRegisterForm(forms.ModelForm):
         return user
 
 
-class CustomLoginForm(forms.Form):
-    identifier = forms.CharField(
-        label=_("Username or Email"),
-        widget=forms.TextInput(attrs={'placeholder': _("Username or Email")})
-    )
-    password = forms.CharField(
-        label=_("Password"),
-        widget=forms.PasswordInput(attrs={'placeholder': _("Password")})
-    )
-
-    def clean(self):
-        cleaned_data = super().clean()
-        identifier = cleaned_data.get('identifier')
-        password = cleaned_data.get('password')
-        
-        user = None
-
-        if identifier and password:
-            if '@' in identifier:
-                try:
-                    user_obj = User.objects.get(email__iexact=identifier)
-                    username = user_obj.username
-                    print(username)
-                except User.DoesNotExist:
-                    raise forms.ValidationError(
-                        _("No user found with this email address.")
-                    )
-            else:
-                username = identifier
-
-            user = authenticate(username=username, password=password)
-            print(user)
-            if user is None:
-                raise forms.ValidationError(
-                    _("Invalid credentials. Please check your username/email and password.")
-                )
-
-        self.user = user
-        return cleaned_data
-
-    def get_user(self):
-        return getattr(self, 'user', None)
+class CustomLoginForm(AuthenticationForm):
+    pass
