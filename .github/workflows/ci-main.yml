@@ -6,10 +6,13 @@ on:
   pull_request:
     branches: [ main ]
 
+defaults:
+  run:
+    working-directory: ./src
+
 jobs:
   test:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -21,7 +24,6 @@ jobs:
 
       - name: Set up Python
         uses: actions/setup-python@v5
-        working-directory: src
         with:
           python-version-file: "pyproject.toml"
 
@@ -31,9 +33,7 @@ jobs:
           enable-cache: true
 
       - name: Install the project dependencies
-        working-directory: src
         run: uv sync --locked --all-extras --dev
 
       - name: Run Django tests
-        working-directory: src
         run: .venv/bin/python manage.py test
