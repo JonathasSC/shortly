@@ -134,7 +134,7 @@ wheels = [
 [[package]]
 name = "src"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "django" },
     { name = "django-widget-tweaks" },
