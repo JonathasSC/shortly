@@ -21,6 +21,8 @@ CSRF_TRUSTED_ORIGINS = [origin for origin in os.environ.get(
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO").upper()
 LOG_DIR = os.environ.get("LOG_DIR", "logs")
 
+os.makedirs(LOG_DIR, exist_ok=True)
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
