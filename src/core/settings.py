@@ -125,6 +125,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
+i
+
 if DEBUG:
     DATABASES = {
         'default': {

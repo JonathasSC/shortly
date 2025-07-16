@@ -1,0 +1,36 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Update packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq unzip
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install UV Package Manager
+        run: | 
+          curl -LsSf https://astral.sh/uv/install.sh /uv-installer.sh | bash
+          
+      - name: Install dependencies 
+        run: |
+          uv pip install . --system --no-build-isolation
+
+      - name: Run tests
+        run: python src/manage.py test
