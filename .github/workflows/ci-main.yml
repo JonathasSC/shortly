@@ -21,6 +21,7 @@ jobs:
 
       - name: Set up Python
         uses: actions/setup-python@v5
+        working-directory: src
         with:
           python-version-file: "pyproject.toml"
 
