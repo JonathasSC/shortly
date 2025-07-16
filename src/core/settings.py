@@ -13,8 +13,10 @@ loadenv(dotenv_path=env_file)
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 DEBUG = True if os.environ.get('DJANGO_DEBUG') == 'TRUE' else False
 
-ALLOWED_HOSTS = [host for host in os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',') if host]
-CSRF_TRUSTED_ORIGINS = [origin for origin in os.environ.get('DJANGO_CSRF_TRUSTED_ORIGINS', '').split(',') if origin]
+ALLOWED_HOSTS = [host for host in os.environ.get(
+    'DJANGO_ALLOWED_HOSTS', '').split(',') if host]
+CSRF_TRUSTED_ORIGINS = [origin for origin in os.environ.get(
+    'DJANGO_CSRF_TRUSTED_ORIGINS', '').split(',') if origin]
 
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO").upper()
 LOG_DIR = os.environ.get("LOG_DIR", "logs")
@@ -122,10 +124,8 @@ TEMPLATES = [
 ]
 
 
-
 WSGI_APPLICATION = 'core.wsgi.application'
 
-i
 
 if DEBUG:
     DATABASES = {
@@ -133,7 +133,7 @@ if DEBUG:
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
         }
-    } 
+    }
 else:
     DB_USER = os.getenv('DB_USER', '')
     DB_NAME = os.getenv('DB_NAME', '')
@@ -141,18 +141,17 @@ else:
     DB_PORT = os.getenv('DB_PORT', '')
     DB_ENGINE = os.getenv('DB_ENGINE', '')
     DB_PASSWORD = os.getenv('DB_PASSWORD', '')
-    
-    
+
     DATABASES = {
         'default': {
-            'ENGINE'  : 'django.db.backends.' + DB_ENGINE,
-            'NAME'    : DB_NAME,
-            'USER'    : DB_USER,
+            'ENGINE': 'django.db.backends.' + DB_ENGINE,
+            'NAME': DB_NAME,
+            'USER': DB_USER,
             'PASSWORD': DB_PASSWORD,
-            'HOST'    : DB_HOST,
-            'PORT'    : DB_PORT,
+            'HOST': DB_HOST,
+            'PORT': DB_PORT,
         }
-    } 
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -205,4 +204,3 @@ AUTHENTICATION_BACKENDS = [
 ACCOUNT_FORMS = {
     'login': 'apps.account.forms.CustomLoginForm',
 }
-

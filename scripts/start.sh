@@ -3,7 +3,6 @@
 ENV_FILE="./src/prod.env"
 DOCKER_COMPOSE="docker compose"
 SERVICE_NAME="shortly"
-ADMIN_COMMAND="create_admin"
 
 # Cores
 GREEN="\033[0;32m"
@@ -11,19 +10,17 @@ RED="\033[0;31m"
 YELLOW="\033[1;33m"
 RESET="\033[0m"
 
-load_env_vars() {
+load_env_vars(){
   log "Carregando variáveis de ambiente do $ENV_FILE"
   set -a
   source "$ENV_FILE"
   set +a
 }
 
-
 validate_env_vars() {
   log "Verificando variáveis obrigatórias"
   : "${SSL_EMAIL:?Variável SSL_EMAIL não definida}"
 }
-
 
 # Log helpers
 log() {
@@ -138,7 +135,7 @@ apply_migrations() {
 
 create_superuser_if_not_exists() {
     log "Tentando criar superusuário (caso não exista)..."
-    $DOCKER_COMPOSE exec $SERVICE_NAME python3 manage.py $ADMIN_COMMAND
+    $DOCKER_COMPOSE exec $SERVICE_NAME python3 manage.py createsuperuser --no-input
     log_success "Tentativa de criação de superusuário finalizada"
 }
 

@@ -28,9 +28,10 @@ jobs:
         run: | 
           curl -LsSf https://astral.sh/uv/install.sh /uv-installer.sh | bash
           
-      - name: Install dependencies 
+      - name: Set up virtualenv and install dependencies from ./src
         run: |
-          uv pip install . --system --no-build-isolation
+          uv venv .venv
+          uv sync --project-dir ./src
 
       - name: Run tests
-        run: python src/manage.py test
+        run: .venv/bin/python src/manage.py test
