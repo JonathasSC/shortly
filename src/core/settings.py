@@ -15,6 +15,7 @@ DEBUG = True if os.environ.get('DJANGO_DEBUG') == 'TRUE' else False
 
 ALLOWED_HOSTS = [host for host in os.environ.get(
     'DJANGO_ALLOWED_HOSTS', '').split(',') if host]
+
 CSRF_TRUSTED_ORIGINS = [origin for origin in os.environ.get(
     'DJANGO_CSRF_TRUSTED_ORIGINS', '').split(',') if origin]
 
@@ -100,13 +101,16 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-SECURE_CROSS_ORIGIN_OPENER_POLICY = None
-SECURE_SSL_REDIRECT = False
+SECURE_CROSS_ORIGIN_OPENER_POLICY = os.environ.get(
+    'DJANGO_SECURE_CROSS_ORIGIN_OPENER_POLICY')
+
+SECURE_SSL_REDIRECT = True if os.environ.get(
+    'DJANGO_SECURE_SSL_REDIRECT') == 'TRUE' else False
 
 APPEND_SLASH = True
 ROOT_URLCONF = 'core.urls'
 
-SITE_ID = 1
+SITE_ID = int(os.environ.get('DJANGO_SITE_ID', 1))
 
 TEMPLATES = [
     {
@@ -173,9 +177,10 @@ AUTH_PASSWORD_VALIDATORS = [
 
 USE_TZ = True
 USE_I18N = True
-TIME_ZONE = 'America/Recife'
 
-LANGUAGE_CODE = 'pt-BR'
+TIME_ZONE = os.environ.get('DJANGO_TIME_ZONE', 'America/Recife')
+LANGUAGE_CODE = os.environ.get('DJANGO_LANGUAGE_CODE', 'pt-BR')
+
 LANGUAGES = (
     ('pt-br', 'Português'),
     ('en', 'English'),
@@ -189,7 +194,7 @@ MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 STATIC_URL = 'static/'
-STATIC_ROOT = '/usr/share/nginx/html'
+STATIC_ROOT = os.environ.get('DJANGO_STATIC_ROOT', '/usr/share/nginx/html')
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),

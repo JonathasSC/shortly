@@ -3,7 +3,7 @@ from apps.converter.models import Url
 from django.contrib.auth.models import User
 
 
-class UrlTestCase(TestCase):
+class UrlModelTestCase(TestCase):
     def setUp(self):
         User.objects.create_user(
             username='Example',
