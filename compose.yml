@@ -12,8 +12,6 @@ services:
     volumes:
       - ./src/logs:/usr/src/logs
       - static_volume:/usr/share/nginx/html
-    expose:
-      - "80" 
     networks:
       - shortly_net
 
