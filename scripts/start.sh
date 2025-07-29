@@ -125,9 +125,14 @@ up_containers() {
     log_success "Containers levantados com sucesso"
 }
 
-apply_migrations() {
+make_migrations() {
     log "Aplicando migracoes no Django..."
     $DOCKER_COMPOSE exec $SERVICE_NAME python3 manage.py makemigrations
+    log_success "Migracoes feitas com sucesso"
+}
+
+apply_migrations() {
+    log "Aplicando migracoes no Django..."
     $DOCKER_COMPOSE exec $SERVICE_NAME python3 manage.py migrate
     log_success "Migracoes aplicadas com sucesso"
 }
@@ -163,6 +168,7 @@ run_start() {
     $DOCKER_COMPOSE build shortly
     $DOCKER_COMPOSE up -d shortly
 
+    make_migrations
     apply_migrations
     create_superuser_if_not_exists
     print_header "Deploy Finalizado com Sucesso 🎉"
