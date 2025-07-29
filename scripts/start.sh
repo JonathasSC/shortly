@@ -127,6 +127,7 @@ up_containers() {
 
 apply_migrations() {
     log "Aplicando migracoes no Django..."
+    $DOCKER_COMPOSE exec $SERVICE_NAME python3 manage.py makemigrations
     $DOCKER_COMPOSE exec $SERVICE_NAME python3 manage.py migrate
     log_success "Migracoes aplicadas com sucesso"
 }
