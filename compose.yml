@@ -27,7 +27,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx/shortly.conf:/etc/nginx/shortly.conf
+      - ./nginx/shortly.conf:/etc/nginx/conf.d/shortly.conf
       - ./nginx/whitelist.conf:/etc/nginx/whitelist.conf:ro
       - ./data/certbot/conf:/etc/letsencrypt
       - ./data/certbot/www:/var/www/certbot
