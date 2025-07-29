@@ -7,7 +7,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 env_file = os.environ.get('DJANGO_ENV_FILE')
 
 if not env_file:
-    loadenv(dotenv_path=BASE_DIR / 'prod.env')
+    loadenv(dotenv_path=BASE_DIR / 'dev.env')
 loadenv(dotenv_path=env_file)
 
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')

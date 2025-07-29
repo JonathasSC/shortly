@@ -10,7 +10,6 @@ class Url(models.Model):
     original_url = models.URLField(
         max_length=500,
         validators=[URLValidator()]
-
     )
 
     short_code = models.CharField(
@@ -22,7 +21,7 @@ class Url(models.Model):
     created_at = models.DateTimeField(
         auto_now_add=True
     )
-    
+
     created_by = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
@@ -44,3 +43,10 @@ class Url(models.Model):
 
     def __str__(self):
         return f"{self.short_code} -> {self.original_url}"
+
+
+class AccessEvent(models.Model):
+    url = models.ForeignKey(Url, on_delete=models.CASCADE)
+    ip_address = models.TextField(max_length=15)
+    created_at = models.DateTimeField(auto_now_add=True)
+    counter = models.PositiveBigIntegerField()

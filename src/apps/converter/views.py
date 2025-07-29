@@ -9,18 +9,23 @@ from datetime import timedelta
 from django.shortcuts import get_object_or_404
 from django.contrib import messages
 from django.utils.safestring import mark_safe
-
+from time import sleep
+from django.http import HttpResponse
 user_request_util = UserRequestUtil()
 
-class RedirectView(RedirectView):
-    permanent = False
-    query_string = True
 
-    def get_redirect_url(self, **kwargs):
-        url = get_object_or_404(Url, short_code=kwargs["short_code"])
-        return url.original_url
-    
-    
+class MiddleView(View):
+    def get(self, request, short_code) -> HttpResponse:
+        url = get_object_or_404(Url, short_code=short_code)
+
+        if url.created_by.username == 'jonathas.cardoso':
+            return redirect(url.original_url)
+
+        return render(request, 'converter/middle.html', {
+            'redirect_url': url.original_url
+        })
+
+
 class HomeView(View):
     def get(self, request):
         url_form = UrlForm()
@@ -30,13 +35,12 @@ class HomeView(View):
 
     def post(self, request):
         url_form = UrlForm(request.POST)
-        
+
         short_url = None
         existing_url = None
+        client_ip = user_request_util.get_client_ip(request)
 
-
-        if not request.user.is_authenticated:
-            client_ip = user_request_util.get_client_ip(request)
+        if not getattr(request, 'user', None) or not request.user.is_authenticated:
 
             today_start = now().replace(hour=0, minute=0, second=0, microsecond=0)
             today_end = today_start + timedelta(days=1)
@@ -58,7 +62,7 @@ class HomeView(View):
         if url_form.is_valid():
             url_object = url_form.save(commit=False)
 
-            if request.user.is_authenticated:
+            if getattr(request, 'user', None) and request.user.is_authenticated:
                 existing_url = Url.objects.filter(
                     original_url=url_object.original_url,
                     created_by=request.user
@@ -81,8 +85,9 @@ class HomeView(View):
                     url_object.created_by_ip = client_ip
                 url_object.save()
 
-            short_url = request.build_absolute_uri(f'/{url_object.short_code}/')
-            
+            short_url = request.build_absolute_uri(
+                f'/{url_object.short_code}/')
+
             messages.success(request, mark_safe(f'''
             <div id="shortUrlWrapper" class="flex flex-col gap-2 align-center justify-center">
                 <p class="text-center">URL encurtada:</p>
@@ -98,9 +103,10 @@ class HomeView(View):
                 </div>                              
                 
             </div>
-            '''))            
-            
+            '''))
+
             return redirect('home')
 
-        messages.error(request, 'Erro ao criar o link. Verifique o formulário.')
+        messages.error(
+            request, 'Erro ao criar o link. Verifique o formulário.')
         return redirect('home')

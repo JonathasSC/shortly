@@ -11,15 +11,15 @@ YELLOW="\033[1;33m"
 RESET="\033[0m"
 
 load_env_vars(){
-  log "Carregando variáveis de ambiente do $ENV_FILE"
+  log "Carregando variaveis de ambiente do $ENV_FILE"
   set -a
   source "$ENV_FILE"
   set +a
 }
 
 validate_env_vars() {
-  log "Verificando variáveis obrigatórias"
-  : "${SSL_EMAIL:?Variável SSL_EMAIL não definida}"
+  log "Verificando variaveis obrigatorias"
+  : "${SSL_EMAIL:?Variavel SSL_EMAIL nao definida}"
 }
 
 # Log helpers
@@ -49,17 +49,16 @@ print_header() {
   echo -e "${border}${RESET}\n"
 }
 
-# Funções principais
 
 obtain_ssl_certificates() {
     print_header "Obtendo certificados SSL com Certbot"
 
     if [ -f "./data/certbot/conf/live/sh0rtly.com/fullchain.pem" ]; then
-        log_warn "Certificados já existem. Pulando passo do Certbot."
+        log_warn "Certificados ja existem. Pulando passo do Certbot."
         return
     fi
 
-    log "Subindo Nginx em modo HTTP para validação ACME..."
+    log "Subindo Nginx em modo HTTP para validacao ACME..."
     $DOCKER_COMPOSE up -d nginx
     sleep 5
 
@@ -81,30 +80,29 @@ obtain_ssl_certificates() {
     $DOCKER_COMPOSE down
 }
 
-
 pull_latest_code() {
-    log "Atualizando código-fonte via git pull..."
+    log "Atualizando codigo-fonte via git pull..."
     if ! git pull; then
         log_error "Erro ao fazer git pull. Abortando."
         exit 1
     fi
-    log_success "Código atualizado com sucesso"
+    log_success "Codigo atualizado com sucesso"
 }
 
 check_docker() {
     if ! command -v docker &>/dev/null; then
-        log_error "Docker não está instalado. Abortando."
+        log_error "Docker nao esta instalado. Abortando."
         exit 1
     fi
     if ! docker info &>/dev/null; then
-        log_error "Docker não está em execução. Inicie o serviço e tente novamente."
+        log_error "Docker nao esta em execucao. Inicie o servico e tente novamente."
         exit 1
     fi
 }
 
 check_docker_compose() {
     if ! command -v $DOCKER_COMPOSE &>/dev/null && ! docker compose version &>/dev/null; then
-        log_error "Docker Compose não está instalado corretamente. Abortando."
+        log_error "Docker Compose nao esta instalado corretamente. Abortando."
         exit 1
     fi
 }
@@ -118,7 +116,7 @@ stop_oldest_containers() {
 build_containers() {
     log "Iniciando build dos containers..."
     $DOCKER_COMPOSE build
-    log_success "Build concluído com sucesso"
+    log_success "Build concluido com sucesso"
 }
 
 up_containers() {
@@ -128,15 +126,15 @@ up_containers() {
 }
 
 apply_migrations() {
-    log "Aplicando migrações no Django..."
+    log "Aplicando migracoes no Django..."
     $DOCKER_COMPOSE exec $SERVICE_NAME python3 manage.py migrate
-    log_success "Migrações aplicadas com sucesso"
+    log_success "Migracoes aplicadas com sucesso"
 }
 
 create_superuser_if_not_exists() {
-    log "Tentando criar superusuário (caso não exista)..."
+    log "Tentando criar superusuario (caso nao exista)..."
     $DOCKER_COMPOSE exec $SERVICE_NAME python3 manage.py createsuperuser --no-input
-    log_success "Tentativa de criação de superusuário finalizada"
+    log_success "Tentativa de criacao de superusuario finalizada"
 }
 
 run_start() {
@@ -169,5 +167,4 @@ run_start() {
     print_header "Deploy Finalizado com Sucesso 🎉"
 }
 
-# Executar tudo
 run_start

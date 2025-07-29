@@ -9,3 +9,24 @@ class TextUtils {
             .catch(err => console.error('Erro ao copiar:', err));
     }
 }
+
+class UrlUtils {
+    delayRedirect(delayMs, redirectUrl){
+        setTimeout(() => {
+            window.location.href = redirectUrl;
+        }, delayMs);
+    }
+}
+
+class TimerUtils {
+    secondTimer(timerSeconds, counterElement) {
+        const interval = setInterval(() => {
+            timerSeconds -= 1;
+            counterElement.innerText = timerSeconds;
+
+            if (timerSeconds <= 0) {
+                clearInterval(interval);
+            }
+        }, 1000);
+    }
+}
