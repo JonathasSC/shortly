@@ -1,27 +1,39 @@
 import os
 from pathlib import Path
-from dotenv import load_dotenv as loadenv
+from dotenv import load_dotenv
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+# =================================
+# === Load Enviroment Variables ===
+# =================================
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+env_file = os.environ.get('DJANGO_ENV_FILE', BASE_DIR / 'dev.env')
+load_dotenv(dotenv_path=env_file)
 
-env_file = os.environ.get('DJANGO_ENV_FILE')
-
-if not env_file:
-    loadenv(dotenv_path=BASE_DIR / 'dev.env')
-loadenv(dotenv_path=env_file)
+# ============================
+# === Django Base Settings ===
+# ============================
+def env_bool(var_name, default='FALSE'):
+    return os.getenv(var_name, default).strip().upper() == 'TRUE'
 
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
-DEBUG = True if os.environ.get('DJANGO_DEBUG') == 'TRUE' else False
+DEBUG = env_bool('DJANGO_DEBUG')
 
-ALLOWED_HOSTS = [host for host in os.environ.get(
-    'DJANGO_ALLOWED_HOSTS', '').split(',') if host]
+ALLOWED_HOSTS = [host for host in os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',') if host]
+CSRF_TRUSTED_ORIGINS = [origin for origin in os.environ.get('DJANGO_CSRF_TRUSTED_ORIGINS', '').split(',') if origin]
 
-CSRF_TRUSTED_ORIGINS = [origin for origin in os.environ.get(
-    'DJANGO_CSRF_TRUSTED_ORIGINS', '').split(',') if origin]
+ROOT_URLCONF = 'core.urls'
+WSGI_APPLICATION = 'core.wsgi.application'
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+SITE_ID = 1
+APPEND_SLASH = True
+SECURE_CROSS_ORIGIN_OPENER_POLICY = None
+SECURE_SSL_REDIRECT = False
 
-LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO").upper()
-LOG_DIR = os.environ.get("LOG_DIR", "logs")
-
+# ========================
+# === Logging Settings ===
+# ========================
+LOG_DIR = os.getenv("LOG_DIR", "logs")
+LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
 os.makedirs(LOG_DIR, exist_ok=True)
 
 LOGGING = {
@@ -37,7 +49,6 @@ LOGGING = {
             "style": "{",
         },
     },
-
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
@@ -55,12 +66,10 @@ LOGGING = {
             "formatter": "verbose",
         },
     },
-
     "root": {
         "handlers": ["console", "file", "error_file"],
         "level": LOG_LEVEL,
     },
-
     "loggers": {
         "django": {
             "handlers": ["console", "file", "error_file"],
@@ -75,7 +84,9 @@ LOGGING = {
     },
 }
 
-
+# ====================
+# === Applications ===
+# ====================
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -87,9 +98,12 @@ INSTALLED_APPS = [
     'widget_tweaks',
 
     'apps.converter',
-    'apps.account'
+    'apps.account',
 ]
 
+# ===================
+# === Middlewares ===
+# ===================
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -101,23 +115,19 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-SECURE_CROSS_ORIGIN_OPENER_POLICY = os.environ.get(
-    'DJANGO_SECURE_CROSS_ORIGIN_OPENER_POLICY')
-
-SECURE_SSL_REDIRECT = True if os.environ.get(
-    'DJANGO_SECURE_SSL_REDIRECT') == 'TRUE' else False
-
-APPEND_SLASH = True
+# ==================
+# === URL e WSGI ===
+# ==================
 ROOT_URLCONF = 'core.urls'
+WSGI_APPLICATION = 'core.wsgi.application'
 
-SITE_ID = int(os.environ.get('DJANGO_SITE_ID', 1))
-
+# =================
+# === Templates ===
+# =================
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [
-            os.path.join(BASE_DIR, 'templates'),
-        ],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -129,84 +139,50 @@ TEMPLATES = [
     },
 ]
 
+# ========================
+# === Database and ORM ===
+# ========================
+DATABASES = {}
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-WSGI_APPLICATION = 'core.wsgi.application'
-
-
-if DEBUG:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
-else:
-    DB_USER = os.getenv('DB_USER', '')
-    DB_NAME = os.getenv('DB_NAME', '')
-    DB_HOST = os.getenv('DB_HOST', '')
-    DB_PORT = os.getenv('DB_PORT', '')
-    DB_ENGINE = os.getenv('DB_ENGINE', '')
-    DB_PASSWORD = os.getenv('DB_PASSWORD', '')
-
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.' + DB_ENGINE,
-            'NAME': DB_NAME,
-            'USER': DB_USER,
-            'PASSWORD': DB_PASSWORD,
-            'HOST': DB_HOST,
-            'PORT': DB_PORT,
-        }
-    }
-
+# ===============================
+# === Security and Validators ===
+# ===============================
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-
-USE_TZ = True
+# =========================================
+# === Language and Internationalization ===
+# =========================================
 USE_I18N = True
+USE_TZ = True
+TIME_ZONE = os.getenv('DJANGO_TIME_ZONE', 'America/Recife')
+LANGUAGE_CODE = os.getenv('DJANGO_LANGUAGE_CODE', 'pt-BR')
+LANGUAGES = (('pt-br', 'Português'), ('en', 'English'))
+LOCALE_PATHS = [BASE_DIR / 'locale']
 
-TIME_ZONE = os.environ.get('DJANGO_TIME_ZONE', 'America/Recife')
-LANGUAGE_CODE = os.environ.get('DJANGO_LANGUAGE_CODE', 'pt-BR')
-
-LANGUAGES = (
-    ('pt-br', 'Português'),
-    ('en', 'English'),
-)
-
-LOCALE_PATHS = [
-    BASE_DIR / 'locale',
-]
-
+# ==============================
+# === Static files and Media === 
+# ==============================
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 STATIC_URL = 'static/'
-STATIC_ROOT = os.environ.get('DJANGO_STATIC_ROOT', '/usr/share/nginx/html')
-
-if DEBUG:
-    STATICFILES_DIRS = [
-        os.path.join(BASE_DIR, 'static'),
-    ]
-
+STATIC_ROOT = os.getenv('DJANGO_STATIC_ROOT', '/usr/share/nginx/html')
 STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+if DEBUG:
+    STATICFILES_DIRS = [BASE_DIR / 'static']
 
+# ===============================
+# === Authentication Backends ===
+# ===============================
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
+    'django.contrib.auth.backends.ModelBackend'
 ]
 
 ACCOUNT_FORMS = {
