@@ -18,9 +18,6 @@ class MiddleView(View):
     def get(self, request, short_code) -> HttpResponse:
         url = get_object_or_404(Url, short_code=short_code)
 
-        if url.created_by.username == 'jonathas.cardoso':
-            return redirect(url.original_url)
-
         return render(request, 'converter/middle.html', {
             'redirect_url': url.original_url
         })
