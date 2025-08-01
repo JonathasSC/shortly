@@ -4,8 +4,6 @@ services:
     build: 
       context: ./src
       dockerfile: Dockerfile
-      args:
-      - DJANGO_SETTINGS_MODULE=core.settings.prod
     env_file:
       - ./src/prod.env
     restart: always

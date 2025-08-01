@@ -1,17 +1,17 @@
-from core.settings import base
+from .base import *
 import os
 
 # ============================
 # === Django Base Settings ===
 # ============================
-base.DEBUG = False
-base.SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
-base.ALLOWED_HOSTS = [host for host in os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',') if host]
+DEBUG = False
+SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
+ALLOWED_HOSTS = [host for host in os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',') if host]
 
 # ========================
 # === Database and ORM ===
 # ========================
-base.DATABASES = {
+DATABASES = {
     'default': {
         'ENGINE'  : 'django.db.backends.' + os.getenv('DB_ENGINE'),
         'NAME'    : os.getenv('DB_NAME', ''),
@@ -22,4 +22,4 @@ base.DATABASES = {
     }
 }
 
-print(base.DATABASES)
+print(DATABASES)
