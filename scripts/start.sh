@@ -174,10 +174,10 @@ run_start() {
     $DOCKER_COMPOSE build shortly
     $DOCKER_COMPOSE up -d shortly
 
-    collect_staticfiles
     make_migrations
     apply_migrations
     create_superuser_if_not_exists
+    collect_staticfiles
     print_header "Deploy Finalizado com Sucesso 🎉"
 }
 
