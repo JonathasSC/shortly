@@ -1,4 +1,5 @@
 import os
+import sys
 from pathlib import Path
 from dotenv import load_dotenv as loadenv
 
@@ -7,17 +8,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 env_file = os.environ.get('DJANGO_ENV_FILE')
 
 if not env_file:
-    loadenv(dotenv_path=BASE_DIR / 'dev.env')
+    loadenv(dotenv_path=BASE_DIR / 'prod.env')
 loadenv(dotenv_path=env_file)
 
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 DEBUG = True if os.environ.get('DJANGO_DEBUG') == 'TRUE' else False
 
 ALLOWED_HOSTS = [host for host in os.environ.get(
-    'DJANGO_ALLOWED_HOSTS', '').split(',') if host]
+    'DJANGO_ALLOWED_HOSTS').split(',') if host]
 
 CSRF_TRUSTED_ORIGINS = [origin for origin in os.environ.get(
-    'DJANGO_CSRF_TRUSTED_ORIGINS', '').split(',') if origin]
+    'DJANGO_CSRF_TRUSTED_ORIGINS').split(',') if origin]
 
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO").upper()
 LOG_DIR = os.environ.get("LOG_DIR", "logs")
@@ -139,14 +140,16 @@ if DEBUG:
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
         }
-    }
+    } 
+    if 'test' in sys.argv:
+        DATABASES['default']['NAME'] = ':memory:'
 else:
-    DB_USER = os.getenv('DB_USER', '')
-    DB_NAME = os.getenv('DB_NAME', '')
-    DB_HOST = os.getenv('DB_HOST', '')
-    DB_PORT = os.getenv('DB_PORT', '')
-    DB_ENGINE = os.getenv('DB_ENGINE', '')
-    DB_PASSWORD = os.getenv('DB_PASSWORD', '')
+    DB_USER = os.getenv('DB_USER')
+    DB_NAME = os.getenv('DB_NAME')
+    DB_HOST = os.getenv('DB_HOST')
+    DB_PORT = os.getenv('DB_PORT')
+    DB_ENGINE = os.getenv('DB_ENGINE')
+    DB_PASSWORD = os.getenv('DB_PASSWORD')
 
     DATABASES = {
         'default': {
