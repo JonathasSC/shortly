@@ -26,7 +26,7 @@ class MiddleView(View):
 
         request.session[f"token_{token}"] = {
             "timestamp": timestamp,
-            "target_url": url.destination_url
+            "target_url": url.original_url
         }
 
         return render(request, 'converter/middle.html', {
