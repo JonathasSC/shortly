@@ -8,6 +8,8 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /usr/src
 
+ENV PYTHONPATH="/usr/src/src:$PYTHONPATH"
+
 RUN apt-get update && apt-get install -y \
     gcc \
     default-libmysqlclient-dev \
