@@ -1,6 +1,10 @@
 {% extends 'shared/base.html' %}
 {% load static %}
 
+{% block extrahead %} 
+<meta http-equiv="refresh" content="5;url={{ redirect_url }}">
+{% endblock %}
+
 {% block content %}
 <div class="flex flex-col items-center justify-center min-h-screen px-4 text-center">
     <h1 class="text-3xl font-semibold text-gray-800 mb-4">
@@ -20,8 +24,6 @@
     const counter = document.getElementById('counter');
     const urlUtils = new UrlUtils();
     const timerUtils = new TimerUtils();
-
-    urlUtils.delayRedirect(5000, "{{ redirect_url }}");
     timerUtils.secondTimer(6, counter);
 </script>
 {% endblock %}

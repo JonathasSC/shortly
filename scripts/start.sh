@@ -125,6 +125,12 @@ up_containers() {
     log_success "Containers levantados com sucesso"
 }
 
+collect_staticfiles() {
+    log "Coletando arquivos estaticos..."
+    $DOCKER_COMPOSE exec $SERVICE_NAME python3 manage.py collectstatic --no-input
+    log_success "Arquivos estaticos coletados"
+}
+
 make_migrations() {
     log "Aplicando migracoes no Django..."
     $DOCKER_COMPOSE exec $SERVICE_NAME python3 manage.py makemigrations
@@ -171,6 +177,7 @@ run_start() {
     make_migrations
     apply_migrations
     create_superuser_if_not_exists
+    collect_staticfiles
     print_header "Deploy Finalizado com Sucesso 🎉"
 }
 

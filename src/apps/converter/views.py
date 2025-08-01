@@ -1,30 +1,61 @@
-from django.views.generic.base import RedirectView
-from django.views import View
 from .models import Url
-from django.shortcuts import render, redirect
 from .forms import UrlForm
 from apps.converter.utils import UserRequestUtil
+
+from django.shortcuts import render, redirect
+from django.views import View
 from django.utils.timezone import now
-from datetime import timedelta
 from django.shortcuts import get_object_or_404
 from django.contrib import messages
 from django.utils.safestring import mark_safe
-from time import sleep
-from django.http import HttpResponse
+from django.utils import timezone
+from django.http import HttpResponse, HttpResponseForbidden
+from django.urls import reverse
+
+from datetime import timedelta
+import secrets
+
 user_request_util = UserRequestUtil()
 
 
 class MiddleView(View):
     def get(self, request, short_code) -> HttpResponse:
         url = get_object_or_404(Url, short_code=short_code)
+        token = secrets.token_urlsafe(16)
+        timestamp = timezone.now().timestamp()
 
-        if url.created_by.username == 'jonathas.cardoso':
-            return redirect(url.original_url)
+        request.session[f"token_{token}"] = {
+            "timestamp": timestamp,
+            "target_url": url.original_url
+        }
 
         return render(request, 'converter/middle.html', {
-            'redirect_url': url.original_url
+            "redirect_url": reverse("confirm_redirect") + f"?token={token}",
         })
 
+
+class ConfirmRedirectView(View):
+    def get(self, request):
+        token = request.GET.get("token")
+        if not token:
+            return HttpResponseForbidden("Token inválido")
+
+        data = request.session.get(f"token_{token}")
+        if not data:
+            return HttpResponseForbidden("Token não encontrado")
+
+        timestamp = data.get("timestamp")
+        target_url = data.get("target_url")
+
+        if not target_url or timestamp is None:
+            return HttpResponseForbidden("Dados incompletos")
+
+        now = timezone.now().timestamp()
+        if now - timestamp < 5:
+            return HttpResponseForbidden("Aguarde mais alguns segundos")
+
+        del request.session[f"token_{token}"]
+        return redirect(target_url)
 
 class HomeView(View):
     def get(self, request):
