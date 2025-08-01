@@ -42,8 +42,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     default-libmysqlclient-dev \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder /install /usr/local
-
 COPY . /usr/src
 
 RUN python manage.py collectstatic --noinput
