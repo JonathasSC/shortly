@@ -1,5 +1,11 @@
 name: Continuous Integration
 
+env:
+  DB_ENGINE: sqlite3
+  DB_NAME: ':memory:'
+  DJANGO_DEBUG: TRUE
+  DJANGO_SECRET_KEY: 'insecure-default-key'
+
 on:
   push:
     branches: [ main, develop ]
@@ -21,8 +27,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y jq unzip
-          
-      - uses: actions/checkout@v4
+        
+      - name: Checkout Python
       - uses: actions/setup-python@v5
         with:
           python-version-file: './src/pyproject.toml'

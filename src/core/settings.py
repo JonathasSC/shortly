@@ -12,7 +12,7 @@ if not env_file:
 loadenv(dotenv_path=env_file)
 
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '')
-DEBUG = True if os.environ.get('DJANGO_DEBUG', '') == 'TRUE' else False
+DEBUG = True if os.environ.get('DJANGO_DEBUG', 'FALSE') == 'TRUE' else False
 
 ALLOWED_HOSTS = [host for host in os.environ.get(
     'DJANGO_ALLOWED_HOSTS', '').split(',') if host]
