@@ -141,19 +141,24 @@ if DEBUG:
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
-    if 'test' in sys.argv:
-        DATABASES['default']['NAME'] = ':memory:'
+elif 'test' in sys.argv:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': ':memory:',
+        }
+    }
 else:
+    DB_ENGINE = os.getenv('DB_ENGINE', 'sqlite3')
+    DB_NAME = os.getenv('DB_NAME', BASE_DIR / 'db.sqlite3')
     DB_USER = os.getenv('DB_USER', '')
-    DB_NAME = os.getenv('DB_NAME', '')
+    DB_PASSWORD = os.getenv('DB_PASSWORD', '')
     DB_HOST = os.getenv('DB_HOST', '')
     DB_PORT = os.getenv('DB_PORT', '')
-    DB_ENGINE = os.getenv('DB_ENGINE', '')
-    DB_PASSWORD = os.getenv('DB_PASSWORD', '')
 
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.' + DB_ENGINE,
+            'ENGINE': f'django.db.backends.{DB_ENGINE}',
             'NAME': DB_NAME,
             'USER': DB_USER,
             'PASSWORD': DB_PASSWORD,
