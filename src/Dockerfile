@@ -23,7 +23,7 @@ RUN sh /uv-installer.sh && rm /uv-installer.sh
 
 ENV PATH="/root/.local/bin/:$PATH"
 
-COPY pyproject.toml .
+COPY pyproject.toml ./
 
 RUN uv pip install . --system --no-build-isolation
 
@@ -41,6 +41,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev \
     default-libmysqlclient-dev \
     && rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /usr/local /usr/local
 
 COPY . /usr/src
 
