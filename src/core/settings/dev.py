@@ -1,4 +1,4 @@
-from src.core.settings import base
+from core.settings import base
 import os
 
 # ============================
