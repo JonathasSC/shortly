@@ -2,6 +2,8 @@ from django.db import models
 from .utils import ShortCodeGenerator
 from django.core.validators import URLValidator
 from django.contrib.auth import get_user_model
+from django.utils import timezone
+from datetime import timedelta
 
 short_code_generator: ShortCodeGenerator = ShortCodeGenerator(length=8)
 
@@ -22,6 +24,12 @@ class Url(models.Model):
         auto_now_add=True
     )
 
+    expires_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Data/hora em que o link expira"
+    )
+
     created_by = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
@@ -39,7 +47,12 @@ class Url(models.Model):
         if not self.short_code:
             self.short_code = short_code_generator.generate_unique(
                 Url, 'short_code')
+        if not self.expires_at:
+            self.expires_at = timezone.now() + timedelta(days=7)
         super().save(*args, **kwargs)
+
+    def is_expired(self) -> bool:
+        return self.expires_at and timezone.now() > self.expires_at
 
     def __str__(self):
         return f"{self.short_code} -> {self.original_url}"

@@ -6,6 +6,7 @@ from dotenv import load_dotenv as loadenv
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 env_file = os.environ.get('DJANGO_ENV_FILE')
+print(env_file)
 
 if not env_file:
     loadenv(dotenv_path=BASE_DIR / 'dev.env')
@@ -220,3 +221,5 @@ AUTHENTICATION_BACKENDS = [
 ACCOUNT_FORMS = {
     'login': 'apps.account.forms.CustomLoginForm',
 }
+
+CELERY_BROKER_URL = f"amqp://{os.environ.get('CELERY_BROKER_USER')}:{os.environ.get('CELERY_BROKER_PASS')}@localhost:5672//"

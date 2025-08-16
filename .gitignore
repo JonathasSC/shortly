@@ -105,9 +105,11 @@ celerybeat-schedule.*
 *.sage.py 
 
 # Environments 
-*.env 
+.env
+.env.*
 .env 
 .venv 
+!.env.example
 env/ 
 venv/ 
 ENV/ 
@@ -147,3 +149,8 @@ GitHub.sublime-settings
 
 data/
 whitelist.conf
+
+# Message Broker
+rabbitmq.conf
+definitions.json
+.env
