@@ -34,7 +34,8 @@ services:
       - shortly_net
 
   rabbitmq:
-    build: 
+    container_name: shortly-rabbitmq
+    build:
       context: ./infra/rabbitmq
       dockerfile: Dockerfile
     restart: always
@@ -79,24 +80,26 @@ services:
     restart: always
 
   flower:
-    image: mher/flower
+    build:
+      context: ./src
+      dockerfile: Dockerfile
     container_name: shortly-flower
     command: celery -A core flower --port=5555 --broker=${CELERY_BROKER_URL}
     ports:
       - "5555:5555"
-    volumes:
-      - ./src:/usr/src/app
+    env_file:
+      - ./src/.env.prod
     working_dir: /usr/src/app
     depends_on:
       - rabbitmq
       - celery_beat
       - celery_worker
-    env_file:
-      - ./src/.env.prod
-    restart: always
+    networks:
+      - shortly_net
 
   certbot:
     image: certbot/certbot:latest
+    container_name: shortly-certbot
     volumes:
       - ./data/certbot/conf:/etc/letsencrypt
       - ./data/certbot/www:/var/www/certbot
