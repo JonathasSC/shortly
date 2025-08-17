@@ -75,7 +75,7 @@ services:
       - ./src/.env.prod
     networks:
       - shortly_net
-      
+
   flower:
     image: mher/flower
     command: celery -A core flower --port=5555
@@ -83,6 +83,7 @@ services:
       - "5555:5555"
     depends_on:
       - rabbitmq
+      - celery_beat
       - celery_worker
     env_file:
       - ./src/.env.prod
