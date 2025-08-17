@@ -96,6 +96,8 @@ services:
       - celery_worker
     networks:
       - shortly_net
+    restart: always
+
 
   certbot:
     image: certbot/certbot:latest
