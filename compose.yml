@@ -50,7 +50,7 @@ services:
       context: ./src
       dockerfile: Dockerfile
     container_name: shortly-celery-worker
-    command: celery -A core worker -l info
+    command: celery -A core.celery worker -l info
     volumes:
       - ./src:/usr/src/app
     depends_on:
@@ -67,7 +67,7 @@ services:
       context: ./src
       dockerfile: Dockerfile
     container_name: shortly-celery-beat
-    command: celery -A core beat -l info
+    command: celery -A core.celery beat -l info
     volumes:
       - ./src:/usr/src/app
     depends_on:
@@ -84,7 +84,7 @@ services:
       context: ./src
       dockerfile: Dockerfile
     container_name: shortly-flower
-    command: celery -A core flower --port=5555 --broker=${CELERY_BROKER_URL}
+    command: celery -A core.celery flower --port=5555 --broker=${CELERY_BROKER_URL}
     ports:
       - "5555:5555"
     env_file:
