@@ -222,4 +222,4 @@ ACCOUNT_FORMS = {
     'login': 'apps.account.forms.CustomLoginForm',
 }
 
-CELERY_BROKER_URL = f"amqp://{os.environ.get('CELERY_BROKER_USER')}:{os.environ.get('CELERY_BROKER_PASS')}@localhost:5672//"
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL')
