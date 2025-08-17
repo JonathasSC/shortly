@@ -43,13 +43,44 @@ services:
       - "15672:15672"
     networks:
       - shortly_net
-    
+
+  celery_worker:
+    build: 
+      context: ./src
+      dockerfile: Dockerfile
+    container_name: shortly-celery-worker
+    command: celery -A core worker -l info
+    volumes:
+      - ./src:/usr/src/app
+    depends_on:
+      - django
+      - rabbitmq
+    env_file:
+      - ./src/.env.prod
+    networks:
+      - shortly_net
+
+  celery_beat:
+    build: 
+      context: ./src
+      dockerfile: Dockerfile
+    container_name: shortly-celery-beat
+    command: celery -A core beat -l info
+    volumes:
+      - ./src:/usr/src/app
+    depends_on:
+      - django
+      - rabbitmq
+    env_file:
+      - ./src/.env.prod
+    networks:
+      - shortly_net
+
   certbot:
     image: certbot/certbot:latest
     volumes:
       - ./data/certbot/conf:/etc/letsencrypt
       - ./data/certbot/www:/var/www/certbot
-
 
 networks:
   shortly_net:
