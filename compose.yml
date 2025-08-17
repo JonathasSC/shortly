@@ -59,6 +59,7 @@ services:
       - ./src/.env.prod
     networks:
       - shortly_net
+    restart: always
 
   celery_beat:
     build: 
@@ -75,8 +76,10 @@ services:
       - ./src/.env.prod
     networks:
       - shortly_net
+    restart: always
 
   flower:
+    container_name: flower
     image: mher/flower
     command: celery -A core flower --port=5555
     ports:
@@ -87,6 +90,7 @@ services:
       - celery_worker
     env_file:
       - ./src/.env.prod
+    restart: always
 
   certbot:
     image: certbot/certbot:latest
