@@ -50,10 +50,12 @@ services:
       context: ./src
       dockerfile: Dockerfile
     container_name: shortly-celery-worker
-    command: celery -A src.core.celery worker -l info
+    command: celery -A core.celery worker -l info
     working_dir: /usr/src/app
     volumes:
       - ./src:/usr/src/app
+    environment:
+      - PYTHONPATH=/usr/src/app
     depends_on:
       - shortly
       - rabbitmq
@@ -62,6 +64,7 @@ services:
     networks:
       - shortly_net
     restart: always
+
 
   celery_beat:
     build: 
