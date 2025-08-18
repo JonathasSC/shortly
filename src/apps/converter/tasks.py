@@ -1,4 +1,4 @@
-from apps.converter.models import Url
+from .models import Url
 from celery import shared_task
 from django.utils import timezone
 
