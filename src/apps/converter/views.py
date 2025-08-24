@@ -57,6 +57,7 @@ class ConfirmRedirectView(View):
         del request.session[f"token_{token}"]
         return redirect(target_url)
 
+
 class HomeView(View):
     def get(self, request):
         url_form = UrlForm()

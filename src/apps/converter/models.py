@@ -10,7 +10,7 @@ short_code_generator: ShortCodeGenerator = ShortCodeGenerator(length=8)
 
 class Url(models.Model):
     original_url = models.URLField(
-        max_length=500,
+        max_length=4096,
         validators=[URLValidator()]
     )
 
