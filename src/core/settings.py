@@ -89,6 +89,7 @@ INSTALLED_APPS = [
     'django_celery_beat',
 
     'apps.converter',
+    'apps.dashboard',
     'apps.account'
 ]
 
