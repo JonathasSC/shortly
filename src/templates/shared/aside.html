@@ -1,0 +1,33 @@
+{% load static i18n %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Minha Aplicação{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'converter/form.css' %}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    {% block extrahead %}{% endblock %}
+</head>
+<body class="bg-white min-h-screen flex flex-col">
+
+    {% block header %}
+        {% include 'shared/header.html' %}
+    {% endblock %}
+
+    <div class="flex flex-1">
+        {% include 'shared/aside.html' %}
+        
+        <main class="flex-1 p-6">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    {% block footer %}
+        {% include 'shared/footer.html' %}
+    {% endblock %}
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>
