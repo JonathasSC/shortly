@@ -171,8 +171,8 @@ run_start() {
     $DOCKER_COMPOSE up -d nginx
 
     print_header "Build e up dos demais containers"
-    $DOCKER_COMPOSE build
-    $DOCKER_COMPOSE up -d
+    build_containers
+    up_containers
 
     make_migrations
     apply_migrations
