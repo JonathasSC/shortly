@@ -15,8 +15,7 @@ loadenv(dotenv_path=env_file)
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '')
 DEBUG = True if os.environ.get('DJANGO_DEBUG', 'FALSE') == 'TRUE' else False
 
-ALLOWED_HOSTS = [host for host in os.environ.get(
-    'DJANGO_ALLOWED_HOSTS', '').split(',') if host]
+ALLOWED_HOSTS = [host for host in os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',') if host]
 
 CSRF_TRUSTED_ORIGINS = [origin for origin in os.environ.get(
     'DJANGO_CSRF_TRUSTED_ORIGINS', '').split(',') if origin]

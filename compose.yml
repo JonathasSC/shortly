@@ -5,7 +5,7 @@ services:
       context: ./src
       dockerfile: Dockerfile
     env_file:
-      - ./src/.env.prod
+      - ${ENV_FILE} 
     restart: always
     volumes:
       - ./src/logs:/usr/src/logs
@@ -23,7 +23,8 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx/shortly.conf:/etc/nginx/conf.d/shortly.conf
+      # - ./nginx/shortly.dev.conf:/etc/nginx/conf.d/shortly.conf
+      - ./nginx/shortly.prod.conf:/etc/nginx/conf.d/shortly.conf
       - ./nginx/whitelist.conf:/etc/nginx/whitelist.conf:ro
       - ./data/certbot/conf:/etc/letsencrypt
       - ./data/certbot/www:/var/www/certbot
@@ -51,16 +52,16 @@ services:
       dockerfile: Dockerfile
     container_name: shortly-celery-worker
     command: celery -A core.celery worker -l info
-    working_dir: /usr/src/app
+    working_dir: /usr/src
     volumes:
-      - ./src:/usr/src/app
+      - ./src:/usr/src
     environment:
-      - PYTHONPATH=/usr/src/app
+      - PYTHONPATH=/usr/src
     depends_on:
       - shortly
       - rabbitmq
     env_file:
-      - ./src/.env.prod
+      - ${ENV_FILE} 
     networks:
       - shortly_net
     restart: always
@@ -71,16 +72,14 @@ services:
       dockerfile: Dockerfile
     container_name: shortly-celery-beat
     command: celery -A core.celery beat -l info
-    working_dir: /usr/src/app
+    working_dir: /usr/src
     volumes:
-      - ./src:/usr/src/app
-    environment:
-      - PYTHONPATH=/usr/src/app
+      - ./src:/usr/src
     depends_on:
       - shortly
       - rabbitmq
     env_file:
-      - ./src/.env.prod
+      - ${ENV_FILE} 
     networks:
       - shortly_net
     restart: always
@@ -90,13 +89,15 @@ services:
       context: ./src
       dockerfile: Dockerfile
     container_name: shortly-flower
+    command: >
+      celery --app=core.celery flower
+      --port=5555
+      --broker=${CELERY_BROKER_URL}
     ports:
       - "5555:5555"
     env_file:
       - ./src/.env.prod
     working_dir: /usr/src/app
-    environment:
-      - PYTHONPATH=/usr/src/app
     depends_on:
       - rabbitmq
       - celery_beat
