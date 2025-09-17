@@ -75,6 +75,9 @@ services:
     working_dir: /usr/src
     volumes:
       - ./src:/usr/src
+      - ./src:/usr/src/app
+    environment:
+      - PYTHONPATH=/usr/src/app
     depends_on:
       - shortly
       - rabbitmq
@@ -90,14 +93,12 @@ services:
       dockerfile: Dockerfile
     container_name: shortly-flower
     command: >
-      celery --app=core.celery flower
-      --port=5555
-      --broker=${CELERY_BROKER_URL}
+      celery --app=core.celery flower --port=5555
     ports:
       - "5555:5555"
     env_file:
-      - ./src/.env.prod
-    working_dir: /usr/src/app
+      - ${ENV_FILE}
+    working_dir: /usr/src
     depends_on:
       - rabbitmq
       - celery_beat
