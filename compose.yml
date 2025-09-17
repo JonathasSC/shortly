@@ -35,14 +35,14 @@ services:
       - shortly_net
 
   rabbitmq:
-    image: rabbitmq:3-management
     container_name: shortly-rabbitmq
+    build:
+      context: ./infra/rabbitmq
+      dockerfile: Dockerfile
     restart: always
     ports:
       - "5672:5672"
       - "15672:15672"
-    env_file:
-      - ./src/.env.prod
     networks:
       - shortly_net
 
@@ -66,6 +66,7 @@ services:
       - shortly_net
     restart: always
 
+
   celery_beat:
     build: 
       context: ./src
@@ -75,9 +76,6 @@ services:
     working_dir: /usr/src
     volumes:
       - ./src:/usr/src
-      - ./src:/usr/src/app
-    environment:
-      - PYTHONPATH=/usr/src/app
     depends_on:
       - shortly
       - rabbitmq
@@ -105,7 +103,6 @@ services:
       - celery_worker
     networks:
       - shortly_net
-    command: celery -A core.celery flower --port=5555
     restart: always
 
   certbot:
