@@ -2,6 +2,7 @@ import os
 import sys
 from pathlib import Path
 from dotenv import load_dotenv as loadenv
+from celery.schedules import crontab
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -223,4 +224,23 @@ ACCOUNT_FORMS = {
     'login': 'apps.account.forms.CustomLoginForm',
 }
 
-CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL')
+# ex: amqp://user:pass@rabbitmq:5672//
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL")
+
+CELERY_RESULT_BACKEND = None
+
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+
+CELERY_TIMEZONE = "America/Sao_Paulo"
+CELERY_TRACK_STARTED = True
+CELERY_IGNORE_RESULT = False
+
+
+CELERY_BEAT_SCHEDULE = {
+    "delete-expired-urls-every-hour": {
+        "task": "apps.converter.tasks.delete_expired_urls",
+        "schedule": crontab(minute=0, hour="*"),
+    },
+}
