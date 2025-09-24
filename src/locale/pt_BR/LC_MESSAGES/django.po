@@ -104,8 +104,6 @@ msgid "Login"
 msgstr "Entrar"
 
 #: shared/templates/shared/header.html:12
-#, fuzzy
-#| msgid "Create your account!"
 msgid "Create Account"
 msgstr "Crie sua conta!"
 
