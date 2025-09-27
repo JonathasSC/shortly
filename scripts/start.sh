@@ -14,6 +14,7 @@ load_env_vars(){
   log "Carregando variaveis de ambiente do $ENV_FILE"
   set -a
   source "$ENV_FILE"
+  export ENV_FILE="$ENV_FILE"
   set +a
 }
 
