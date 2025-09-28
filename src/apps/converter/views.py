@@ -17,7 +17,6 @@ from apps.converter.models import Url, AccessEvent
 
 
 user_request_util = UserRequestUtil()
-access_event = AccessEvent()
 
 
 class MiddleView(View):
@@ -27,7 +26,7 @@ class MiddleView(View):
         timestamp = timezone.now().timestamp()
         ip_address = user_request_util.get_client_ip(request)
 
-        access_event.objects.create(
+        AccessEvent.objects.create(
             url=url,
             ip_address=ip_address
         )
