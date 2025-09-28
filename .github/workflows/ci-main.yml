@@ -41,8 +41,5 @@ jobs:
       - name: Install the project dependencies
         run: uv sync --locked --all-extras --dev
 
-      - name: Run Django tests | apps.converter
-        run: .venv/bin/python manage.py test apps.converter.tests
-
-      - name: Run Django tests | apps.account
-        run: .venv/bin/python manage.py test apps.account.tests
+      - name: Run Django tests
+        run: .venv/bin/python manage.py test
