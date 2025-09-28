@@ -2,6 +2,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Sum
 from django.shortcuts import render
 from django.views import View
+from django.db.models import Count
 
 from apps.converter.models import AccessEvent, Url
 
@@ -17,12 +18,11 @@ class DashboardHomeView(LoginRequiredMixin, View):
         total_links = user_links.count()
 
         total_accesses = AccessEvent.objects.filter(
-            url__in=user_links).aggregate(total=Sum('counter'))['total'] or 0
+            url__in=user_links).count()
 
-        from django.db.models import Sum as SumAgg
-
-        recent_links = user_links.annotate(clicks=SumAgg(
-            'accessevent__counter')).order_by('-created_at')
+        recent_links = user_links.annotate(
+            clicks=Count('accessevent')
+        ).order_by('-created_at')
 
         context = {
             "user_links": user_links,
