@@ -30,3 +30,8 @@ package-dir = { "" = "." }
 where = ["."]
 include = ["core*", "apps*", "shortly*"]
 exclude = ["locale*", "templates*", "static*", "logs*"]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.13.2",
+]
