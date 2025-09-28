@@ -1,6 +1,7 @@
-from django.test import TestCase
-from apps.converter.models import Url
 from django.contrib.auth.models import User
+from django.test import TestCase
+
+from apps.converter.models import Url
 
 
 class UrlModelTestCase(TestCase):

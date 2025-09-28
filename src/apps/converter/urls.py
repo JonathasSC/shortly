@@ -1,5 +1,6 @@
 from django.urls import path
-from .views import HomeView, MiddleView, ConfirmRedirectView
+
+from .views import ConfirmRedirectView, HomeView, MiddleView
 
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),

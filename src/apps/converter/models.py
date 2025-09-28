@@ -1,9 +1,11 @@
-from django.db import models
-from .utils import ShortCodeGenerator
-from django.core.validators import URLValidator
-from django.contrib.auth import get_user_model
-from django.utils import timezone
 from datetime import timedelta
+
+from django.contrib.auth import get_user_model
+from django.core.validators import URLValidator
+from django.db import models
+from django.utils import timezone
+
+from .utils import ShortCodeGenerator
 
 short_code_generator: ShortCodeGenerator = ShortCodeGenerator(length=8)
 
@@ -62,4 +64,3 @@ class AccessEvent(models.Model):
     url = models.ForeignKey(Url, on_delete=models.CASCADE)
     ip_address = models.TextField(max_length=15)
     created_at = models.DateTimeField(auto_now_add=True)
-    counter = models.PositiveBigIntegerField()

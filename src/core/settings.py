@@ -1,28 +1,44 @@
 import os
 import sys
 from pathlib import Path
-from dotenv import load_dotenv as loadenv
+
 from celery.schedules import crontab
+from dotenv import load_dotenv as loadenv
 
+# ================================================================
+# BASE DIRECTORIES
+# ================================================================
 BASE_DIR = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = os.path.dirname(__file__)
+sys.path.insert(0, os.path.join(PROJECT_ROOT, 'apps'))
 
-env_file = os.environ.get('DJANGO_ENV_FILE')
+# ================================================================
+# ENVIRONMENT VARIABLES
+# ================================================================
+loadenv(dotenv_path=BASE_DIR / '.env.prod')
 
-if not env_file:
-    loadenv(dotenv_path=BASE_DIR / '.env.dev')
-loadenv(dotenv_path=env_file)
-
+# ================================================================
+# SECURITY
+# ================================================================
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '')
 DEBUG = True if os.environ.get('DJANGO_DEBUG', 'FALSE') == 'TRUE' else False
+ALLOWED_HOSTS = [
+    host for host in os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',') if host
+]
+CSRF_TRUSTED_ORIGINS = [
+    origin for origin in os.environ.get('DJANGO_CSRF_TRUSTED_ORIGINS', '').split(',') if origin
+]
 
-ALLOWED_HOSTS = [host for host in os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',') if host]
+SECURE_CROSS_ORIGIN_OPENER_POLICY = os.environ.get(
+    'DJANGO_SECURE_CROSS_ORIGIN_OPENER_POLICY')
+SECURE_SSL_REDIRECT = True if os.environ.get(
+    'DJANGO_SECURE_SSL_REDIRECT') == 'TRUE' else False
 
-CSRF_TRUSTED_ORIGINS = [origin for origin in os.environ.get(
-    'DJANGO_CSRF_TRUSTED_ORIGINS', '').split(',') if origin]
-
+# ================================================================
+# LOGGING
+# ================================================================
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO").upper()
 LOG_DIR = os.environ.get("LOG_DIR", "logs")
-
 os.makedirs(LOG_DIR, exist_ok=True)
 
 LOGGING = {
@@ -38,7 +54,6 @@ LOGGING = {
             "style": "{",
         },
     },
-
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
@@ -56,12 +71,10 @@ LOGGING = {
             "formatter": "verbose",
         },
     },
-
     "root": {
         "handlers": ["console", "file", "error_file"],
         "level": LOG_LEVEL,
     },
-
     "loggers": {
         "django": {
             "handlers": ["console", "file", "error_file"],
@@ -76,8 +89,11 @@ LOGGING = {
     },
 }
 
-
+# ================================================================
+# DJANGO APPS
+# ================================================================
 INSTALLED_APPS = [
+    # Django built-in apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -85,14 +101,20 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # Third-party apps
     'widget_tweaks',
     'django_celery_beat',
 
+    # Local apps
     'apps.converter',
     'apps.dashboard',
     'apps.account'
 ]
 
+# ================================================================
+# MIDDLEWARE
+# ================================================================
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -104,23 +126,19 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-SECURE_CROSS_ORIGIN_OPENER_POLICY = os.environ.get(
-    'DJANGO_SECURE_CROSS_ORIGIN_OPENER_POLICY')
-
-SECURE_SSL_REDIRECT = True if os.environ.get(
-    'DJANGO_SECURE_SSL_REDIRECT') == 'TRUE' else False
-
-APPEND_SLASH = True
+# ================================================================
+# URLS & WSGI
+# ================================================================
 ROOT_URLCONF = 'core.urls'
+WSGI_APPLICATION = 'core.wsgi.application'
 
-SITE_ID = int(os.environ.get('DJANGO_SITE_ID', 1))
-
+# ================================================================
+# TEMPLATES
+# ================================================================
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [
-            os.path.join(BASE_DIR, 'templates'),
-        ],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -132,10 +150,9 @@ TEMPLATES = [
     },
 ]
 
-
-WSGI_APPLICATION = 'core.wsgi.application'
-
-
+# ================================================================
+# DATABASES
+# ================================================================
 if DEBUG:
     DATABASES = {
         'default': {
@@ -169,22 +186,28 @@ else:
         }
     }
 
+
+# ================================================================
+# AUTHENTICATION & PASSWORD VALIDATION
+# ================================================================
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
 
+ACCOUNT_FORMS = {
+    'login': 'apps.account.forms.CustomLoginForm',
+}
+
+# ================================================================
+# INTERNATIONALIZATION & TIMEZONE
+# ================================================================
 USE_TZ = True
 USE_I18N = True
 
@@ -200,6 +223,9 @@ LOCALE_PATHS = [
     BASE_DIR / 'locale',
 ]
 
+# ================================================================
+# STATIC & MEDIA FILES
+# ================================================================
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
@@ -213,19 +239,10 @@ if DEBUG:
 
 STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-]
-
-ACCOUNT_FORMS = {
-    'login': 'apps.account.forms.CustomLoginForm',
-}
-
-# ex: amqp://user:pass@rabbitmq:5672//
+# ================================================================
+# CELERY CONFIGURATION
+# ================================================================
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL")
-
 CELERY_RESULT_BACKEND = None
 
 CELERY_ACCEPT_CONTENT = ["json"]
@@ -235,7 +252,6 @@ CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = "America/Sao_Paulo"
 CELERY_TRACK_STARTED = True
 CELERY_IGNORE_RESULT = False
-
 
 CELERY_BEAT_SCHEDULE = {
     "delete-expired-urls-every-hour": {

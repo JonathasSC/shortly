@@ -1,21 +1,23 @@
-from .models import Url
-from .forms import UrlForm
+import secrets
+from datetime import timedelta
+
+from django.contrib import messages
+from django.http import HttpResponse, HttpResponseForbidden
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+from django.utils import timezone
+from django.utils.safestring import mark_safe
+from django.utils.timezone import now
+from django.views import View
+
 from apps.converter.utils import UserRequestUtil
 
-from django.shortcuts import render, redirect
-from django.views import View
-from django.utils.timezone import now
-from django.shortcuts import get_object_or_404
-from django.contrib import messages
-from django.utils.safestring import mark_safe
-from django.utils import timezone
-from django.http import HttpResponse, HttpResponseForbidden
-from django.urls import reverse
+from .forms import UrlForm
+from apps.converter.models import Url, AccessEvent
 
-from datetime import timedelta
-import secrets
 
 user_request_util = UserRequestUtil()
+access_event = AccessEvent()
 
 
 class MiddleView(View):
@@ -23,6 +25,12 @@ class MiddleView(View):
         url = get_object_or_404(Url, short_code=short_code)
         token = secrets.token_urlsafe(16)
         timestamp = timezone.now().timestamp()
+        ip_address = user_request_util.get_client_ip(request)
+
+        access_event.objects.create(
+            url=url,
+            ip_address=ip_address
+        )
 
         request.session[f"token_{token}"] = {
             "timestamp": timestamp,
