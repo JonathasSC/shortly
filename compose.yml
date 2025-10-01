@@ -110,8 +110,6 @@ services:
     volumes:
       - ./data/certbot/conf:/etc/letsencrypt
       - ./data/certbot/www:/var/www/certbot
-    entrypoint: "/bin/sh -c 'certbot certonly --webroot -w /var/www/certbot -d sh0rtly.com -d www.sh0rtly.com -d flower.sh0rtly.com -d rabbitmq.sh0rtly.com && tail -f /dev/null'"
-
 
 networks:
   shortly_net:
