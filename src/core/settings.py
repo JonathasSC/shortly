@@ -15,7 +15,7 @@ sys.path.insert(0, os.path.join(PROJECT_ROOT, 'apps'))
 # ================================================================
 # ENVIRONMENT VARIABLES
 # ================================================================
-loadenv(dotenv_path=BASE_DIR / '.env.prod')
+loadenv(dotenv_path=BASE_DIR / '.env.dev')
 
 # ================================================================
 # SECURITY
