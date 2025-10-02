@@ -1,10 +1,13 @@
 {% extends 'shared/base_aside.html' %}
 {% load static %}
 
+{% load i18n %}
+
+{% block header %}
+{% endblock header %}
+
 {% block content %}
 <div class="p-6 space-y-6">
-
-    <!-- Cards de métricas -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div class="bg-white shadow rounded p-4 text-center">
             <h2 class="text-lg font-bold mb-2">Meus Links</h2>
@@ -20,7 +23,6 @@
         </div>
     </div>
 
-    <!-- Tabela de links -->
     <div class="bg-white shadow rounded p-4">
         <h2 class="text-lg font-bold mb-4">Meus Links Recentes</h2>
         <div class="overflow-x-auto">
@@ -40,7 +42,9 @@
                         <td class="border px-2 py-1">{{ link.id }}</td>
                         <td class="border px-2 py-1 truncate max-w-xs">{{ link.original_url }}</td>
                         <td class="border px-2 py-1 text-blue-600">
-                            <a href="{{ link.get_short_url }}" target="_blank">{{ link.short_code }}</a>
+                            <a href="{{ request.scheme }}://{{ request.get_host }}/{{ link.short_code }}" target="_blank">
+                                {{ link.short_code }}
+                            </a>
                         </td>
                         <td class="border px-2 py-1">{{ link.clicks|default:0 }}</td>
                         <td class="border px-2 py-1">{{ link.created_at|date:"d/m/Y H:i" }}</td>

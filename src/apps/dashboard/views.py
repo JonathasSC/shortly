@@ -1,8 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Sum
+from django.db.models import Count
 from django.shortcuts import render
 from django.views import View
-from django.db.models import Count
 
 from apps.converter.models import AccessEvent, Url
 

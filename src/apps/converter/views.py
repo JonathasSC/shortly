@@ -10,11 +10,10 @@ from django.utils.safestring import mark_safe
 from django.utils.timezone import now
 from django.views import View
 
+from apps.converter.models import AccessEvent, Url
 from apps.converter.utils import UserRequestUtil
 
 from .forms import UrlForm
-from apps.converter.models import Url, AccessEvent
-
 
 user_request_util = UserRequestUtil()
 
