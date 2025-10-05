@@ -40,7 +40,7 @@ jobs:
 
             if [ -d .git ]; then
               echo 'Atualizando repositório...'
-              git pull origin main
+              sudo git pull origin main
             else
               echo 'Nenhum repositório git encontrado em /etc/shortly'
               exit 1
