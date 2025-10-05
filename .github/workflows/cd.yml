@@ -51,6 +51,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=yes -p ${EC2_SSH_PORT} ${EC2_USER}@${EC2_HOST} "
             set -euo pipefail
+            cd /etc/shortly
             echo 'Executando start.sh...'
-            sudo bash /etc/shortly/scripts/start.sh
+            sudo bash scripts/start.sh
           "
