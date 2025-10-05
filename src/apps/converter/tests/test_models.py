@@ -1,6 +1,5 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
-from django.utils import timezone
 
 from apps.converter.models import AccessEvent, Url
 
