@@ -1,7 +1,6 @@
-from django.test import TestCase, Client
 from django.contrib.auth.models import User
+from django.test import Client, TestCase
 from django.urls import reverse
-from apps.converter.models import Url
 
 
 class UrlViewTests(TestCase):

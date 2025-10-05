@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-ENV_FILE="./src/prod.env"
+ENV_FILE="./src/.env.prod"
 BACKUP_DIR="${BACKUP_DIR:-/var/backups/mysql}"
 TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
 FILENAME="mysql_backup_$TIMESTAMP.sql.gz"

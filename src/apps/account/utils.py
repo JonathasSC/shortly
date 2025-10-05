@@ -1,9 +1,10 @@
 import os
 import random
-from django.utils.text import slugify
-from datetime import datetime
 from abc import ABC
+from datetime import datetime
+
 from django.contrib.auth import authenticate, get_user_model
+from django.utils.text import slugify
 
 
 class AbstractLoginData(ABC):

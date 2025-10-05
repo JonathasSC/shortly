@@ -1,6 +1,7 @@
 from django import forms
-from .models import Url
 from django.utils.translation import gettext_lazy
+
+from .models import Url
 
 
 class UrlForm(forms.ModelForm):
