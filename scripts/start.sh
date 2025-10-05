@@ -114,16 +114,16 @@ stop_oldest_containers() {
     log_success "Containers antigos parados com sucesso"
 }
 
-build_containers() {
-    log "Iniciando build dos containers..."
-    $DOCKER_COMPOSE build
-    log_success "Build concluido com sucesso"
+build_app_containers() {
+    log "Iniciando build dos containers da aplicação (Django + Celery + Flower)..."
+    $DOCKER_COMPOSE build shortly celery_worker celery_beat flower
+    log_success "Build concluído com sucesso"
 }
 
-up_containers() {
-    log "Levantando containers..."
+up_all_containers() {
+    log "Levantando todos os containers..."
     $DOCKER_COMPOSE up -d
-    log_success "Containers levantados com sucesso"
+    log_success "Todos os containers levantados com sucesso"
 }
 
 collect_staticfiles() {
@@ -172,8 +172,8 @@ run_start() {
     $DOCKER_COMPOSE up -d nginx
 
     print_header "Build e up dos demais containers"
-    build_containers
-    up_containers
+    build_app_containers
+    up_all_containers
 
     make_migrations
     apply_migrations
