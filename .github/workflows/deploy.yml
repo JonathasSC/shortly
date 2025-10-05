@@ -1,0 +1,60 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy to EC2 via SSH
+    runs-on: ubuntu-latest
+
+    env:
+      EC2_HOST: ${{ secrets.EC2_HOST }}
+      EC2_USER: ${{ secrets.EC2_USER }}
+      EC2_SSH_PORT: ${{ secrets.EC2_SSH_PORT }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Prepare SSH key
+        uses: webfactory/ssh-agent@v0.8.1
+        with:
+          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+
+      - name: Ensure host key is known (prevents interactive prompt)
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p ${EC2_SSH_PORT} -H "${EC2_HOST}" >> ~/.ssh/known_hosts || true
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Reset and update repository
+        run: |
+          ssh -o StrictHostKeyChecking=yes -p ${EC2_SSH_PORT} ${EC2_USER}@${EC2_HOST} "
+            set -euo pipefail
+            cd /etc/shortly || { echo '/etc/shortly inexistente'; exit 1; }
+
+            if [ -d .git ]; then
+              echo 'Atualizando repositório...'
+              git pull origin main
+            else
+              echo 'Nenhum repositório git encontrado em /etc/shortly'
+              exit 1
+            fi
+          "
+
+      - name: Run start.sh script
+        run: |
+          ssh -o StrictHostKeyChecking=yes -p ${EC2_SSH_PORT} ${EC2_USER}@${EC2_HOST} "
+            set -euo pipefail
+
+            if [ -x /etc/shortly/scripts/start.sh ]; then
+              echo 'Executando start.sh...'
+              sudo bash /etc/shortly/scripts/start.sh
+            else
+              echo 'scripts/start.sh não encontrado ou não executável'
+              exit 1
+            fi
+          "
