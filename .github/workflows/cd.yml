@@ -51,12 +51,6 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=yes -p ${EC2_SSH_PORT} ${EC2_USER}@${EC2_HOST} "
             set -euo pipefail
-
-            if [ -x /etc/shortly/scripts/start.sh ]; then
-              echo 'Executando start.sh...'
-              sudo bash /etc/shortly/scripts/start.sh
-            else
-              echo 'scripts/start.sh não encontrado ou não executável'
-              exit 1
-            fi
+            echo 'Executando start.sh...'
+            sudo bash /etc/shortly/scripts/start.sh
           "
