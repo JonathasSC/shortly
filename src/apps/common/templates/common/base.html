@@ -1,0 +1,42 @@
+{% load static %}
+
+{% load i18n %}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>{% block title %}Encurtador de URL{% endblock %}</title>
+    
+    <link rel="stylesheet" type="text/css" href="{% static '/converter/form.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3184834555541287"
+     crossorigin="anonymous">
+    </script>
+    
+    {% block extrahead %}
+    {% endblock %}
+</head>
+    <body class="bg-white min-h-screen flex flex-col items-center justify-center">
+
+        {% block header %}
+            {% include 'shared/header.html' %}
+        {% endblock %}
+
+        <main class="w-full flex items-center flex-col justify-center">
+        {% block content %}
+        {% endblock %}
+        </main>
+        
+        {% block footer %}
+            {% include 'shared/footer.html' %}
+        {% endblock %}
+        
+        {% block scripts %}
+        {% endblock %}
+    </body>
+</html>
