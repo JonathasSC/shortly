@@ -39,24 +39,20 @@ class AccessEventModelTestCase(TestCase):
         event = AccessEvent.objects.create(
             url=self.url,
             ip_address='123.123.123.123',
-            counter=1
         )
 
         self.assertIsNotNone(event.pk)
         self.assertEqual(event.url, self.url)
         self.assertEqual(event.ip_address, '123.123.123.123')
-        self.assertEqual(event.counter, 1)
 
     def test_multiple_access_events(self):
         AccessEvent.objects.create(
             url=self.url,
             ip_address='111.111.111.111',
-            counter=1
         )
         AccessEvent.objects.create(
             url=self.url,
             ip_address='222.222.222.222',
-            counter=2
         )
 
         events = AccessEvent.objects.filter(url=self.url)

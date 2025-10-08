@@ -110,7 +110,8 @@ INSTALLED_APPS = [
     # Local apps
     'apps.converter',
     'apps.dashboard',
-    'apps.account'
+    'apps.account',
+    'apps.common',
 ]
 
 # ================================================================

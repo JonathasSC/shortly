@@ -20,11 +20,11 @@
 <body class="bg-white min-h-screen flex flex-col">
 
     {% block header %}
-        {% include 'shared/header.html' %}
+        {% include 'common/includes/header.html' %}
     {% endblock %}
 
     <div class="flex flex-1">
-        {% include 'shared/aside.html' %}
+        {% include 'common/includes/aside.html' %}
         
         <main class="flex-1 p-6">
             {% block content %}{% endblock %}
@@ -32,7 +32,7 @@
     </div>
 
     {% block footer %}
-        {% include 'shared/footer.html' %}
+        {% include 'common/includes/footer.html' %}
     {% endblock %}
 
     {% block scripts %}{% endblock %}

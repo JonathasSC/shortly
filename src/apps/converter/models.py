@@ -5,12 +5,12 @@ from django.core.validators import URLValidator
 from django.db import models
 from django.utils import timezone
 
-from .utils import ShortCodeGenerator
+from apps.common.models import BaseModelAbstract
+from apps.converter.utils import ShortCodeGenerator
 
 short_code_generator: ShortCodeGenerator = ShortCodeGenerator(length=8)
 
-
-class Url(models.Model):
+class Url(BaseModelAbstract):
     original_url = models.URLField(
         max_length=4096,
         validators=[URLValidator()]
@@ -60,7 +60,7 @@ class Url(models.Model):
         return f"{self.short_code} -> {self.original_url}"
 
 
-class AccessEvent(models.Model):
+class AccessEvent(BaseModelAbstract):
     url = models.ForeignKey(Url, on_delete=models.CASCADE)
     ip_address = models.TextField(max_length=15)
     created_at = models.DateTimeField(auto_now_add=True)
