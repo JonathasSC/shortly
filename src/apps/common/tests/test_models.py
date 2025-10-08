@@ -15,11 +15,18 @@ class ExampleModel(BaseModelAbstract):
 
         
 class BaseModelAbstractTest(TransactionTestCase):
+    reset_sequences = True
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        with connection.schema_editor() as schema_editor:
-            schema_editor.create_model(ExampleModel)
+
+        with connection.cursor() as cursor:
+            tables = connection.introspection.table_names(cursor)
+
+        if ExampleModel._meta.db_table not in tables:
+            with connection.schema_editor() as schema_editor:
+                schema_editor.create_model(ExampleModel)
 
     @classmethod
     def tearDownClass(cls):
