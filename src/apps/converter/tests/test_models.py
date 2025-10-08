@@ -1,26 +1,29 @@
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 
 from apps.converter.models import AccessEvent, Url
 
+User = get_user_model()
+
 
 class UrlModelTestCase(TestCase):
     def setUp(self):
-        User.objects.create_user(
+        self.user = User.objects.create_user(
             username='Example',
             email='example@email.com'
         )
 
-        user = User.objects.get(email='example@email.com')
-
-        Url.objects.create(
+        self.url = Url.objects.create(
             original_url='https://sh0rtly.com',
-            created_by=user
+            created_by=self.user
         )
 
     def test_url_create(self):
         url = Url.objects.get(original_url='https://sh0rtly.com')
         self.assertEqual(url.original_url, 'https://sh0rtly.com')
+        self.assertIsNotNone(url.short_code)
+        self.assertIsNotNone(url.expires_at)
+        self.assertFalse(url.is_expired())
 
 
 class AccessEventModelTestCase(TestCase):
@@ -55,7 +58,8 @@ class AccessEventModelTestCase(TestCase):
             ip_address='222.222.222.222',
         )
 
-        events = AccessEvent.objects.filter(url=self.url)
+        events = AccessEvent.objects.filter(
+            url=self.url).order_by('created_at')
         self.assertEqual(events.count(), 2)
         self.assertEqual(events[0].ip_address, '111.111.111.111')
         self.assertEqual(events[1].ip_address, '222.222.222.222')
