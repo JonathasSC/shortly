@@ -66,13 +66,13 @@ class ConfirmRedirectView(View):
 
 class HomeView(View):
     def get(self, request):
-        url_form = UrlForm()
+        form = UrlForm()
         return render(request, 'converter/home.html', {
-            'url_form': url_form,
+            'form': form,
         })
 
     def post(self, request):
-        url_form = UrlForm(request.POST)
+        form = UrlForm(request.POST)
 
         short_url = None
         existing_url = None
@@ -97,8 +97,8 @@ class HomeView(View):
                 '''))
                 return redirect('home')
 
-        if url_form.is_valid():
-            url_object = url_form.save(commit=False)
+        if form.is_valid():
+            url_object = form.save(commit=False)
 
             if getattr(request, 'user', None) and request.user.is_authenticated:
                 existing_url = Url.objects.filter(

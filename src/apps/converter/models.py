@@ -22,21 +22,10 @@ class Url(BaseModelAbstract):
         editable=False
     )
 
-    created_at = models.DateTimeField(
-        auto_now_add=True
-    )
-
     expires_at = models.DateTimeField(
         null=True,
         blank=True,
         help_text="Data/hora em que o link expira"
-    )
-
-    created_by = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True
     )
 
     created_by_ip = models.GenericIPAddressField(

@@ -11,11 +11,11 @@ class UrlForm(forms.ModelForm):
             'original_url'
         ]
         labels = {
-            'original_url': gettext_lazy('Your URL')
+            'original_url': gettext_lazy('Original URL')
         }
         widgets = {
             'original_url': forms.URLInput(attrs={
-                'class': 'w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500',
+                'class': 'w-full p-2 border border-zinc-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500',
                 'placeholder': gettext_lazy('Type or Paste your URL here...')
             })
         }

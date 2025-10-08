@@ -108,10 +108,10 @@ INSTALLED_APPS = [
     'django_celery_beat',
 
     # Local apps
+    'apps.common',
     'apps.converter',
     'apps.dashboard',
     'apps.account',
-    'apps.common',
 ]
 
 # ================================================================
@@ -233,11 +233,6 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 STATIC_URL = 'static/'
 STATIC_ROOT = os.environ.get('DJANGO_STATIC_ROOT', '/usr/share/nginx/html')
-
-if DEBUG:
-    STATICFILES_DIRS = [
-        os.path.join(BASE_DIR, 'static'),
-    ]
 
 STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
 
