@@ -28,7 +28,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 x: { grid: { display: false } }
             },
             plugins: {
-                legend: { display: true, labels: { color: '#374151' } },
+                legend: {
+                    display: false,
+                    labels: {
+                        color: '#374151' 
+                    }
+                },
                 tooltip: { backgroundColor: '#111827', titleColor: '#fff', bodyColor: '#fff' }
             }
         }
@@ -43,12 +48,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 label: 'Cliques por URL',
                 data: pieData,
                 backgroundColor: [
-                    'rgba(59, 130, 246, 0.6)',
-                    'rgba(16, 185, 129, 0.6)',
-                    'rgba(234, 179, 8, 0.6)',
-                    'rgba(239, 68, 68, 0.6)',
-                    'rgba(139, 92, 246, 0.6)',
-                    'rgba(16, 163, 127, 0.6)'
+                    'rgba(30, 64, 175, 0.8)',  
+                    'rgba(37, 99, 235, 0.8)',  
+                    'rgba(59, 130, 246, 0.8)',  
+                    'rgba(96, 165, 250, 0.8)', 
+                    'rgba(147, 197, 253, 0.8)',
+                    'rgba(219, 234, 254, 0.8)',
                 ],
                 borderColor: 'rgba(255, 255, 255, 1)',
                 borderWidth: 2
@@ -56,8 +61,9 @@ document.addEventListener("DOMContentLoaded", function() {
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false, 
             plugins: {
-                legend: { display: true, position: 'right', labels: { color: '#374151' } },
+                legend: { display: true, position: 'bottom', align: 'start', labels: { color: '#374151' } },
                 tooltip: {
                     callbacks: {
                         label: function(context) {

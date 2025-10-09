@@ -42,7 +42,7 @@ class DashboardHomeView(LoginRequiredMixin, View):
             .filter(clicks__gt=0)
             .order_by('-clicks')[:10]
         )
-        top_urls_labels = [url.short_code for url in top_clicked_urls]  # ou url.name, url.original_url
+        top_urls_labels = [url.short_code for url in top_clicked_urls]
         top_urls_clicks = [url.clicks for url in top_clicked_urls]
 
         recent_urls = user_urls.annotate(clicks=Count("accessevent")).order_by("-created_at")

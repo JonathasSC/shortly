@@ -1,0 +1,67 @@
+{% load static %}
+{% load i18n %}
+
+
+<div class="bg-white border border-zinc-200 flex flex-col gap-4 rounded p-4">
+    <h2 class="text-md font-semibold">Meus Links Recentes</h2>
+    <div class="overflow-x-auto">
+        <table class="min-w-full border border-zinc-200 rounded-lg table-auto border-collapse">
+            <thead>
+                <tr class="border-b border-zinc-200">
+                    <th class="px-2 py-1 text-left">URL Original</th>
+                    <th class="px-2 py-1 text-left">Short Link</th>
+                    <th class="px-2 py-1 text-center">Acessos</th>
+                    <th class="px-2 py-1 text-center">Criado em</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for link in recent_links %}
+                <tr class="hover:bg-gray-100 border-b-zinc-200">
+                    <td class="px-2 py-1">
+                        <div class="flex items-center gap-2">
+                            <p class="truncate text-sm max-w-xs">
+                                {{ link.original_url }}
+                            </p>
+                            <a
+                                href="{{ link.original_url }}"
+                                target="_blank"
+                                class="w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-200 transition"
+                            >
+                                <span class="material-symbols-outlined text-xl text-gray-700">
+                                    open_in_new
+                                </span>
+                            </a>
+                        </div>
+                    </td>
+                    <td class="px-2 py-1">
+                        <div class="flex items-center gap-2">
+                            <p id="shortCode-{{ link.uuid }}" class="bg-zinc-100 px-2 py-1 rounded-md font-mono text-sm">{{ request.scheme }}://{{ request.get_host }}/{{ link.short_code }}</p>
+
+                            <button
+                                onclick="copyToClipboard('{{ link.uuid }}')"
+                                class="w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-200 transition"
+                            >
+                                <span id="copyIcon-{{ link.uuid }}" class="material-symbols-outlined text-xl text-gray-700">
+                                    content_copy
+                                </span>
+                            </button>
+                        </div>
+                    </td>
+                    <td class="px-2 py-1 text-center">
+                        <span class="bg-zinc-100 px-2 py-1 font-bold rounded-md font-mono text-sm">
+                            {{ link.clicks|default:0 }}
+                        </span>
+                    </td>
+                    <td class="px-2 py-1 text-center text-zinc-400">{{ link.created_at|date:"d/m/Y" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="border px-2 py-1 text-center text-gray-500">
+                        Nenhum link registrado
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>

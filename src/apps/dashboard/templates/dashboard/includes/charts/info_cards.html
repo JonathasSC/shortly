@@ -1,0 +1,31 @@
+{% load static %}
+{% load i18n %}
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="bg-white border flex flex-col gap-2 border-zinc-200 rounded p-4">
+        <div class="flex items-center justify-between w-full">
+            <h2 class="text-md font-semibold">Meus Links</h2>
+            <span class="material-symbols-outlined text-zinc-400">link</span>
+        </div>
+        <p class="text-3xl font-extrabold">{{ total_links }}</p>
+        <p class="text-sm text-zinc-600">Links encurtados por você</p>
+    </div>
+
+    <div class="bg-white border flex flex-col gap-2 border-zinc-200 rounded p-4">
+        <div class="flex items-center justify-between w-full">
+            <h2 class="text-md font-semibold">Total de Acessos</h2>
+            <span class="material-symbols-outlined text-zinc-400">ads_click</span>
+        </div>
+        <p class="text-3xl font-extrabold">{{ total_accesses }}</p>
+        <p class="text-sm text-zinc-600">Total de acessos de todos os seus links</p>
+    </div>
+
+    <div class="bg-white border flex flex-col gap-2 border-zinc-200 rounded p-4">
+        <div class="flex items-center justify-between w-full">
+            <h2 class="text-md font-semibold">Links Ativos</h2>
+            <span class="material-symbols-outlined text-zinc-400">link</span>
+        </div>
+        <p class="text-3xl font-extrabold">{{ user_links|length }}</p>
+        <p class="text-sm text-zinc-600">Seus links encurtados e ativos</p>
+    </div>
+</div>
