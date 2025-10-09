@@ -1,9 +1,10 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.utils import timezone
 from datetime import timedelta
+
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count
 from django.db.models.functions import TruncMonth
 from django.shortcuts import render
+from django.utils import timezone
 from django.views import View
 
 from apps.converter.models import AccessEvent, Url
