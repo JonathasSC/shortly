@@ -1,0 +1,58 @@
+<footer class="w-full mt-12 border-t border-zinc-200 bg-white">
+    <div class="max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-3 gap-8 text-sm text-zinc-600">
+        <div class="flex flex-col gap-3">
+            <a href="/" class="flex items-center gap-2">
+                <span class="text-xl font-extrabold text-blue-600">Sh0rtly<span class="text-zinc-800">.com</span></span>
+            </a>
+            <p class="text-zinc-500 leading-relaxed">
+                Simplifique seus links com estilo. Monitore cliques, desempenho e alcance com o Sh0rtly.
+            </p>
+        </div>
+
+        <div>
+            <h3 class="text-zinc-800 font-semibold mb-3">Navegação</h3>
+            <ul class="space-y-2">
+                <li><a href="{% url 'dasboard-home' %}" class="hover:text-blue-600 transition">Dashboard</a></li>
+                <li><a href="{% url 'home' %}" class="hover:text-blue-600 transition">Criar Link</a></li>
+            </ul>
+        </div>
+
+        <div>
+            <h3 class="text-zinc-800 font-semibold mb-3">Contato</h3>
+            <ul class="space-y-2">
+                <li class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-gray-500 text-base">mail</span>
+                    <a href="mailto:contato@sh0rtly.com" class="hover:text-blue-600 transition">
+                        contato@sh0rtly.com
+                    </a>
+                </li>
+                <li class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-gray-500 text-base">public</span>
+                    <a href="https://sh0rtly.com" target="_blank" class="hover:text-blue-600 transition">
+                        www.sh0rtly.com
+                    </a>
+                </li>
+            </ul>
+
+            <div class="flex gap-3 mt-4">
+                <a href="https://github.com/JonathasSC" target="_blank"
+                    class="w-8 h-8 flex items-center justify-center rounded-md hover:bg-zinc-100 transition"
+                    aria-label="GitHub de Jonathas S. Cardoso">
+                    <i class="fa-brands fa-github text-zinc-700 text-lg"></i>
+                </a>
+                <a href="https://www.linkedin.com/in/jonathas-s-cardoso/" target="_blank"
+                    class="w-8 h-8 flex items-center justify-center rounded-md hover:bg-zinc-100 transition"
+                    aria-label="LinkedIn de Jonathas S. Cardoso">
+                    <i class="fa-brands fa-linkedin-in text-zinc-700 text-lg"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="border-t border-zinc-200 py-4 text-center text-xs text-zinc-500">
+        © {{ now|date:"Y" }} Sh0rtly.com — Desenvolvido por 
+        <a href="https://github.com/JonathasSC" target="_blank" class="text-blue-600 hover:underline">
+            Jonathas S. Cardoso
+        </a>. Todos os direitos reservados.
+    </div>
+</footer>
