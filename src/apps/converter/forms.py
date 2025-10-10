@@ -15,7 +15,7 @@ class UrlForm(forms.ModelForm):
         }
         widgets = {
             'original_url': forms.URLInput(attrs={
-                'class': 'w-full p-2 border border-zinc-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500',
+                'class': 'w-full p-2 border text-sm sm:text-md border-zinc-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500',
                 'placeholder': gettext_lazy('Type or Paste your URL here...')
             })
         }

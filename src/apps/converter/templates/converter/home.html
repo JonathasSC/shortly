@@ -4,20 +4,21 @@
 {% load static %}
 
 {% block content %}
-<main class="min-h-screen flex flex-col items-center justify-center">
+<main class="min-h-screen p-4 flex flex-col items-center justify-center">
     <div class="flex flex-col w-full max-w-md justify-center w-full gap-4">
         <div class="flex flex-col justify-center text-center">
-        <h1 class="text-2xl font-bold mb-2 text-center">Encurtador de Links</h1>
-        <p class="text-md text-center">Transforme links longos em URLs curtas e fáceis de compartilhar</p>
-    </div>
-
+            <h1 class="text-xl sm:text-2xl font-bold mb-2 text-center">Encurtador de Links</h1>
+            <p class="text-sm md:text-base text-center">
+                Transforme links longos em URLs curtas e fáceis de compartilhar
+            </p>
+        </div>
     <div>
-        <form method="post" class="border rounded-xl flex flex-col gap-2 p-4 border-zinc-200">
+    <form method="post" class="border rounded-xl flex flex-col gap-2 p-4 border-zinc-200">
       {% csrf_token %}
 
         {% for field in form %}
         <div>
-            <label for="{{ field.id_for_label }}" class="block font-extrabold text-md font-medium mb-1">
+            <label for="{{ field.id_for_label }}" class="block font-extrabold text-sm sm:text-md font-medium mb-1">
                 {{ field.label }}
             </label>
             {{ field }}
@@ -27,7 +28,7 @@
         </div>
         {% endfor %}
 
-        <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition">
+        <button type="submit" class="w-full bg-blue-500 text-sm sm:text-md text-white py-2 px-4 rounded hover:bg-blue-600 transition">
             Encurtar
         </button>
         </form>
