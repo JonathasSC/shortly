@@ -13,7 +13,7 @@ class ExampleModel(BaseModelAbstract):
     class Meta:
         app_label = 'common'
 
-        
+
 class BaseModelAbstractTest(TransactionTestCase):
     reset_sequences = True
 
@@ -42,12 +42,14 @@ class BaseModelAbstractTest(TransactionTestCase):
         )
 
     def test_create_instance(self):
-        instance = ExampleModel.objects.create(name="teste", created_by=self.user)
-        self.assertIsNotNone(instance.uuid)
+        instance = ExampleModel.objects.create(
+            name="teste", created_by=self.user)
+        self.assertIsNotNone(instance.id)
         self.assertEqual(instance.created_by, self.user)
 
     def test_created_by_and_updated_by_fields(self):
-        instance = ExampleModel.objects.create(name="Exemplo", created_by=self.user)
+        instance = ExampleModel.objects.create(
+            name="Exemplo", created_by=self.user)
         self.assertEqual(instance.created_by, self.user)
         self.assertIsNone(instance.updated_by)
 
@@ -57,7 +59,8 @@ class BaseModelAbstractTest(TransactionTestCase):
         self.assertEqual(instance.updated_by, self.user)
 
     def test_auto_now_and_auto_now_add_behavior(self):
-        instance = ExampleModel.objects.create(name="Teste", created_by=self.user)
+        instance = ExampleModel.objects.create(
+            name="Teste", created_by=self.user)
         old_updated_at = instance.updated_at
 
         instance.name = "Teste atualizado"
@@ -68,12 +71,14 @@ class BaseModelAbstractTest(TransactionTestCase):
         self.assertGreater(instance.updated_at, old_updated_at)
 
     def test_fields_editable_false_behavior(self):
-        field_names = [f.name for f in ExampleModel._meta.fields if not f.editable]
-        self.assertIn("uuid", field_names)
+        field_names = [
+            f.name for f in ExampleModel._meta.fields if not f.editable]
+        self.assertIn("id", field_names)
         self.assertIn("created_at", field_names)
         self.assertIn("created_by", field_names)
         self.assertIn("updated_by", field_names)
 
     def test_string_representation(self):
-        instance = ExampleModel.objects.create(name="Meu exemplo", created_by=self.user)
-        self.assertEqual(str(instance), f"ExampleModel object ({instance.uuid})")
+        instance = ExampleModel.objects.create(
+            name="Meu exemplo", created_by=self.user)
+        self.assertEqual(str(instance), f"ExampleModel object ({instance.id})")

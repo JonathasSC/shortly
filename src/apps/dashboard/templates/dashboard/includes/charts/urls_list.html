@@ -35,13 +35,13 @@
                     </td>
                     <td class="px-2 py-1">
                         <div class="flex items-center gap-2">
-                            <p id="shortCode-{{ link.uuid }}" class="bg-zinc-100 px-2 py-1 rounded-md font-mono text-sm">{{ request.scheme }}://{{ request.get_host }}/{{ link.short_code }}</p>
+                            <p id="shortCode-{{ link.id }}" class="bg-zinc-100 px-2 py-1 rounded-md font-mono text-sm">{{ request.scheme }}://{{ request.get_host }}/{{ link.short_code }}</p>
 
                             <button
-                                onclick="copyToClipboard('{{ link.uuid }}')"
+                                onclick="copyToClipboard('{{ link.id }}')"
                                 class="w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-200 transition"
                             >
-                                <span id="copyIcon-{{ link.uuid }}" class="material-symbols-outlined text-xl text-gray-700">
+                                <span id="copyIcon-{{ link.id }}" class="material-symbols-outlined text-xl text-gray-700">
                                     content_copy
                                 </span>
                             </button>

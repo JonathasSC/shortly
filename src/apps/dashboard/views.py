@@ -18,7 +18,7 @@ class DashboardHomeView(LoginRequiredMixin, View):
         clicks_subquery = (
             AccessEvent.objects.filter(url=OuterRef("pk"))
             .values("url")
-            .annotate(clicks_count=Count("uuid"))
+            .annotate(clicks_count=Count("id"))
             .values("clicks_count")[:1]
         )
 
@@ -29,7 +29,8 @@ class DashboardHomeView(LoginRequiredMixin, View):
             .order_by("-created_at")
         )
 
-        access_events = AccessEvent.objects.filter(url__created_by=request.user)
+        access_events = AccessEvent.objects.filter(
+            url__created_by=request.user)
 
         total_urls = user_urls.count()
         total_access_events = access_events.count()
@@ -38,20 +39,24 @@ class DashboardHomeView(LoginRequiredMixin, View):
         seven_days_ago = now - timedelta(days=7)
         six_months_ago = now - timedelta(days=180)
 
-        recent_urls_last_7_days = user_urls.filter(created_at__gte=seven_days_ago)
-        total_accesses_last_6_months = access_events.filter(created_at__gte=six_months_ago).count()
+        recent_urls_last_7_days = user_urls.filter(
+            created_at__gte=seven_days_ago)
+        total_accesses_last_6_months = access_events.filter(
+            created_at__gte=six_months_ago).count()
 
         monthly_accesses = (
             access_events.filter(created_at__gte=six_months_ago)
             .annotate(month=TruncMonth("created_at"))
             .values("month")
-            .annotate(total_clicks=Count("uuid"))
+            .annotate(total_clicks=Count("id"))
             .order_by("month")
         )
-        monthly_labels = [entry["month"].strftime("%b/%Y") for entry in monthly_accesses]
+        monthly_labels = [entry["month"].strftime(
+            "%b/%Y") for entry in monthly_accesses]
         monthly_data = [entry["total_clicks"] for entry in monthly_accesses]
 
-        top_clicked_urls = user_urls.filter(clicks__gt=0).order_by("-clicks")[:10]
+        top_clicked_urls = user_urls.filter(
+            clicks__gt=0).order_by("-clicks")[:10]
         top_urls_labels = [url.short_code for url in top_clicked_urls]
         top_urls_clicks = [url.clicks or 0 for url in top_clicked_urls]
 
