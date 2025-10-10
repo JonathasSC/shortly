@@ -203,6 +203,8 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
+AUTH_USER_MODEL = 'user_account.User'
+
 ACCOUNT_FORMS = {
     'login': 'apps.account.forms.CustomLoginForm',
 }
