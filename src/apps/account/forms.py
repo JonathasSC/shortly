@@ -11,7 +11,7 @@ class CustomRegisterForm(forms.ModelForm):
         label=_("Username"),
         widget=forms.TextInput(attrs={
             'placeholder': _("Your username"),
-            'class': 'w-full p-2 border border-zinc-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500',
+            'class': 'w-full text-sm sm:text-md p-2 border border-zinc-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500',
         })
     )
 
@@ -19,7 +19,7 @@ class CustomRegisterForm(forms.ModelForm):
         label=_("E-mail address"),
         widget=forms.EmailInput(attrs={
             'placeholder': _("example@email.com"),
-            'class': 'w-full p-2 border border-zinc-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500',
+            'class': 'w-full text-sm sm:text-md p-2 border border-zinc-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500',
         })
     )
 
@@ -27,7 +27,7 @@ class CustomRegisterForm(forms.ModelForm):
         label=_("Password"),
         widget=forms.PasswordInput(attrs={
             'placeholder': _("Your secure password"),
-            'class': 'w-full p-2 border border-zinc-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500',
+            'class': 'w-full text-sm sm:text-md p-2 border border-zinc-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500',
         })
     )
 
@@ -35,7 +35,7 @@ class CustomRegisterForm(forms.ModelForm):
         label=_("Confirm password"),
         widget=forms.PasswordInput(attrs={
             'placeholder': _("Confirm your password"), 
-            'class': 'w-full p-2 border border-zinc-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500',
+            'class': 'w-full text-sm sm:text-md p-2 border border-zinc-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500',
         })
     )
     class Meta:
@@ -74,7 +74,7 @@ class CustomLoginForm(AuthenticationForm):
         label=_("Username"),
         widget=forms.TextInput(attrs={
             'placeholder': _("Seu nome de usuário"),
-            'class': 'w-full p-2 border border-zinc-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500',
+            'class': 'w-full text-sm sm:text-md p-2 border border-zinc-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500',
         })
     )
 
@@ -82,6 +82,6 @@ class CustomLoginForm(AuthenticationForm):
         label=_("Password"),
         widget=forms.PasswordInput(attrs={
             'placeholder': _("Sua senha"),
-            'class': 'w-full p-2 border border-zinc-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500',
+            'class': 'w-full text-sm sm:text-md p-2 border border-zinc-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500',
         })
     )
