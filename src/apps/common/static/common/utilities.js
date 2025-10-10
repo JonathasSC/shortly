@@ -1,18 +1,32 @@
-const copyToClipboard = (linkId) => {
-    const textElement = document.getElementById(`shortCode-${linkId}`);
-    const iconElement = document.getElementById(`copyIcon-${linkId}`);
-    console.log(textElement)
+const copyToClipboard = (source, icon = null) => {
+    const textElement = typeof source === "string" 
+        ? document.getElementById(source) 
+        : source;
 
-    if (!textElement || !iconElement) return;
+    if (!textElement) {
+        console.error("Elemento de texto não encontrado:", source);
+        return;
+    }
 
-    navigator.clipboard.writeText(textElement.textContent.trim()).then(() => {
-        iconElement.textContent = "check";
+    const text = textElement.textContent.trim();
 
-        setTimeout(() => {
-            iconElement.textContent = "content_copy";
-            iconElement.classList.remove("text-green-600");
-        }, 1500);
-    }).catch(err => {
+    navigator.clipboard.writeText(text).then(() => {
+        if (icon) {
+            const iconElement = typeof icon === "string"
+                ? document.getElementById(icon)
+                : icon;
+
+            if (iconElement) {
+                iconElement.textContent = "check";
+
+                setTimeout(() => {
+                    iconElement.textContent = "content_copy";
+                    iconElement.classList.remove("text-green-600");
+                }, 1500);
+            }
+        }
+    }).catch((err) => {
         console.error("Erro ao copiar:", err);
     });
 }
+

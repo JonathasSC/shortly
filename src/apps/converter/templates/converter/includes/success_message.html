@@ -1,0 +1,15 @@
+<div id="shortUrlWrapper" class="flex w-full max-w-md flex-col gap-2 align-center justify-center">
+    <p class="text-center">URL encurtada:</p>
+    <div class="flex w-full items-center justify-center gap-2">
+        <a href="{{ short_url }}" id="shortUrlLink" target="_blank" class="bg-zinc-100 underline text-blue-700 px-2 py-1 rounded-md font-mono text-md"">
+            {{ short_url }}
+        </a>
+        <button id="copyButton" 
+            onclick="copyToClipboard('shortUrlLink', 'copyButtonIcon')" 
+            class="w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-200 transition">
+            <span id="copyButtonIcon" class="material-symbols-outlined text-blue-700 text-xl ">
+                content_copy
+            </span>
+        </button>
+    </div>
+</div>

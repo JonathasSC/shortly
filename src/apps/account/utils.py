@@ -5,6 +5,7 @@ from datetime import datetime
 
 from django.contrib.auth import authenticate, get_user_model
 from django.utils.text import slugify
+from django.utils.translation import gettext_lazy as _
 
 
 class AbstractLoginData(ABC):
@@ -45,3 +46,15 @@ class AuthenticationUtils:
                 pass
 
         return user
+
+    @staticmethod
+    def password_validation(password: str):
+        if len(password) < 8:
+            raise ValueError(_("A senha deve ter pelo menos 8 caracteres."))
+
+        if not any(char.isdigit() for char in password) or not any(char.isalpha() for char in password):
+            raise ValueError(_("A senha deve conter letras e números."))
+
+        if not any(char in "!@#$%^&*()-_=+[]{}|;:,.<>?/" for char in password):
+            raise ValueError(_("A senha deve conter pelo menos um caractere especial."))
+            

@@ -12,8 +12,10 @@
     </h1>
     <div class="text-6xl font-bold text-blue-600" id="counter">5</div>
     <p class="text-sm text-gray-500 mt-2">
-        Caso não seja redirecionado automaticamente, <br>
-        <a href="{{ redirect_url }}" class="text-blue-600 underline">clique aqui</a>.
+        <span id="manualLink" class="hidden">
+            Caso não seja redirecionado automaticamente, <br>
+            <a href="{{ redirect_url }}" class="text-blue-600 underline">clique aqui</a>.
+        </span>
     </p>
 </div>
 {% endblock %}
@@ -22,8 +24,11 @@
 <script src="{% static 'converter/utils.js' %}"></script>
 <script>
     const counter = document.getElementById('counter');
-    const urlUtils = new UrlUtils();
+    const manualLink = document.getElementById('manualLink');
     const timerUtils = new TimerUtils();
-    timerUtils.secondTimer(6, counter);
+
+    timerUtils.secondTimer(6, counter, () => {
+        manualLink.classList.remove('hidden');
+    });
 </script>
 {% endblock %}

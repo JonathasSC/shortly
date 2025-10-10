@@ -1,49 +1,58 @@
-{% extends 'shared/base.html'%}
+{% extends 'common/base.html'%}
 
 {% load widget_tweaks %}
 {% load static %}
 {% load i18n %}
 
-{% block header %}{% endblock %}
+{% block header %}
+<header class="fixed w-full bg-white z-50 ">
+  <div class="border-box px-4 py-3 flex items-center justify-start">
+    <a href="{% url 'home' %}" class="text-2xl font-bold text-gray-800">Shortly</a> 
+  </div>
+</header>
+{% endblock %}
+
 {% block footer %}{% endblock %}
 
 {% block content %}
-<div>
-    <form method="post" class="border p-10 w-90">
-        <h1 class="text-blue-500 text-xl mb-2 font-semibold">
-            {% trans "Welcome back!" %}
-        </h1>
-
-        <p class="text-zinc-400 mb-10">
-            {% trans "Please log in to your account" %}
-        </p>
+<main class="min-h-screen w-full flex flex items-center justify-center">
+    <div class="flex flex-col w-full max-w-md justify-center w-full gap-4">
+        <div class="flex flex-col justify-center text-center">
+            <h1 class="text-blue-500 text-xl sm:text-2xl font-bold text-center">
+                {% trans "Welcome back!" %}
+            </h1>
+            <p class="text-zinc-400 text-sm sm:text-base">
+                {% trans "Please log in to your account" %}
+            </p>
+        </div>
         
-        {% csrf_token %}
+        <form method="post" class="border rounded-xl flex flex-col gap-2 p-4 border-zinc-200">
+            
+            {% csrf_token %}
 
-        <p class="text-red-400 w-full mb-10">
-            {{ form.non_field_errors }}
-        </p>
+            {% for field in form %}
+            <div>
+                <label for="{{ field.id_for_label }}" class="block font-medium text-xs sm:text-sm mb-1">
+                    {{ field.label }}
+                </label>
+                {{ field }}
+                {% if field.errors %}
+                    <p class="text-red-500 text-xs sm:text-sm mt-1">{{ field.errors }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
 
-        <div class="mb-4">
-            {{ form.username.label_tag }}
-            {{ form.username|add_class:"w-full px-3 py-2 border rounded" }}
-        </div>
-
-        <div class="mb-4">
-            {{ form.password.label_tag }}
-            {{ form.password|add_class:"w-full px-3 py-2 border rounded" }}
-        </div>
-
-        <button type="submit" class="w-full text-white px-3 py-2 rounded bg-blue-500 hover:bg-blue-600">
+            <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition">
                 {% trans "Signin" %}
-        </button>
+            </button>
 
-        <p class="text-center mt-2">
-          Ainda não possui uma conta?
-          <a href="{% url 'register' %}" class="text-blue-500">
-            Clique aqui
-          </a>
-        </p>
-    </form>
-</div>
+            <p class="text-center mt-2 text-sm sm:text-base">
+                Ainda não possui uma conta?
+                <a href="{% url 'register' %}" class="text-blue-500">
+                    Clique aqui
+                </a>
+            </p>
+        </form>
+    </div>
+</main>
 {% endblock %}
