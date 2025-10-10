@@ -6,8 +6,8 @@ from django.utils import timezone
 
 
 class BaseModelAbstract(models.Model):
-    uuid = models.UUIDField(
-        default=uuid.uuid4, 
+    id = models.UUIDField(
+        default=uuid.uuid4,
         primary_key=True,
         editable=False,
         unique=True
@@ -30,7 +30,7 @@ class BaseModelAbstract(models.Model):
     updated_at = models.DateTimeField(
         auto_now=True
     )
-    
+
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         related_name='%(class)s_updated',
