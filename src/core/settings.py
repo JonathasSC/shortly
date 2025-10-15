@@ -112,6 +112,7 @@ INSTALLED_APPS = [
     'apps.converter',
     'apps.dashboard',
     'apps.account',
+    'apps.institutional',
 ]
 
 # ================================================================
