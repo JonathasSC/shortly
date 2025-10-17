@@ -1,0 +1,36 @@
+{% extends 'common/base.html' %}
+{% load static %}
+
+{% block content %}
+<main class="min-h-screen p-4 flex flex-col items-center justify-center">
+    <div class="flex flex-col w-full max-w-md justify-center gap-4">
+        <div class="text-center">
+            <h1 class="text-xl sm:text-2xl font-bold mb-2">Comprar Coins</h1>
+            <p class="text-sm md:text-base">Selecione um pacote para continuar</p>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4">
+            {% for amount, price in prices.items %}
+            <form method="get" action="{% url 'buy_coins' amount %}" class="border rounded-xl p-4 flex flex-col gap-2 border-zinc-200">
+                <h2 class="text-lg font-semibold">{{ amount }} Coins</h2>
+                <p class="text-sm">R$ {{ price }}</p>
+                <button type="submit"
+                        class="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition">
+                    Comprar
+                </button>
+            </form>
+            {% endfor %}
+        </div>
+
+        {% if messages %}
+        <div class="w-full max-w-md">
+            {% for message in messages %}
+            <div class="rounded w-full">
+                {{ message|safe }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</main>
+{% endblock %}

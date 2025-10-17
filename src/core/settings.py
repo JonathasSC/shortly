@@ -113,6 +113,7 @@ INSTALLED_APPS = [
     'apps.dashboard',
     'apps.account',
     'apps.institutional',
+    'apps.billing',
 ]
 
 # ================================================================
@@ -259,3 +260,6 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": crontab(minute=0, hour="*"),
     },
 }
+
+MERCADO_PAGO_ACCESS_TOKEN = os.environ.get("MERCADO_PAGO_ACCESS_TOKEN")
+MERCADO_PAGO_PUBLIC_KEY = os.environ.get("MERCADO_PAGO_PUBLIC_KEY")

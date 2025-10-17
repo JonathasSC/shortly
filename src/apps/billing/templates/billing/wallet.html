@@ -1,0 +1,32 @@
+{% extends 'common/base.html' %}
+{% load static %}
+
+{% block content %}
+<main class="min-h-screen p-4 flex flex-col items-center justify-center">
+    <div class="flex flex-col w-full max-w-md justify-center gap-4">
+        <div class="text-center">
+            <h1 class="text-xl sm:text-2xl font-bold mb-2">Minha Carteira</h1>
+            <p class="text-sm md:text-base">Saldo e histórico de transações</p>
+        </div>
+
+        <div class="border rounded-xl p-4 border-zinc-200 mb-4">
+            <p class="text-lg font-semibold">💰 Saldo: {{ wallet.balance }} coins</p>
+        </div>
+
+        <div class="flex flex-col gap-2">
+            <h2 class="font-bold mb-2">Extrato</h2>
+            {% if transactions %}
+                {% for tx in transactions %}
+                <div class="border rounded-xl p-3 border-zinc-200">
+                    <p class="text-sm"><strong>Tipo:</strong> {{ tx.transaction_type }}</p>
+                    <p class="text-sm"><strong>Valor:</strong> {{ tx.amount }}</p>
+                    <p class="text-xs text-gray-500">{{ tx.created_at }}</p>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-sm text-gray-500">Nenhuma transação encontrada.</p>
+            {% endif %}
+        </div>
+    </div>
+</main>
+{% endblock %}
