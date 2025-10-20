@@ -1,4 +1,3 @@
-import mercadopago
 from apps.billing.abstracts import PaymentAbstract
 
 

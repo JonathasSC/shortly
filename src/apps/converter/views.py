@@ -8,8 +8,8 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.views import View
-from apps.billing.models import UserWallet, WalletTransaction
 
+from apps.billing.models import UserWallet, WalletTransaction
 from apps.converter.models import AccessEvent, Url
 from apps.converter.utils import UserRequestUtil
 
