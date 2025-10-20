@@ -1,0 +1,46 @@
+{% extends 'common/base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+<section class="w-full mt-16 sm:mt-0 h-fit sm:min-h-screen flex items-center justify-center">
+    <div class="p-6 w-full max-w-[1440px] flex flex-col gap-10 sm:gap-12">
+        <div class="flex flex-col items-center gap-2 sm:gap-4 text-center">
+            <h1 class="text-2xl sm:text-3xl md:text-2xl font-bold">{% trans "About Shortly" %}</h1>
+            <p class="text-gray-600 text-sm sm:text-base md:text-lg leading-relaxed max-w-3xl">
+                {% blocktrans %}Shortly is a modern platform for URL shortening, designed to make link sharing faster, smarter, and more efficient.{% endblocktrans %}
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
+            <div class="bg-white border sm:items-center justify-center flex flex-col gap-2 border-zinc-200 rounded p-4">
+                <span class="material-symbols-outlined text-4xl sm:text-5xl text-blue-600">bolt</span>
+                <h2 class="text-lg sm:text-xl font-semibold">{% trans "Fast Shortening" %}</h2>
+                <p class="text-gray-600 text-xs sm:text-center sm:text-sm md:text-base">
+                    {% trans "Turn long links into short, easy-to-share URLs in just a few clicks." %}
+                </p>
+            </div>
+
+            <div class="bg-white border sm:items-center justify-center flex flex-col gap-2 border-zinc-200 rounded p-4">
+                <span class="material-symbols-outlined text-4xl sm:text-5xl text-blue-600">analytics</span>
+                <h2 class="text-lg sm:text-xl font-semibold">{% trans "Smart Monitoring" %}</h2>
+                <p class="text-gray-600 text-xs sm:text-center sm:text-sm md:text-base">
+                    {% trans "Track usage metrics, number of clicks, devices, and access locations." %}
+                </p>
+            </div>
+
+            <div class="bg-white border sm:items-center justify-center flex flex-col gap-2 border-zinc-200 rounded p-4">
+                <span class="material-symbols-outlined text-4xl sm:text-5xl text-blue-600">insights</span>
+                <h2 class="text-lg sm:text-xl font-semibold">{% trans "Insights and Analytics" %}</h2>
+                <p class="text-gray-600 text-xs sm:text-center sm:text-sm md:text-base">
+                    {% trans "Gain valuable data to optimize campaigns, understand your audience, and make better decisions." %}
+                </p>
+            </div>
+        </div>
+
+        <div class="text-gray-600 leading-relaxed max-w-4xl mx-auto text-center text-sm sm:text-base md:text-lg">
+            {% blocktrans %}Our goal is to provide a simple, secure, and powerful experience for creators, professionals, businesses, and anyone who needs to share links efficiently and intelligently. With Shortly, you have full control over your links and access to insights that make a difference.{% endblocktrans %}
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,168 @@
+{% extends 'common/base.html' %}
+{% load static %}
+
+{% block content %}
+<main class="w-full flex-col mt-16 flex items-center justify-center">
+    <div class="p-6 w-full max-w-[1440px] space-y-6">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="font-bold text-xl">Assinaturas</h1>
+                <p class="text-zinc-400">Escolha um plano para continuar</p>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {% for plan in plans %}
+            <form method="get" action="{% url 'subscribe_plan' plan.id %}" class="relative border rounded-md p-4 flex flex-col items-center gap-4 bg-gradient-to-b from-blue-50 to-white flex-col justify-between border">
+                <div class="flex flex-col w-full gap-4">
+                    <div class="flex items-center justify-center gap-4 flex-col">
+                        <h2 class="text-lg font-bold flex items-center gap-2 flex-col">
+                            <div class="flex items-center justify-center w-14 h-14 bg-blue-500 text-white text-2xl font-extrabold rounded-full" >
+                                {% if plan.name == "Starter" %}
+                                    <span class="material-symbols-outlined text-white text-3xl">rocket</span>
+                                {% elif plan.name == "Turbo" %}
+                                    <span class="material-symbols-outlined text-white text-3xl">bolt</span>
+                                {% elif plan.name == "Power" %}
+                                    <span class="material-symbols-outlined text-white text-3xl">star</span>
+                                {% elif plan.name == "Master" %}
+                                    <span class="material-symbols-outlined text-white text-3xl">whatshot</span>
+                                {% else %}
+                                    <span class="material-symbols-outlined text-white text-3xl">circle</span>
+                                {% endif %}
+                            </div>
+
+                            {{ plan.name }}
+                        </h2>
+      
+                        <div class="flex flex-col">
+                            <p class="text-xl font-semibold text-gray-800">R$ {{ plan.price }} / mês</p>
+            
+                            <p class="text-sm">
+                            {{ plan.monthly_credits }} Créditos mensais
+                            </p>
+                        </div>
+                    </div>
+    
+                    <ul class="flex flex-col gap-1 text-sm w-full">
+                        <li class="border-b border-gray-200 p-2 {% if plan.longtime_expiration_date %}text-green-600 font-semibold{% else %}text-gray-300{% endif %}">Expiração prolongada</li>
+                        <li class="border-b border-gray-200 p-2  {% if plan.disable_interstitial_page %}text-green-600 font-semibold{% else %}text-gray-300{% endif %}">Sem página intermediária</li>
+                        <li class="border-b border-gray-200 p-2 {% if plan.advanced_stats %}text-green-600 font-semibold{% else %}text-gray-300{% endif %}">Estatísticas avançadas</li>
+                        <li class="border-b border-gray-200 p-2 {% if plan.conditional_redirect %}text-green-600 font-semibold{% else %}text-gray-300{% endif %}">Redirecionamento condicional</li>
+                        <li class="border-b border-gray-200 p-2 {% if plan.priority_support %}text-green-600 font-semibold{% else %}text-gray-300{% endif %}">Suporte prioritário</li>
+                    </ul>
+                </div>
+
+                <button type="submit" 
+                        class="mt-2 w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600 transition">
+                    Assinar
+                </button>
+            </form>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="p-6 w-full max-w-[1440px] space-y-6">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="font-bold text-xl">Comprar Créditos</h1>
+                <p class="text-zinc-400">Selecione um pacote para continuar</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {% for amount, info in prices.items %}
+            <form method="get" action="{% url 'buy_credits' amount %}" 
+                class="relative border rounded-md p-4 flex flex-col items-center gap-4 bg-gradient-to-b from-blue-50 to-white {% if amount == 100 %}border-green-500 border-2{% endif %}">                
+                
+                <div class="flex flex-col items-center justify-center gap-2">
+                    <div class="flex items-center justify-center w-14 h-14 bg-blue-500 text-white text-xl font-extrabold rounded-full">
+                        {{ amount }}
+                    </div>
+    
+                    <p class="text-lg font-bold">Credits</p>
+                </div>
+
+                <p class="text-xl font-semibold text-gray-800">R$ {{ info.total_price }}</p>
+
+                <button type="submit" class="mt-2 w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600 transition">
+                    Comprar
+                </button>
+
+                {% if amount == 100 %}
+                <span class="absolute top-[-24px] left-auto bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-xs shadow">
+                    Melhor custo-benefício
+                </span>
+                {% endif %}
+
+            </form>
+            {% endfor %}
+        </div>
+
+
+        {% if messages %}
+        <div class="w-full max-w-md">
+            {% for message in messages %}
+            <div class="rounded w-full">
+                {{ message|safe }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+
+    <div class="p-6 w-full max-w-[1440px] space-y-6">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="font-bold text-xl">Seu extrato</h1>
+                <p class="text-zinc-400">Veja suas ultimas transferências</p>
+            </div>
+        </div>
+        <div class="flex flex-col gap-2">
+            <h2 class="font-bold mb-2">Extrato</h2>
+            {% if transactions %}
+                {% for tx in transactions %}
+                <div class="border rounded-md p-4 border-zinc-200 justify-between flex items-center gap-3">
+                    {% if tx.transaction_type == "CREDIT" %}
+                        <div class="flex gap-4">
+                            <div class="bg-zinc-200 rounded-full h-8 w-8 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-green-500 text-xl">
+                                    payment_arrow_down
+                                </span>
+                            </div>
+                            <div class="flex flex-col">
+                                <p class="text-sm">
+                                    <strong>{{ tx.source }}</strong> 
+                                </p>
+                                <p class="text-xs text-gray-500">
+                                    {{ tx.created_at }}
+                                </p>
+                            </div>
+                        <div>
+                    {% else %}
+                        <div class="flex gap-4">
+                            <div class="bg-zinc-200 rounded-full h-8 w-8 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-black text-xl">
+                                    payments
+                                </span>
+                            </div>
+                            <div class="flex flex-col">
+                                <p class="text-sm">
+                                    <strong>{{ tx.source }}</strong> 
+                                </p>
+                                <p class="text-xs text-gray-500">
+                                    {{ tx.created_at }}
+                                </p>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <p class="text-sm">
+                        <strong>{{ tx.amount }} Credit</strong> 
+                    </p>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-sm text-gray-500">Nenhuma transação encontrada.</p>
+            {% endif %}
+        </div>
+    </div>
+</main>
+{% endblock %}

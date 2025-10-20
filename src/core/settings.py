@@ -112,6 +112,8 @@ INSTALLED_APPS = [
     'apps.converter',
     'apps.dashboard',
     'apps.account',
+    'apps.institutional',
+    'apps.billing',
 ]
 
 # ================================================================
@@ -147,6 +149,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'apps.billing.context_processors.user_balance',
             ],
         },
     },
@@ -203,6 +206,8 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
+AUTH_USER_MODEL = 'user_account.User'
+
 ACCOUNT_FORMS = {
     'login': 'apps.account.forms.CustomLoginForm',
 }
@@ -256,3 +261,6 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": crontab(minute=0, hour="*"),
     },
 }
+
+MERCADO_PAGO_ACCESS_TOKEN = os.environ.get("MERCADO_PAGO_ACCESS_TOKEN", "")
+MERCADO_PAGO_PUBLIC_KEY = os.environ.get("MERCADO_PAGO_PUBLIC_KEY", "")

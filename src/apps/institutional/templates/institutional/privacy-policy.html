@@ -1,0 +1,66 @@
+{% extends 'common/base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+<section class="max-w-[1440px] mt-16 mx-auto px-6 py-12">
+    <div class="w-full flex flex-col gap-4">
+        <h1 class="text-xl sm:text-2xl font-bold text-gray-800">{% trans "Privacy Policy" %}</h1>
+    
+        <p class="text-sm sm:text-lg text-gray-600 leading-relaxed mb-6">
+            {% blocktrans %}At Shortly, your privacy is our top priority. This Privacy Policy outlines the types of information we collect, how we use it, and the measures we take to safeguard your personal data.{% endblocktrans %}
+        </p>
+    </div>
+
+  <div class="flex flex-col gap-4 sm:gap-6">
+    <div class="bg-white border flex-col gap-2 border-zinc-200 rounded p-4">
+        <h2 class="text-xl font-semibold flex items-start gap-1 mb-2">
+            <span class="text-blue-600">1.</span> {% trans "Information We Collect" %}
+        </h2>
+        <ul class="list-disc list-inside text-gray-600 text-sm space-y-1">
+            <li class="text-sm sm:text-base">{% trans "Information you provide when creating an account, including your name, email address, and encrypted password." %}</li>
+            <li class="text-sm sm:text-base">{% trans "Data related to your use of our services, such as shortened URLs, click statistics, and dashboard activity." %}</li>
+            <li class="text-sm sm:text-base">{% trans "Technical information, including IP address, browser type, and device information, used for security and system optimization." %}</li>
+        </ul>
+    </div>
+
+    <div class="bg-white border flex-col gap-2 border-zinc-200 rounded p-4">
+        <h2 class="text-xl font-semibold flex items-start gap-1 mb-2">
+            <span class="text-blue-600">2.</span> {% trans "How We Use Your Information" %}
+        </h2>
+        <ul class="list-disc list-inside text-gray-600 text-sm space-y-1">
+            <li class="text-sm sm:text-base">{% trans "To provide, maintain, and improve the functionality of our platform." %}</li>
+            <li class="text-sm sm:text-base">{% trans "To enhance the user experience and optimize system performance." %}</li>
+            <li class="text-sm sm:text-base">{% trans "To communicate important updates, support information, and service notifications." %}</li>
+        </ul>
+    </div>
+
+    <div class="bg-white border flex-col gap-2 border-zinc-200 rounded p-4">
+        <h2 class="text-xl font-semibold flex items-start gap-1 mb-2">
+            <span class="text-blue-600">3.</span> {% trans "Information Sharing and Disclosure" %}
+        </h2>
+        <p class="text-gray-600 text-sm sm:text-base">
+            {% trans "We do not sell, trade, or otherwise transfer your personal information to outside parties, except as required by law, to comply with legal obligations, or to protect our rights and services." %}
+        </p>
+    </div>
+
+    <div class="bg-white border flex-col gap-2 border-zinc-200 rounded p-4">
+        <h2 class="text-xl font-semibold flex items-start gap-1 mb-2">
+            <span class="text-blue-600">4.</span> {% trans "Security Measures" %}
+        </h2>
+        <p class="text-gray-600 text-sm sm:text-base">
+            {% trans "We implement appropriate technical, administrative, and physical safeguards to protect your information from unauthorized access, disclosure, alteration, or destruction." %}
+        </p>
+    </div>
+
+    <div class="bg-white border flex-col gap-2 border-zinc-200 rounded p-4">
+        <h2 class="text-xl font-semibold flex items-start gap-1 mb-2">
+            <span class="text-blue-600">5.</span> {% trans "Cookies and Tracking Technologies" %}
+        </h2>
+        <p class="text-gray-600 text-sm sm:text-base">
+            {% trans "We may use cookies and similar tracking technologies to enhance site performance, provide personalized content, and improve your overall experience on Shortly." %}
+        </p>
+    </div>
+  </div>
+</section>
+{% endblock %}
