@@ -1,5 +1,4 @@
 import secrets
-from datetime import timedelta
 
 from django.contrib import messages
 from django.http import HttpResponse, HttpResponseForbidden
@@ -8,8 +7,8 @@ from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
-from django.utils.timezone import now
 from django.views import View
+from apps.billing.models import UserWallet, WalletTransaction
 
 from apps.converter.models import AccessEvent, Url
 from apps.converter.utils import UserRequestUtil
@@ -64,12 +63,44 @@ class ConfirmRedirectView(View):
                 "redirect_url": reverse("confirm_redirect") + f"?token={token}",
                 "remaining": remaining,
             })
-        
+
         del request.session[f"token_{token}"]
         return redirect(target_url)
 
 
 class HomeView(View):
+    def __get_existing_url(self, url_object, user, client_ip):
+        if user.is_authenticated:
+            return Url.objects.filter(original_url=url_object.original_url, created_by=user).first()
+        else:
+            return Url.objects.filter(original_url=url_object.original_url, created_by=None, created_by_ip=client_ip).first()
+
+    def __debit_user_wallet(self, user):
+        wallet = UserWallet.objects.get(user=user)
+        if wallet.balance < 1:
+            return False
+
+        wallet.debit(1)
+
+        WalletTransaction.objects.create(
+            wallet=wallet,
+            transaction_type=WalletTransaction.TransactionType.DEBIT,
+            amount=1,
+            source='URL shortening'
+        )
+        return True
+
+    def __create_short_url(self, url_object, user=None, client_ip=None):
+        if user:
+            url_object.created_by = user
+            url_object.created_by_ip = None
+        else:
+            url_object.created_by = None
+            url_object.created_by_ip = client_ip
+
+        url_object.save()
+        return url_object
+
     def get(self, request):
         form = UrlForm()
         return render(request, 'converter/home.html', {
@@ -78,66 +109,40 @@ class HomeView(View):
 
     def post(self, request):
         form = UrlForm(request.POST)
-
-        short_url = None
-        existing_url = None
         client_ip = user_request_util.get_client_ip(request)
+        create_new = request.POST.get('create_new', 'false') == 'true'
 
-        if not getattr(request, 'user', None) or not request.user.is_authenticated:
-
-            today_start = now().replace(hour=0, minute=0, second=0, microsecond=0)
-            today_end = today_start + timedelta(days=1)
-
-            count_today = Url.objects.filter(
-                created_by_ip=client_ip,
-                created_at__range=(today_start, today_end)
-            ).count()
-
-            MAX_IP_PER_DAY = 5
-            if count_today >= MAX_IP_PER_DAY:
-                messages.error(request, mark_safe('''
-                    <p class="text-center bg-yellow-100 w-full max-w-lg px-4 py-2 w-80 rounded text-yellow-600">
-                        Você atingiu o limite de 5 links por dia. Tente novamente amanhã ou faça login para continuar.
-                    </p>
-                '''))
-                return redirect('home')
-
-        if form.is_valid():
-            url_object = form.save(commit=False)
-
-            if getattr(request, 'user', None) and request.user.is_authenticated:
-                existing_url = Url.objects.filter(
-                    original_url=url_object.original_url,
-                    created_by=request.user
-                ).first()
-            else:
-                existing_url = Url.objects.filter(
-                    original_url=url_object.original_url,
-                    created_by=None,
-                    created_by_ip=client_ip
-                ).first()
-
-            if existing_url:
-                url_object = existing_url
-            else:
-                if request.user.is_authenticated:
-                    url_object.created_by = request.user
-                    url_object.created_by_ip = None
-                else:
-                    url_object.created_by = None
-                    url_object.created_by_ip = client_ip
-                url_object.save()
-
-            short_url = request.build_absolute_uri(
-                f'/{url_object.short_code}/')
-            
-            html_message = render_to_string('converter/includes/success_message.html', {
-                'short_url': short_url
-            })
-            messages.success(request, mark_safe(html_message))
-
+        if not form.is_valid():
+            messages.error(
+                request, 'Erro ao criar o link. Verifique o formulário.')
             return redirect('home')
 
-        messages.error(
-            request, 'Erro ao criar o link. Verifique o formulário.')
+        url_object = form.save(commit=False)
+        user = request.user if request.user.is_authenticated else None
+
+        existing_url = self.__get_existing_url(url_object, user, client_ip)
+
+        if existing_url and not create_new:
+            messages.info(request, mark_safe(f'''
+                <div class="existing-url-message" data-original-url="{existing_url.original_url}"></div>
+            '''))
+            return redirect('home')
+
+        if user and not self.__debit_user_wallet(user):
+            messages.error(request, mark_safe('''
+                <p class="text-center bg-red-100 w-full max-w-lg px-4 py-2 w-80 rounded text-red-600">
+                    Saldo insuficiente! Adicione mais coins para encurtar mais URL's
+                </p>
+            '''))
+            return redirect('home')
+
+        created_url = self.__create_short_url(url_object, user, client_ip)
+        short_url = request.build_absolute_uri(f'/{created_url.short_code}/')
+
+        html_message = render_to_string(
+            'converter/includes/success_message.html',
+            {'short_url': short_url}
+        )
+
+        messages.success(request, mark_safe(html_message))
         return redirect('home')
