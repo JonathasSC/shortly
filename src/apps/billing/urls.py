@@ -2,7 +2,6 @@ from django.http import HttpResponse
 from django.urls import path
 
 from apps.billing.views import (
-    WalletPageView,
     MercadoPagoWebhookView,
     SubscribePlanView,
     WalletPageView,
