@@ -2,14 +2,14 @@ from django.http import HttpResponse
 from django.urls import path
 
 from apps.billing.views import (
-    BuyCoinsPageView,
+    WalletPageView,
     MercadoPagoWebhookView,
     SubscribePlanView,
     WalletPageView,
 )
 
 urlpatterns = [
-    path('wallet/', BuyCoinsPageView.as_view(), name='wallet_page'),
+    path('wallet/', WalletPageView.as_view(), name='wallet_page'),
 
     path('buy-coins/<int:coin_amount>/',
          WalletPageView.as_view(), name='buy_credits'),
