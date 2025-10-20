@@ -1,23 +1,26 @@
-from apps.billing.models import Plan, UserWallet, WalletTransaction
-from django.shortcuts import render
-from django.shortcuts import redirect
+import mercadopago
+from django.conf import settings
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views import View
-from django.http import JsonResponse, HttpResponse
-from apps.billing.services import MercadoPagoService
+
 from apps.billing.models import Plan, UserSubscription, UserWallet, WalletTransaction
+from apps.billing.services import MercadoPagoService
 
 
 class BuyCoinsView(View):
     prices = {
-        10: 4.99,
-        20: 8.99,
-        50: 31.99,
-        100: 59.99,
+        10: 5.99,
+        20: 10.99,
+        50: 24.99,
+        100: 39.99,
     }
 
     def get(self, request, coin_amount, *args, **kwargs):
-        mp_service = MercadoPagoService()
+        sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
+        mp_service = MercadoPagoService(sdk)
+
         if coin_amount not in self.prices:
             return redirect("payment_failure")
 
@@ -37,8 +40,6 @@ class BuyCoinsView(View):
             }
         )
 
-        print("SUCCESS URL:", success_url)
-
         if preference.get("status") == 201:
             return redirect(preference["response"]["init_point"])
         else:
@@ -50,8 +51,10 @@ class SubscribePlanView(View):
 
     def get(self, request, plan_id, *args, **kwargs):
         try:
-            mp_service = MercadoPagoService()
+            sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
+            mp_service = MercadoPagoService(sdk)
             plan = Plan.objects.get(id=plan_id)
+            print(plan)
         except Plan.DoesNotExist:
             return redirect("payment_failure")
 
@@ -71,13 +74,12 @@ class SubscribePlanView(View):
             }
         )
 
-        return redirect(preference["init_point"])
+        return redirect(preference["response"]["init_point"])
 
 
 class MercadoPagoWebhookView(View):
-    """Recebe notificações do Mercado Pago"""
-
-    mp_service = MercadoPagoService()
+    sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
+    mp_service = MercadoPagoService(sdk)
 
     def post(self, request, *args, **kwargs):
         return self.handle_webhook(request)
@@ -105,7 +107,6 @@ class MercadoPagoWebhookView(View):
         status = payment_data.get("status")
         metadata = payment_data.get("metadata", {})
 
-        # Só processa se estiver aprovado
         if status != "approved":
             return JsonResponse({"status": "pending_or_failed"})
 
@@ -146,37 +147,40 @@ class MercadoPagoWebhookView(View):
         return JsonResponse({"status": "ignored_no_valid_type"})
 
 
-class BuyCoinsPageView(View):
-    template_name = "billing/buy_coins.html"
-
-    prices = {
-        10: 4.99,
-        20: 8.99,
-        50: 31.99,
-        100: 59.99,
-    }
-
-    def get(self, request, *args, **kwargs):
-        context = {"prices": self.prices}
-        return render(request, self.template_name, context)
-
-
-class SubscribePlanPageView(View):
-    template_name = "billing/subscribe_plan.html"
-
-    def get(self, request, *args, **kwargs):
-        plans = Plan.objects.all()
-        return render(request, self.template_name, {"plans": plans})
-
-
 class WalletPageView(View):
     template_name = "billing/wallet.html"
 
+    prices = {
+        10: 5.99,
+        20: 10.99,
+        50: 24.99,
+        100: 39.99,
+    }
+
+    def get_prices_with_value(self):
+        prices_info = {}
+        for amount, price in self.prices.items():
+            price_per_coin = price / amount
+            prices_info[amount] = {
+                "total_price": price,
+                "price_per_coin": round(price_per_coin, 2),
+            }
+        return prices_info
+
     def get(self, request, *args, **kwargs):
-        wallet, _ = UserWallet.objects.get_or_create(user=request.user)
+        prices_info = self.get_prices_with_value()
+        plans = Plan.objects.all()
+
+        wallet, _ = UserWallet.objects.get_or_create(
+            user=request.user
+        )
         transactions = WalletTransaction.objects.filter(
-            user=request.user).order_by("-created_at")
+            wallet=wallet
+        ).order_by("-created_at")
+
         return render(request, self.template_name, {
+            "prices": prices_info,
+            "plans": plans,
             "wallet": wallet,
             "transactions": transactions
         })
