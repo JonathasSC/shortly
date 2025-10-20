@@ -1,6 +1,8 @@
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
+
+User = get_user_model()
 
 
 class UrlViewTests(TestCase):
@@ -17,5 +19,3 @@ class UrlViewTests(TestCase):
         response = self.client.get(reverse('home'))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'converter/home.html')
-
-
