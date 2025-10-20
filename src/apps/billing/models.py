@@ -6,12 +6,40 @@ User = get_user_model()
 
 
 class Plan(models.Model):
-    name = models.CharField(max_length=50, unique=True)
-    monthly_coins = models.PositiveIntegerField(default=0)
-    price = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
-    max_urls = models.PositiveIntegerField(null=True, blank=True)
-    enable_custom_domains = models.BooleanField(default=False)
-    enable_advanced_stats = models.BooleanField(default=False)
+    name = models.CharField(
+        max_length=50,
+        unique=True
+    )
+
+    monthly_credits = models.PositiveIntegerField(
+        default=0
+    )
+
+    price = models.DecimalField(
+        max_digits=8,
+        decimal_places=2,
+        default=0.00
+    )
+
+    disable_interstitial_page = models.BooleanField(
+        default=True
+    )
+
+    advanced_stats = models.BooleanField(
+        default=False
+    )
+
+    longtime_expiration_date = models.BooleanField(
+        default=False
+    )
+
+    conditional_redirect = models.BooleanField(
+        default=False
+    )
+
+    priority_support = models.BooleanField(
+        default=False
+    )
 
     def __str__(self):
         return f"{self.name} - R$ {self.price}"
