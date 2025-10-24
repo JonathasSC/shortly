@@ -212,6 +212,10 @@ ACCOUNT_FORMS = {
     'login': 'apps.account.forms.CustomLoginForm',
 }
 
+LOGIN_URL = 'apps.account:login'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = 'apps.converter:home'
+
 # ================================================================
 # INTERNATIONALIZATION & TIMEZONE
 # ================================================================
