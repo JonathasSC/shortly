@@ -1,4 +1,5 @@
 import secrets
+from datetime import timedelta
 
 from django.contrib import messages
 from django.http import HttpResponse, HttpResponseForbidden
@@ -10,10 +11,10 @@ from django.utils.safestring import mark_safe
 from django.views import View
 
 from apps.billing.models import UserWallet, WalletTransaction
+
 from apps.converter.models import AccessEvent, Url
 from apps.converter.utils import UserRequestUtil
-
-from .forms import UrlForm
+from apps.converter.forms import UrlForm
 
 user_request_util = UserRequestUtil()
 
@@ -91,14 +92,10 @@ class HomeView(View):
         return True
 
     def __create_short_url(self, url_object, user=None, client_ip=None):
-        if user:
-            url_object.created_by = user
-            url_object.created_by_ip = None
-        else:
-            url_object.created_by = None
-            url_object.created_by_ip = client_ip
-
+        url_object.created_by = user
+        url_object.created_by_ip = client_ip
         url_object.save()
+
         return url_object
 
     def get(self, request):
@@ -111,38 +108,69 @@ class HomeView(View):
         form = UrlForm(request.POST)
         client_ip = user_request_util.get_client_ip(request)
         create_new = request.POST.get('create_new', 'false') == 'true'
+        user = request.user
+        user_is_authenticated = user.is_authenticated
 
         if not form.is_valid():
             messages.error(
                 request, 'Erro ao criar o link. Verifique o formulário.')
             return redirect('home')
-
         url_object = form.save(commit=False)
-        user = request.user if request.user.is_authenticated else None
 
-        existing_url = self.__get_existing_url(url_object, user, client_ip)
+        if user_is_authenticated:
+            existing_url = self.__get_existing_url(
+                url_object, request.user, client_ip)
 
-        if existing_url and not create_new:
-            messages.info(request, mark_safe(f'''
-                <div class="existing-url-message" data-original-url="{existing_url.original_url}"></div>
-            '''))
+            if existing_url and not create_new:
+                messages.info(request, mark_safe(f'''
+                    <div class="existing-url-message" data-original-url="{existing_url.original_url}"></div>
+                '''))
+                return redirect('home')
+
+            if user and not self.__debit_user_wallet(user):
+                messages.error(request, mark_safe('''
+                    <p class="text-center bg-red-100 w-full max-w-lg px-4 py-2 w-80 rounded text-red-600">
+                        Saldo insuficiente! Adicione mais coins para encurtar mais URL's
+                    </p>
+                '''))
+                return redirect('home')
+
+            created_url = self.__create_short_url(url_object, user, client_ip)
+            short_url = request.build_absolute_uri(
+                f'/{created_url.short_code}/')
+
+            html_message = render_to_string(
+                'converter/includes/success_message.html',
+                {'short_url': short_url}
+            )
+
+            messages.success(request, mark_safe(html_message))
             return redirect('home')
 
-        if user and not self.__debit_user_wallet(user):
+        today_start = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        today_end = today_start + timedelta(days=1)
+
+        count_today = Url.objects.filter(
+            created_by_ip=client_ip,
+            created_at__range=(today_start, today_end)
+        ).count()
+
+        MAX_IP_PER_DAY = 5
+        if count_today >= MAX_IP_PER_DAY:
             messages.error(request, mark_safe('''
-                <p class="text-center bg-red-100 w-full max-w-lg px-4 py-2 w-80 rounded text-red-600">
-                    Saldo insuficiente! Adicione mais coins para encurtar mais URL's
+                <p class="text-center bg-yellow-100 px-4 py-2 w-full rounded text-yellow-600">
+                    Você atingiu o limite de 5 links por dia. Tente novamente amanhã ou faça login para continuar.
                 </p>
             '''))
             return redirect('home')
 
-        created_url = self.__create_short_url(url_object, user, client_ip)
-        short_url = request.build_absolute_uri(f'/{created_url.short_code}/')
+        created_url = self.__create_short_url(url_object, None, client_ip)
+        short_url = request.build_absolute_uri(
+            f'/{created_url.short_code}/')
 
         html_message = render_to_string(
             'converter/includes/success_message.html',
             {'short_url': short_url}
         )
-
         messages.success(request, mark_safe(html_message))
         return redirect('home')
