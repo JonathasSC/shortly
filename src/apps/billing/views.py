@@ -1,6 +1,5 @@
 import mercadopago
 from django.conf import settings
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import EmptyPage, Paginator
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
@@ -54,7 +53,7 @@ class SubscribePlanView(View):
             sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
             mp_service = MercadoPagoService(sdk)
             plan = Plan.objects.get(id=plan_id)
-            
+
         except Plan.DoesNotExist:
             return redirect("payment_failure")
 
@@ -150,6 +149,7 @@ class MercadoPagoWebhookView(View):
             )
             return JsonResponse({"status": "subscription_activated"})
         return JsonResponse({"status": "ignored_no_valid_type"})
+
 
 class WalletPageView(View):
     template_name = "billing/wallet.html"
