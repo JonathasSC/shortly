@@ -45,7 +45,6 @@ class BuyCoinsView(View):
         if preference.get("status") == 201:
             return redirect(preference["response"]["init_point"])
         else:
-            print("ERRO NO RETORNO:", preference)
             return HttpResponse("Erro ao criar preferência de pagamento", status=400)
 
 
@@ -55,7 +54,6 @@ class SubscribePlanView(View):
             sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
             mp_service = MercadoPagoService(sdk)
             plan = Plan.objects.get(id=plan_id)
-            print(plan)
         except Plan.DoesNotExist:
             return redirect("payment_failure")
 
@@ -75,16 +73,12 @@ class SubscribePlanView(View):
             }
         )
 
-        print(preference)
-
         return redirect(preference["response"]["init_point"])
 
 
 class MercadoPagoWebhookView(View):
     sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
-    print(sdk)
     mp_service = MercadoPagoService(sdk)
-    print(mp_service)
 
     def post(self, request, *args, **kwargs):
         return self.handle_webhook(request)
@@ -94,14 +88,11 @@ class MercadoPagoWebhookView(View):
 
     def handle_webhook(self, request):
         data = request.GET or request.POST
-        print(">>> WEBHOOK - Dados Recebidos:", dict(data))
         topic = data.get("topic") or data.get("type")
-        print(">>> WEBHOOK - Tópico:", topic)
         if topic != "payment":
             return JsonResponse({"status": "ignored"})
 
         payment_id = data.get("id") or data.get("data.id")
-        print(">>> WEBHOOK - ID do Pagamento:", payment_id)
 
         if not payment_id:
             return JsonResponse({"error": "id not found"}, status=400)
@@ -109,30 +100,22 @@ class MercadoPagoWebhookView(View):
         try:
             payment_info = self.mp_service.sdk.payment().get(payment_id)
             payment_data = payment_info.get("response", {})
-            print(">>> WEBHOOK - Dados do MP (Status):",
-                  payment_data.get("status"))
         except Exception as e:
             return JsonResponse({"error": f"failed to fetch payment: {str(e)}"}, status=500)
 
         status = payment_data.get("status")
         metadata = payment_data.get("metadata", {})
-        print(">>> WEBHOOK - Metadados:", metadata)
 
         if status != "approved":
-            print(">>> WEBHOOK - Status NÃO aprovado. Ignorando.")
             return JsonResponse({"status": "pending_or_failed"})
 
         payment_type = metadata.get("type")
         user_id = metadata.get("user_id")
-        print(">>> WEBHOOK - Tipo de Pagamento:", payment_type)
-        print(">>> WEBHOOK - User ID:", user_id)
 
         if payment_type == "coins":
             amount = metadata.get("amount", 0)
-            print(">>> WEBHOOK - COINS: Quantidade:", amount)
 
             wallet, _ = UserWallet.objects.get_or_create(user_id=user_id)
-            print(">>> WEBHOOK - COINS: Wallet Balance Anterior:", wallet.balance)
 
             wallet.balance += int(amount)
             wallet.save()
@@ -144,13 +127,11 @@ class MercadoPagoWebhookView(View):
                 description=f"Crédito de {amount} coins via Mercado Pago",
                 external_reference=str(payment_id)
             )
-            print(">>> WEBHOOK - COINS: Wallet Balance Novo:", wallet.balance)
             return JsonResponse({"status": "wallet_updated"})
 
         if payment_type == "plan":
             plan_id = metadata.get("plan_id")
             plan = Plan.objects.get(id=plan_id)
-            print(">>> WEBHOOK - PLAN: ID do Plano:", plan_id)
 
             UserSubscription.objects.update_or_create(
                 user_id=user_id,
@@ -161,7 +142,6 @@ class MercadoPagoWebhookView(View):
             )
 
             return JsonResponse({"status": "subscription_activated"})
-        print(">>> WEBHOOK - Tipo de Pagamento Inválido/Ignorado.")
         return JsonResponse({"status": "ignored_no_valid_type"})
 
 
