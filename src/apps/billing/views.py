@@ -54,6 +54,7 @@ class SubscribePlanView(View):
             sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
             mp_service = MercadoPagoService(sdk)
             plan = Plan.objects.get(id=plan_id)
+            
         except Plan.DoesNotExist:
             return redirect("payment_failure")
 
@@ -80,6 +81,26 @@ class MercadoPagoWebhookView(View):
     sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
     mp_service = MercadoPagoService(sdk)
 
+    def __process_wallet_credit(user_id, amount, payment_id):
+        wallet, _ = UserWallet.objects.get_or_create(user_id=user_id)
+        wallet.balance += int(amount)
+        wallet.save()
+
+        WalletTransaction.objects.create(
+            user_id=user_id,
+            amount=int(amount),
+            transaction_type="CREDIT",
+            description=f"Crédito de {amount} coins via Mercado Pago",
+            external_reference=str(payment_id)
+        )
+
+    def __activate_subscription(user_id, plan_id):
+        plan = Plan.objects.get(id=plan_id)
+        UserSubscription.objects.update_or_create(
+            user_id=user_id,
+            defaults={"plan": plan, "is_active": True}
+        )
+
     def post(self, request, *args, **kwargs):
         return self.handle_webhook(request)
 
@@ -92,7 +113,11 @@ class MercadoPagoWebhookView(View):
         if topic != "payment":
             return JsonResponse({"status": "ignored"})
 
-        payment_id = data.get("id") or data.get("data.id")
+        payment_id = (
+            data.get("id")
+            or data.get("data.id")
+            or (data.get("data", {}) or {}).get("id")
+        )
 
         if not payment_id:
             return JsonResponse({"error": "id not found"}, status=400)
@@ -103,49 +128,30 @@ class MercadoPagoWebhookView(View):
         except Exception as e:
             return JsonResponse({"error": f"failed to fetch payment: {str(e)}"}, status=500)
 
-        status = payment_data.get("status")
-        metadata = payment_data.get("metadata", {})
-
-        if status != "approved":
+        if payment_data.get("status") != "approved":
             return JsonResponse({"status": "pending_or_failed"})
 
+        metadata = payment_data.get("metadata", {})
         payment_type = metadata.get("type")
         user_id = metadata.get("user_id")
 
         if payment_type == "coins":
-            amount = metadata.get("amount", 0)
-
-            wallet, _ = UserWallet.objects.get_or_create(user_id=user_id)
-
-            wallet.balance += int(amount)
-            wallet.save()
-
-            WalletTransaction.objects.create(
+            self.__process_wallet_credit(
                 user_id=user_id,
-                amount=int(amount),
-                transaction_type="CREDIT",
-                description=f"Crédito de {amount} coins via Mercado Pago",
-                external_reference=str(payment_id)
+                amount=metadata.get("amount"),
+                payment_id=payment_id
             )
             return JsonResponse({"status": "wallet_updated"})
 
         if payment_type == "plan":
-            plan_id = metadata.get("plan_id")
-            plan = Plan.objects.get(id=plan_id)
-
-            UserSubscription.objects.update_or_create(
+            self.__activate_subscription(
                 user_id=user_id,
-                defaults={
-                    "plan": plan,
-                    "is_active": True,
-                }
+                plan_id=metadata.get("plan_id")
             )
-
             return JsonResponse({"status": "subscription_activated"})
         return JsonResponse({"status": "ignored_no_valid_type"})
 
-
-class WalletPageView(LoginRequiredMixin, View):
+class WalletPageView(View):
     template_name = "billing/wallet.html"
     paginate_by = 5
 
