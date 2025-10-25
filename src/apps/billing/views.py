@@ -1,6 +1,8 @@
+import json
+
 import mercadopago
 from django.conf import settings
-from django.core.paginator import EmptyPage, Paginator
+from django.core.paginator import Paginator
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
@@ -10,7 +12,6 @@ from django.views.decorators.csrf import csrf_exempt
 
 from apps.billing.models import Plan, UserSubscription, UserWallet, WalletTransaction
 from apps.billing.services import MercadoPagoService
-import json
 
 
 class BuyCoinsView(View):
