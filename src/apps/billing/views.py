@@ -2,7 +2,9 @@ import json
 
 import mercadopago
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.paginator import Paginator
+from django.db import transaction
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
@@ -86,50 +88,45 @@ class MercadoPagoWebhookView(View):
     mp_service = MercadoPagoService(sdk)
 
     def _process_wallet_credit(self, user_id, amount, payment_id):
-        print(
-            f"[DEBUG] Iniciando crédito de carteira | user_id={user_id}, amount={amount}, payment_id={payment_id}")
+        try:
+            User = get_user_model()
+            User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            raise ValueError("user_not_found")
+
+        try:
+            amount = int(float(amount))
+        except (TypeError, ValueError):
+            return {"status": "invalid_amount"}
+
+        if WalletTransaction.objects.filter(external_reference=payment_id).exists():
+            return {"status": "already_processed"}
 
         wallet, _ = UserWallet.objects.get_or_create(user_id=user_id)
-        print(
-            f"[DEBUG] Carteira localizada/criada: wallet_id={wallet.id}, saldo_atual={wallet.balance}")
 
-        amount = int(float(amount))
-        wallet.balance += amount
-        wallet.save()
+        with transaction.atomic():
+            wallet.credit(amount)
+            WalletTransaction.objects.create(
+                wallet=wallet,
+                amount=amount,
+                transaction_type=WalletTransaction.TransactionType.CREDIT,
+                source=f"Crédito de {amount} coins via Mercado Pago",
+                external_reference=str(payment_id)
+            )
 
-        print(f"[DEBUG] Novo saldo da carteira: {wallet.balance}")
-
-        WalletTransaction.objects.create(
-            user_id=user_id,
-            amount=amount,
-            transaction_type="CREDIT",
-            description=f"Crédito de {amount} coins via Mercado Pago",
-            external_reference=str(payment_id)
-        )
-        print(
-            f"[DEBUG] Transação de carteira registrada para user_id={user_id}")
+        return {"status": "wallet_updated"}
 
     def _activate_subscription(self, user_id, plan_id):
-        print(
-            f"[DEBUG] Ativando assinatura | user_id={user_id}, plan_id={plan_id}")
-
         plan = Plan.objects.get(id=plan_id)
-        print(
-            f"[DEBUG] Plano localizado: {plan.name if hasattr(plan, 'name') else plan.id}")
-
         UserSubscription.objects.update_or_create(
             user_id=user_id,
             defaults={"plan": plan, "is_active": True}
         )
-        print(
-            f"[DEBUG] Assinatura ativada ou atualizada com sucesso para user_id={user_id}")
 
     def post(self, request, *args, **kwargs):
-        print("[DEBUG] Webhook recebido via POST")
         return self.handle_webhook(request)
 
     def get(self, request, *args, **kwargs):
-        print("[DEBUG] Webhook recebido via GET")
         return self.handle_webhook(request)
 
     def handle_webhook(self, request):
@@ -138,12 +135,11 @@ class MercadoPagoWebhookView(View):
                 data = json.loads(request.body.decode("utf-8"))
             except Exception:
                 data = {}
-            else:
-                data = request.GET or request.POST
+        else:
+            data = request.GET or request.POST
 
         topic = data.get("topic") or data.get("type")
         if topic != "payment":
-            print("[DEBUG] Evento ignorado — não é um pagamento")
             return JsonResponse({"status": "ignored"})
 
         payment_id = (
@@ -151,63 +147,45 @@ class MercadoPagoWebhookView(View):
             or data.get("data.id")
             or (data.get("data", {}) or {}).get("id")
         )
-        print(f"[DEBUG] payment_id extraído: {payment_id}")
 
         if not payment_id:
-            print("[DEBUG] ERRO: ID de pagamento não encontrado no payload")
             return JsonResponse({"error": "id not found"}, status=400)
 
         try:
-            print(
-                f"[DEBUG] Buscando informações de pagamento no Mercado Pago: {payment_id}")
             payment_info = self.mp_service.sdk.payment().get(payment_id)
             payment_data = payment_info.get("response", {})
-            print(f"[DEBUG] Dados do pagamento recebidos: {payment_data}")
-
         except Exception as e:
-            print(f"[DEBUG] ERRO ao buscar pagamento: {str(e)}")
             return JsonResponse({"error": f"failed to fetch payment: {str(e)}"}, status=500)
 
         if payment_data.get("status") != "approved":
             return JsonResponse({"status": "pending_or_failed"})
 
-        status = payment_data.get("status")
-        print(f"[DEBUG] Status do pagamento: {status}")
-
-        if status != "approved":
-            print("[DEBUG] Pagamento ainda não aprovado ou falhou")
-            return JsonResponse({"status": "pending_or_failed"})
-
         metadata = payment_data.get("metadata", {})
-        print(f"[DEBUG] Metadata extraída: {metadata}")
-
         payment_type = metadata.get("type")
         user_id = metadata.get("user_id")
 
-        print(f"[DEBUG] Tipo de pagamento: {payment_type}, user_id: {user_id}")
-
         if payment_type == "credits":
-            amount = metadata.get("amount")
-            print(f"[DEBUG] Processando crédito de coins | amount={amount}")
-            self._process_wallet_credit(
-                user_id=user_id,
-                amount=metadata.get("amount"),
-                payment_id=payment_id
-            )
-            print("[DEBUG] Crédito de carteira concluído com sucesso")
-            return JsonResponse({"status": "wallet_updated"})
+            try:
+                result = self._process_wallet_credit(
+                    user_id=user_id,
+                    amount=metadata.get("amount"),
+                    payment_id=payment_id
+                )
+                return JsonResponse(result)
+
+            except ValueError as e:
+                return JsonResponse({"error": str(e)}, status=400)
+
+            except Exception:
+                return JsonResponse({"error": "internal_error"}, status=500)
 
         if payment_type == "plan":
-            plan_id = metadata.get("plan_id")
-            print(f"[DEBUG] Processando ativação de plano | plan_id={plan_id}")
             self._activate_subscription(
                 user_id=user_id,
                 plan_id=metadata.get("plan_id")
             )
-            print("[DEBUG] Assinatura ativada com sucesso")
             return JsonResponse({"status": "subscription_activated"})
 
-        print("[DEBUG] Nenhum tipo válido de pagamento encontrado na metadata")
         return JsonResponse({"status": "ignored_no_valid_type"})
 
 

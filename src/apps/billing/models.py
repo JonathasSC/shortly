@@ -96,6 +96,8 @@ class WalletTransaction(models.Model):
     amount = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     source = models.CharField(max_length=50, blank=True, null=True)
+    external_reference = models.CharField(
+        max_length=128, blank=True, null=True, unique=False)
 
     def __str__(self):
         return f"{self.transaction_type} - {self.amount} for {self.wallet.user}"
