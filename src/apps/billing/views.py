@@ -4,6 +4,7 @@ from django.core.paginator import EmptyPage, Paginator
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
+from django.utils.decorators import method_decorator
 from django.views import View
 
 from apps.billing.models import Plan, UserSubscription, UserWallet, WalletTransaction
@@ -76,6 +77,7 @@ class SubscribePlanView(View):
         return redirect(preference["response"]["init_point"])
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class MercadoPagoWebhookView(View):
     sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
     mp_service = MercadoPagoService(sdk)
