@@ -85,22 +85,23 @@ class MercadoPagoWebhookView(View):
     sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
     mp_service = MercadoPagoService(sdk)
 
-    def _process_wallet_credit(user_id, amount, payment_id):
+    def _process_wallet_credit(self, user_id, amount, payment_id):
         print(
             f"[DEBUG] Iniciando crédito de carteira | user_id={user_id}, amount={amount}, payment_id={payment_id}")
 
         wallet, _ = UserWallet.objects.get_or_create(user_id=user_id)
-
         print(
             f"[DEBUG] Carteira localizada/criada: wallet_id={wallet.id}, saldo_atual={wallet.balance}")
+
         amount = int(float(amount))
-        wallet.balance += int(amount)
+        wallet.balance += amount
         wallet.save()
+
         print(f"[DEBUG] Novo saldo da carteira: {wallet.balance}")
 
         WalletTransaction.objects.create(
             user_id=user_id,
-            amount=int(amount),
+            amount=amount,
             transaction_type="CREDIT",
             description=f"Crédito de {amount} coins via Mercado Pago",
             external_reference=str(payment_id)
@@ -108,7 +109,7 @@ class MercadoPagoWebhookView(View):
         print(
             f"[DEBUG] Transação de carteira registrada para user_id={user_id}")
 
-    def _activate_subscription(user_id, plan_id):
+    def _activate_subscription(self, user_id, plan_id):
         print(
             f"[DEBUG] Ativando assinatura | user_id={user_id}, plan_id={plan_id}")
 
