@@ -6,7 +6,6 @@ from django.utils import timezone
 
 from apps.common.models import BaseModelAbstract
 from apps.converter.utils import ShortCodeGenerator
-from typing import Optional
 
 short_code_generator: ShortCodeGenerator = ShortCodeGenerator(length=8)
 

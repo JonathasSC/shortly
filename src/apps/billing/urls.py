@@ -11,7 +11,7 @@ from apps.billing.views import (
 urlpatterns = [
     path('wallet/', WalletPageView.as_view(), name='wallet_page'),
 
-    path('buy-coins/<int:coin_amount>/',
+    path('buy-coins/<int:credit_amount>/',
          BuyCoinsView.as_view(), name='buy_credits'),
     path('subscribe/<int:plan_id>/',
          SubscribePlanView.as_view(), name='subscribe_plan'),

@@ -118,10 +118,9 @@
         </div>
         <div class="flex flex-col gap-2">
             <h2 class="font-bold mb-2">Extrato</h2>
-            {% if transactions %}
-                {% for tx in transactions %}
+            {% for transaction in transactions %}
                 <div class="border rounded-md p-4 border-zinc-200 justify-between flex items-center gap-3">
-                    {% if tx.transaction_type == "CREDIT" %}
+                    {% if transaction.transaction_type == "CREDIT" %}
                         <div class="flex gap-4">
                             <div class="bg-zinc-200 rounded-full h-8 w-8 flex items-center justify-center">
                                 <span class="material-symbols-outlined text-green-500 text-xl">
@@ -130,10 +129,10 @@
                             </div>
                             <div class="flex flex-col">
                                 <p class="text-sm">
-                                    <strong>{{ tx.source }}</strong> 
+                                    <strong>{{ transaction.source }}</strong> 
                                 </p>
                                 <p class="text-xs text-gray-500">
-                                    {{ tx.created_at }}
+                                    {{ transaction.created_at }}
                                 </p>
                             </div>
                         <div>
@@ -146,10 +145,10 @@
                             </div>
                             <div class="flex flex-col">
                                 <p class="text-sm">
-                                    <strong>{{ tx.source }}</strong> 
+                                    <strong>{{ transaction.source }}</strong> 
                                 </p>
                                 <p class="text-xs text-gray-500">
-                                    {{ tx.created_at }}
+                                    {{ transaction.created_at }}
                                 </p>
                             </div>
                         </div>
@@ -158,9 +157,62 @@
                         <strong>{{ tx.amount }} Credit</strong> 
                     </p>
                 </div>
-                {% endfor %}
-            {% else %}
+            {% empty %}
                 <p class="text-sm text-gray-500">Nenhuma transação encontrada.</p>
+            {% endfor %}
+        </div>
+        <div class="pagination-controls mt-4 flex justify-center items-center">
+            {% if transactions.has_previous %}
+            <a href="?page=1" class="btn-page text-sm border-r px-2" title="Primeira Página">
+                <span class="material-symbols-outlined text-base text-blue-500">
+                    first_page
+                </span>
+            </a>
+            <a href="?page={{ transactions.previous_page_number }}" class="btn-page text-sm px-2" title="Página Anterior">
+                <span class="material-symbols-outlined text-base text-blue-500">
+                    chevron_left
+                </span>
+            </a>
+            {% else %}
+            <span class="btn-page text-sm border-r px-2 cursor-not-allowed">
+                <span class="material-symbols-outlined text-base text-gray-400">
+                    first_page
+                </span>
+            </span>
+            <span class="btn-page text-sm px-2 cursor-not-allowed">
+                <span class="material-symbols-outlined text-base text-gray-400">
+                    chevron_left
+                </span>
+            </span>
+            {% endif %}
+
+            <span class="current-page mx-4 text-blue-500 font-medium text-sm">
+                {{ transactions.number }} de {{ transactions.paginator.num_pages }}.
+            </span>
+
+
+            {% if transactions.has_next %}
+            <a href="?page={{ transactions.next_page_number }}" class="btn-page text-sm px-2" title="Próxima Página">
+                <span class="material-symbols-outlined text-base text-blue-500">
+                    chevron_right
+                </span>
+            </a>
+            <a href="?page={{ transactions.paginator.num_pages }}" class="btn-page text-sm border-l px-2" title="Última Página">
+                <span class="material-symbols-outlined text-base text-blue-500">
+                    last_page
+                </span>
+            </a>
+            {% else %}
+            <span class="btn-page text-sm px-2 cursor-not-allowed">
+                <span class="material-symbols-outlined text-base text-gray-400">
+                    chevron_right
+                </span>
+            </span>
+            <span class="btn-page text-sm border-l px-2 cursor-not-allowed">
+                <span class="material-symbols-outlined text-base text-gray-400">
+                    last_page
+                </span>
+            </span>
             {% endif %}
         </div>
     </div>

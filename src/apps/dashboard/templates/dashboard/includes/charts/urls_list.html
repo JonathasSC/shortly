@@ -4,7 +4,7 @@
 
 <div class="bg-white border border-zinc-200 flex flex-col gap-4 rounded p-4">
     <h2 class="text-md font-semibold">Meus Links Recentes</h2>
-    <div class="overflow-x-auto">
+    <div class="overflow-x-auto flex flex-col gap-3">
         <table class="min-w-full border border-zinc-200 rounded-lg table-auto border-collapse">
             <thead>
                 <tr class="border-b border-zinc-200">
@@ -63,5 +63,9 @@
                 {% endfor %}
             </tbody>
         </table>
+        <a href="{% url 'user-url-list' %}" class="flex w-fit items-center gap-1 px-2 py-1 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 transition duration-200">
+            <span class="material-symbols-outlined">add</span>
+            Ver todas
+        </a>
     </div>
 </div>
