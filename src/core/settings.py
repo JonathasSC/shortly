@@ -264,6 +264,10 @@ CELERY_BEAT_SCHEDULE = {
         "task": "apps.converter.tasks.delete_expired_urls",
         "schedule": crontab(minute=0, hour="*"),
     },
+    "disable-expired-subscriptions-daily": {
+        "task": "apps.billing.tasks.disable_user_subscription",
+        "schedule": crontab(minute=0, hour=0),
+    },
 }
 
 MERCADO_PAGO_ACCESS_TOKEN = os.environ.get("MERCADO_PAGO_ACCESS_TOKEN", "")

@@ -4,6 +4,7 @@
 {% block content %}
 <main class="w-full flex-col mt-16 flex items-center justify-center">
     <div class="p-6 w-full max-w-[1440px] space-y-6">
+        {% if request.user.is_superuser %}
         <div class="flex justify-between items-center">
             <div>
                 <h1 class="font-bold text-xl">Assinaturas</h1>
@@ -32,7 +33,7 @@
 
                             {{ plan.name }}
                         </h2>
-      
+    
                         <div class="flex flex-col">
                             <p class="text-xl font-semibold text-gray-800">R$ {{ plan.price }} / mês</p>
             
@@ -59,6 +60,7 @@
             {% endfor %}
         </div>
     </div>
+    {% endif %}
     <div class="p-6 w-full max-w-[1440px] space-y-6">
         <div class="flex justify-between items-center">
             <div>
