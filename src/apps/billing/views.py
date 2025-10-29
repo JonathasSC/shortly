@@ -1,3 +1,5 @@
+import hashlib
+import hmac
 import json
 
 import mercadopago
@@ -123,6 +125,30 @@ class MercadoPagoWebhookView(View):
             defaults={"plan": plan, "is_active": True}
         )
 
+    def _verify_signature(self, request):
+        secret = settings.MERCADO_PAGO_WEBHOOK_SECRET
+
+        x_signature = request.headers.get("X-Signature")
+        x_request_id = request.headers.get("X-Request-Id")
+
+        payment_id = (
+            request.GET.get("id")
+            or request.GET.get("data.id")
+            or (json.loads(request.body.decode("utf-8")).get("data", {}) or {}).get("id")
+        )
+
+        if not x_signature or not payment_id:
+            return False
+
+        message = f"id:{payment_id};request-id:{x_request_id}".encode("utf-8")
+        expected_hmac = hmac.new(
+            secret.encode("utf-8"),
+            message,
+            hashlib.sha256
+        ).hexdigest()
+
+        return hmac.compare_digest(expected_hmac, x_signature)
+
     def post(self, request, *args, **kwargs):
         return self.handle_webhook(request)
 
@@ -130,6 +156,9 @@ class MercadoPagoWebhookView(View):
         return self.handle_webhook(request)
 
     def handle_webhook(self, request):
+        if not self._verify_signature(request):
+            return JsonResponse({"error": "invalid_signature"}, status=403)
+
         if request.content_type == "application/json":
             try:
                 data = json.loads(request.body.decode("utf-8"))
