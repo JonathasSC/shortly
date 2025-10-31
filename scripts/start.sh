@@ -134,7 +134,7 @@ collect_staticfiles() {
 
 make_migrations() {
     log "Aplicando migracoes no Django..."
-    $DOCKER_COMPOSE exec $SERVICE_NAME python3 manage.py makemigrations
+    nohup $DOCKER_COMPOSE exec $SERVICE_NAME python3 manage.py makemigrations
     log_success "Migracoes feitas com sucesso"
 }
 
