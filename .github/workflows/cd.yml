@@ -32,21 +32,6 @@ jobs:
           ssh-keyscan -p ${EC2_SSH_PORT} -H "${EC2_HOST}" >> ~/.ssh/known_hosts || true
           chmod 600 ~/.ssh/known_hosts
 
-      - name: Reset and update repository
-        run: |
-          ssh -o StrictHostKeyChecking=yes -p ${EC2_SSH_PORT} ${EC2_USER}@${EC2_HOST} "
-            set -euo pipefail
-            cd /etc/shortly || { echo '/etc/shortly inexistente'; exit 1; }
-
-            if [ -d .git ]; then
-              echo 'Atualizando repositório...'
-              sudo git pull origin main
-            else
-              echo 'Nenhum repositório git encontrado em /etc/shortly'
-              exit 1
-            fi
-          "
-
       - name: Run start.sh script
         run: |
           ssh -o StrictHostKeyChecking=yes -p ${EC2_SSH_PORT} ${EC2_USER}@${EC2_HOST} "
