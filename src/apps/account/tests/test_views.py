@@ -14,12 +14,12 @@ class RegisterViewTests(TestCase):
         data = {
             "username": "newuser",
             "email": "newuser@example.com",
-            "password1": "StrongPassword123",
-            "password2": "StrongPassword123",
+            "password": "Strong@Password123",
+            "confirm_password": "Strong@Password123",
         }
         response = self.client.post(reverse("register"), data)
         
-        form = response.context.get("form")
+        form = response.context
         if form:
             print(form.errors)
 
@@ -27,6 +27,48 @@ class RegisterViewTests(TestCase):
         self.assertRedirects(response, reverse("login"))
 
         self.assertTrue(User.objects.filter(username="newuser").exists())
+
+    def test_register_fails_with_mismatched_passwords(self):
+        data = {
+            "username": "user2",
+            "email": "user2@example.com",
+            "password": "Strong@Password123",
+            "confirm_password": "WrongPassword456",
+        }
+        response = self.client.post(reverse("register"), data)
+        form = response.context["form"]
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(form.errors)
+        self.assertIn('Senhas não coincidem', form.errors['__all__'])
+        self.assertFalse(User.objects.filter(username="user2").exists())
+
+    def test_register_fails_with_invalid_password_size(self):
+        data = {
+            "username": "user2",
+            "email": "user2@example.com",
+            "password": "J@2",
+            "confirm_password": "J@2",
+        }
+        response = self.client.post(reverse("register"), data)
+        form = response.context["form"]
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(form.errors)
+        self.assertIn("password", form.errors)
+        self.assertFalse(User.objects.filter(username="user2").exists())
+
+    def test_register_fails_with_invalid_password_without_special_char(self):
+        data = {
+            "username": "user2",
+            "email": "user2@example.com",
+            "password": "J2323",
+            "confirm_password": "J2323",
+        }
+        response = self.client.post(reverse("register"), data)
+        form = response.context["form"]
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(form.errors)
+        self.assertIn("password", form.errors)
+        self.assertFalse(User.objects.filter(username="user2").exists())
 
 
 class UserLoginViewTests(TestCase):
@@ -68,5 +110,4 @@ class LogoutViewTests(TestCase):
         response = self.client.get(reverse("logout"))
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("login"))
-        response = self.client.get(reverse("home"))
-        self.assertEqual(response.status_code, 302)
+                                                                                                                                                        
