@@ -64,4 +64,4 @@ O Shortly foi desenvolvido com foco em **performance, segurança e escalabilidad
 
 📩 **Contato e Suporte**  
 Caso tenha dúvidas ou sugestões, entre em contato pelo e-mail:  
-**suporte@sh0rtly.com**
+**contato@sh0rtly.com**
