@@ -2,11 +2,14 @@ from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
 
+from apps.common.utils import CommonUtils
+
 User = get_user_model()
 
 
 class UrlViewTests(TestCase):
     def setUp(self):
+        CommonUtils().disable_welcome_signal()
         self.client = Client()
         self.user = User.objects.create_user(
             username='jonathas.cardoso', password='password')

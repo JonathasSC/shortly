@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from apps.account.models import User
+from apps.common.utils import CommonUtils
 
 
 class RegisterViewTests(TestCase):
@@ -73,6 +74,7 @@ class RegisterViewTests(TestCase):
 
 class UserLoginViewTests(TestCase):
     def setUp(self):
+        CommonUtils().disable_welcome_signal()
         self.user = User.objects.create_user(
             username="testuser",
             password="12345"
@@ -100,6 +102,7 @@ class UserLoginViewTests(TestCase):
 
 class LogoutViewTests(TestCase):
     def setUp(self):
+        CommonUtils().disable_welcome_signal()
         self.user = User.objects.create_user(
             username="logoutuser",
             password="12345"
