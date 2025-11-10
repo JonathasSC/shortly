@@ -1,6 +1,6 @@
-from django.test import TestCase, override_settings
-from django.core import mail
 from django.contrib.auth import get_user_model
+from django.core import mail
+from django.test import TestCase, override_settings
 
 from apps.notification.tasks import send_welcome_email_task
 
