@@ -1,3 +1,5 @@
 FROM nginx:latest
 
-EXPOSE 80 443
+RUN rm /etc/nginx/conf.d/default.conf
+
+EXPOSE 8080

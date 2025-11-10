@@ -34,10 +34,11 @@ class CustomRegisterForm(forms.ModelForm):
     confirm_password = forms.CharField(
         label=_("Confirm password"),
         widget=forms.PasswordInput(attrs={
-            'placeholder': _("Confirm your password"), 
+            'placeholder': _("Confirm your password"),
             'class': 'w-full text-sm sm:text-md p-2 border border-zinc-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500',
         })
     )
+
     class Meta:
         model = User
         fields = ('username', 'email', 'password')
