@@ -20,13 +20,10 @@ services:
       dockerfile: Dockerfile
     restart: always
     ports:
-      - "80:80"
-      - "443:443"
+      - "8080:80"
     volumes:
-      - ./nginx/shortly.prod.conf:/etc/nginx/conf.d/shortly.conf
+      - ./nginx/shortly.dev.conf:/etc/nginx/conf.d/shortly.conf
       - ./nginx/whitelist.conf:/etc/nginx/whitelist.conf:ro
-      - ./data/certbot/conf:/etc/letsencrypt
-      - ./data/certbot/www:/var/www/certbot
       - static_volume:/usr/share/nginx/html
     depends_on:
       - shortly
@@ -50,7 +47,7 @@ services:
       context: ./src
       dockerfile: Dockerfile
     container_name: shortly-celery-worker
-    command: celery -A core.celery worker -l info
+    command: celery -A core.celery worker -l info 
     working_dir: /usr/src
     volumes:
       - ./src:/usr/src
@@ -103,13 +100,6 @@ services:
     networks:
       - shortly_net
     restart: always
-
-  certbot:
-    image: certbot/certbot:latest
-    container_name: shortly-certbot
-    volumes:
-      - ./data/certbot/conf:/etc/letsencrypt
-      - ./data/certbot/www:/var/www/certbot
 
 networks:
   shortly_net:

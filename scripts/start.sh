@@ -50,37 +50,6 @@ print_header() {
   echo -e "${border}${RESET}\n"
 }
 
-
-obtain_ssl_certificates() {
-    print_header "Obtendo certificados SSL com Certbot"
-
-    if [ -f "./data/certbot/conf/live/sh0rtly.com/fullchain.pem" ]; then
-        log_warn "Certificados ja existem. Pulando passo do Certbot."
-        return
-    fi
-
-    log "Subindo Nginx em modo HTTP para validacao ACME..."
-    $DOCKER_COMPOSE up -d nginx
-    sleep 5
-
-    docker compose run --rm certbot certonly -v \
-        --webroot -w /var/www/certbot \
-        --email $SSL_EMAIL \
-        --agree-tos \
-        --no-eff-email \
-        -d sh0rtly.com
-
-    if [ $? -eq 0 ]; then
-        log_success "Certificados SSL obtidos com sucesso"
-    else
-        log_error "Falha ao obter certificados SSL"
-        exit 1
-    fi
-
-    log "Reiniciando Nginx com suporte SSL..."
-    $DOCKER_COMPOSE down
-}
-
 pull_latest_code() {
     log "Atualizando codigo-fonte via git pull..."
     if ! git pull; then
@@ -160,14 +129,6 @@ run_start() {
     stop_oldest_containers
 
     print_header "Build e up do Nginx (HTTP apenas)"
-    $DOCKER_COMPOSE build nginx
-    $DOCKER_COMPOSE up -d nginx
-
-    obtain_ssl_certificates
-    
-    print_header "Parando Nginx (modo HTTP)"
-    $DOCKER_COMPOSE down nginx
-
     $DOCKER_COMPOSE build nginx
     $DOCKER_COMPOSE up -d nginx
 

@@ -114,6 +114,7 @@ INSTALLED_APPS = [
     'apps.account',
     'apps.institutional',
     'apps.billing',
+    'apps.notification',
 ]
 
 # ================================================================
@@ -158,39 +159,24 @@ TEMPLATES = [
 # ================================================================
 # DATABASES
 # ================================================================
-if DEBUG:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
+DATABASES = {
+    'default': {
+        'ENGINE': f'django.db.backends.{os.getenv("DB_ENGINE")}',
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT'),
     }
-elif 'test' in sys.argv:
+}
+
+if 'test' in sys.argv:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': ':memory:',
         }
     }
-else:
-    DB_ENGINE = os.getenv('DB_ENGINE', 'sqlite3')
-    DB_NAME = os.getenv('DB_NAME', BASE_DIR / 'db.sqlite3')
-    DB_USER = os.getenv('DB_USER', '')
-    DB_PASSWORD = os.getenv('DB_PASSWORD', '')
-    DB_HOST = os.getenv('DB_HOST', '')
-    DB_PORT = os.getenv('DB_PORT', '')
-
-    DATABASES = {
-        'default': {
-            'ENGINE': f'django.db.backends.{DB_ENGINE}',
-            'NAME': DB_NAME,
-            'USER': DB_USER,
-            'PASSWORD': DB_PASSWORD,
-            'HOST': DB_HOST,
-            'PORT': DB_PORT,
-        }
-    }
-
 
 # ================================================================
 # AUTHENTICATION & PASSWORD VALIDATION
@@ -214,7 +200,7 @@ ACCOUNT_FORMS = {
 
 LOGIN_URL = 'apps.account:login'
 LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = 'apps.converter:home'
+LOGOUT_REDIRECT_URL = '/'
 
 # ================================================================
 # INTERNATIONALIZATION & TIMEZONE
@@ -273,3 +259,25 @@ CELERY_BEAT_SCHEDULE = {
 MERCADO_PAGO_ACCESS_TOKEN = os.environ.get("MERCADO_PAGO_ACCESS_TOKEN", "")
 MERCADO_PAGO_PUBLIC_KEY = os.environ.get("MERCADO_PAGO_PUBLIC_KEY", "")
 MERCADO_PAGO_WEBHOOK_SECRET = os.environ.get("MERCADO_PAGO_WEBHOOK_SECRET", "")
+
+# ================================================================
+# EMAIL CONFIGURATION
+# ================================================================
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+try:
+    EMAIL_HOST = os.environ.get('DJANGO_EMAIL_HOST')
+    EMAIL_PORT = int(os.environ.get('DJANGO_EMAIL_PORT', 465))
+    EMAIL_USE_SSL = os.environ.get('DJANGO_EMAIL_USE_SSL', '').lower() in ['true', '1', 'yes']
+    EMAIL_USE_TLS = os.environ.get('DJANGO_EMAIL_USE_TLS', '').lower() in ['true', '1', 'yes']
+    EMAIL_HOST_USER = os.environ.get('DJANGO_EMAIL_HOST_USER')
+    EMAIL_HOST_PASSWORD = os.environ.get('DJANGO_EMAIL_HOST_PASSWORD')
+    DEFAULT_FROM_EMAIL = os.environ.get('DJANGO_DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
+
+except KeyError as e:
+    missing_key = e.args[0]
+    raise RuntimeError(
+        f"Configuração de e-mail ausente: a variável de ambiente '{missing_key}' não foi definida.")
+
+except ValueError as e:
+    raise RuntimeError(f"Erro na configuração de e-mail: {e}")
