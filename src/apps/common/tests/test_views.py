@@ -7,4 +7,4 @@ class NotFoundViewTest(TestCase):
         url = reverse('notfound')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'common/notfound.html')
+        self.assertTemplateUsed(response, 'common/404.html')
