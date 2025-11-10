@@ -6,7 +6,6 @@ from django.dispatch import receiver
 from apps.account.models import User
 from apps.notification.tasks import send_welcome_email_task
 
-
 user: User = get_user_model()
 
 
