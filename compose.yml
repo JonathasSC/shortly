@@ -3,9 +3,7 @@ services:
     container_name: shortly
     build: 
       context: ./src
-      dockerfile: Dockerfile
-    env_file:
-      - ${ENV_FILE} 
+      dockerfile: Dockerfile 
     restart: always
     volumes:
       - ./src/logs:/usr/src/logs
@@ -55,9 +53,7 @@ services:
       - PYTHONPATH=/usr/src
     depends_on:
       - shortly
-      - rabbitmq
-    env_file:
-      - ${ENV_FILE} 
+      - rabbitmq 
     networks:
       - shortly_net
     restart: always
@@ -74,9 +70,7 @@ services:
       - ./src:/usr/src
     depends_on:
       - shortly
-      - rabbitmq
-    env_file:
-      - ${ENV_FILE} 
+      - rabbitmq 
     networks:
       - shortly_net
     restart: always
@@ -90,8 +84,6 @@ services:
       celery --app=core.celery flower --port=5555
     ports:
       - "5555:5555"
-    env_file:
-      - ${ENV_FILE}
     working_dir: /usr/src
     depends_on:
       - rabbitmq
