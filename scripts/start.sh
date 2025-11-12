@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ENV_FILE="./src/.env.prod"
+ENV_FILE="./src/.env"
 DOCKER_COMPOSE="docker compose"
 SERVICE_NAME="shortly"
 
