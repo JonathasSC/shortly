@@ -1,6 +1,7 @@
 import hashlib
 import hmac
 import json
+import logging
 
 import mercadopago
 from django.conf import settings
@@ -18,6 +19,7 @@ from django.views.decorators.csrf import csrf_exempt
 from apps.billing.models import Plan, UserSubscription, UserWallet, WalletTransaction
 from apps.billing.services import MercadoPagoService
 
+logger = logging.getLogger(__name__)
 
 class BuyCoinsView(LoginRequiredMixin, View):
     prices = {
@@ -28,10 +30,13 @@ class BuyCoinsView(LoginRequiredMixin, View):
     }
 
     def get(self, request, credit_amount, *args, **kwargs):
+        logger.info(f"Usuário {request.user.id} iniciou compra de {credit_amount} créditos.")
+
         sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
         mp_service = MercadoPagoService(sdk)
 
         if credit_amount not in self.prices:
+            logger.warning(f"Tentativa de compra inválida de {credit_amount} créditos por {request.user.id}")
             return redirect("payment_failure")
 
         success_url = request.build_absolute_uri(reverse("payment_success"))
@@ -51,8 +56,10 @@ class BuyCoinsView(LoginRequiredMixin, View):
         )
 
         if preference.get("status") == 201:
+            logger.info(f"Preferência de pagamento criada com sucesso para {request.user.id}")
             return redirect(preference["response"]["init_point"])
         else:
+            logger.error(f"Erro ao criar preferência de pagamento para {request.user.id}: {preference}")
             return HttpResponse("Erro ao criar preferência de pagamento", status=400)
 
 
@@ -62,8 +69,10 @@ class SubscribePlanView(LoginRequiredMixin, View):
             sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
             mp_service = MercadoPagoService(sdk)
             plan = Plan.objects.get(id=plan_id)
+            logger.info(f"Usuário {request.user.id} iniciou assinatura do plano {plan_id}")
 
         except Plan.DoesNotExist:
+            logger.warning(f"Plano {plan_id} não encontrado para assinatura por {request.user.id}")
             return redirect("payment_failure")
 
         success_url = request.build_absolute_uri(reverse("payment_success"))
@@ -81,7 +90,8 @@ class SubscribePlanView(LoginRequiredMixin, View):
                 "plan_id": plan.id
             }
         )
-
+       
+        logger.info(f"Preferência de pagamento criada para assinatura do plano {plan_id} pelo usuário {request.user.id}")
         return redirect(preference["response"]["init_point"])
 
 
@@ -91,10 +101,13 @@ class MercadoPagoWebhookView(View):
     mp_service = MercadoPagoService(sdk)
 
     def _process_wallet_credit(self, user_id, amount, payment_id):
+        logger.info(f"Processando crédito na carteira: user={user_id}, amount={amount}, payment={payment_id}")
         try:
             User = get_user_model()
             User.objects.get(pk=user_id)
+
         except User.DoesNotExist:
+            logger.info(f"Processando crédito na carteira: user={user_id}, amount={amount}, payment={payment_id}")
             raise ValueError("user_not_found")
 
         try:
@@ -116,7 +129,7 @@ class MercadoPagoWebhookView(View):
                 source=f"Crédito de {amount} coins via Mercado Pago",
                 external_reference=str(payment_id)
             )
-
+        logger.info(f"Crédito de {amount} coins aplicado ao usuário {user_id}")
         return {"status": "wallet_updated"}
 
     def _activate_subscription(self, user_id, plan_id):
