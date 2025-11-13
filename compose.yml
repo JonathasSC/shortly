@@ -28,7 +28,7 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - ./nginx/shortly.dev.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/shortly.prod.conf:/etc/nginx/conf.d/default.conf
       - ./nginx/whitelist.conf:/etc/nginx/whitelist.conf:ro
       - static_volume:/usr/share/nginx/html
     depends_on:
