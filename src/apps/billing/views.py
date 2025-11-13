@@ -5,6 +5,7 @@ import json
 import mercadopago
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
 from django.db import transaction
 from django.http import HttpResponse, JsonResponse
@@ -18,7 +19,7 @@ from apps.billing.models import Plan, UserSubscription, UserWallet, WalletTransa
 from apps.billing.services import MercadoPagoService
 
 
-class BuyCoinsView(View):
+class BuyCoinsView(LoginRequiredMixin, View):
     prices = {
         10: 5.99,
         20: 10.99,
@@ -55,7 +56,7 @@ class BuyCoinsView(View):
             return HttpResponse("Erro ao criar preferência de pagamento", status=400)
 
 
-class SubscribePlanView(View):
+class SubscribePlanView(LoginRequiredMixin, View):
     def get(self, request, plan_id, *args, **kwargs):
         try:
             sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
