@@ -103,13 +103,13 @@ services:
       context: ./src
       dockerfile: Dockerfile
     container_name: shortly-flower
+    env_file:
+      - ${ENV_FILE}
     command: >
       celery --app=core.celery flower --port=5555
       --basic_auth=${FLOWER_USER}:${FLOWER_PASSWORD}
     ports:
       - "5555:5555"
-    env_file:
-      - ${ENV_FILE}
     working_dir: /usr/src
     depends_on:
       rabbitmq:
