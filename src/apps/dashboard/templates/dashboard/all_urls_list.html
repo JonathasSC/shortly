@@ -1,6 +1,5 @@
 {% extends 'common/base.html' %}
 {% load static %}
-
 {% load i18n %}
 
 {% block content %}
@@ -11,7 +10,7 @@
                 type="text"
                 name="q"
                 value="{{ request.GET.q|default:'' }}"
-                placeholder="Buscar URL ou Código Curto..."
+                placeholder="{% trans 'Search URL or Short Code...' %}"
                 class="w-full p-2 border text-sm sm:text-md border-zinc-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
 
@@ -19,25 +18,27 @@
                 type="number"
                 name="min_clicks"
                 value="{{ request.GET.min_clicks|default:'' }}"
-                placeholder="Mínimo de cliques"
+                placeholder="{% trans 'Minimum clicks' %}"
                 class="w-full p-2 border text-sm sm:text-md border-zinc-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
 
             <button type="submit" 
                 class="w-fit flex flex-row gap-2 items-center bg-blue-500 text-sm sm:text-md text-white py-2 px-4 rounded hover:bg-blue-600 transition">
                 <span class="material-symbols-outlined text-sm">filter_alt</span>
-                Filtrar
+                
+                {% trans "Filter" %}
+            
             </button>
         </form>
 
         <table class="hidden md:table min-w-full border border-zinc-200 rounded-lg table-auto overflow-hidden">
             <thead class="bg-zinc-50 border-b border-zinc-200">
                 <tr>
-                    <th class="px-3 py-2 text-left text-sm text-zinc-600">URL Original</th>
-                    <th class="px-3 py-2 text-left text-sm text-zinc-600">Short Link</th>
-                    <th class="px-3 py-2 text-center text-sm text-zinc-600">Acessos</th>
-                    <th class="px-3 py-2 text-center text-sm text-zinc-600">Criado em</th>
-                    <th class="px-3 py-2 text-center text-sm text-zinc-600">Ações</th>
+                    <th class="px-3 py-2 text-left text-sm text-zinc-600">{% trans "Original URL" %}</th>
+                    <th class="px-3 py-2 text-left text-sm text-zinc-600">{% trans "Short Link" %}</th>
+                    <th class="px-3 py-2 text-center text-sm text-zinc-600">{% trans "Clicks" %}</th>
+                    <th class="px-3 py-2 text-center text-sm text-zinc-600">{% trans "Created at" %}</th>
+                    <th class="px-3 py-2 text-center text-sm text-zinc-600">{% trans "Actions" %}</th>
                 </tr>
             </thead>
 
@@ -97,7 +98,9 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5" class="text-center py-6 text-gray-500">Nenhum link encontrado.</td>
+                    <td colspan="5" class="text-center py-6 text-gray-500">
+                        {% trans "No links found." %}
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -145,13 +148,14 @@
         <div class="pagination-controls mt-4 flex justify-center items-center">
             {% if links.has_previous %}
                 <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}{% if request.GET.min_clicks %}min_clicks={{ request.GET.min_clicks }}&{% endif %}page=1"
-                class="btn-page text-sm border-r px-2" title="Primeira Página">
+                class="btn-page text-sm border-r px-2" title="{% trans 'First Page' %}">
                     <span class="material-symbols-outlined text-base text-blue-500">
                         first_page
                     </span>
                 </a>
+
                 <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}{% if request.GET.min_clicks %}min_clicks={{ request.GET.min_clicks }}&{% endif %}page={{ links.previous_page_number }}"
-                class="btn-page text-sm px-2" title="Página Anterior">
+                class="btn-page text-sm px-2" title="{% trans 'Previous Page' %}">
                     <span class="material-symbols-outlined text-base text-blue-500">
                         chevron_left
                     </span>
@@ -170,18 +174,19 @@
             {% endif %}
 
             <span class="current-page mx-4 text-blue-500 font-medium text-sm">
-                {{ links.number|default:1 }} de {{ links.paginator.num_pages|default:1 }}
+                {{ links.number|default:1 }} {% trans "of" %} {{ links.paginator.num_pages|default:1 }}
             </span>
 
             {% if links.has_next %}
                 <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}{% if request.GET.min_clicks %}min_clicks={{ request.GET.min_clicks }}&{% endif %}page={{ links.next_page_number }}"
-                class="btn-page text-sm px-2" title="Próxima Página">
+                class="btn-page text-sm px-2" title="{% trans 'Next Page' %}">
                     <span class="material-symbols-outlined text-base text-blue-500">
                         chevron_right
                     </span>
                 </a>
+
                 <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}{% if request.GET.min_clicks %}min_clicks={{ request.GET.min_clicks }}&{% endif %}page={{ links.paginator.num_pages }}"
-                class="btn-page text-sm border-l px-2" title="Última Página">
+                class="btn-page text-sm border-l px-2" title="{% trans 'Last Page' %}">
                     <span class="material-symbols-outlined text-base text-blue-500">
                         last_page
                     </span>
