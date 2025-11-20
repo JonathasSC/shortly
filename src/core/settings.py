@@ -235,7 +235,16 @@ STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesSto
 # CELERY CONFIGURATION
 # ================================================================
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL")
-CELERY_RESULT_BACKEND = None
+
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND")
+
+CELERY_BROKER_TRANSPORT_OPTIONS = {
+    "region": os.getenv("CELERY_BROKER_TRANSPORT_REGION"),
+    "visibility_timeout": int(os.getenv("CELERY_BROKER_TRANSPORT_VISIBILITY_TIMEOUT", 3600)),
+    "polling_interval": int(os.getenv("CELERY_BROKER_TRANSPORT_POLLING_INTERVAL", 1)),
+    "queue_name_prefix": os.getenv("CELERY_BROKER_TRANSPORT_QUEUE_NAME_PREFIX", "shortly-")
+}
 
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
