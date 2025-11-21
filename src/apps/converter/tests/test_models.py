@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
+from apps.common.utils import CommonUtils
 from apps.converter.models import AccessEvent, Url
 
 User = get_user_model()
@@ -8,6 +9,7 @@ User = get_user_model()
 
 class UrlModelTestCase(TestCase):
     def setUp(self):
+        CommonUtils().disable_welcome_signal()
         self.user = User.objects.create_user(
             username='Example',
             email='example@email.com'
@@ -28,6 +30,7 @@ class UrlModelTestCase(TestCase):
 
 class AccessEventModelTestCase(TestCase):
     def setUp(self):
+        CommonUtils().disable_welcome_signal()
         self.user = User.objects.create_user(
             username='AccessUser',
             email='accessuser@email.com'

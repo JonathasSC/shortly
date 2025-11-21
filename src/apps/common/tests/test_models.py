@@ -5,6 +5,7 @@ from django.db import connection, models
 from django.test import TransactionTestCase
 
 from apps.common.models import BaseModelAbstract
+from apps.common.utils import CommonUtils
 
 
 class ExampleModel(BaseModelAbstract):
@@ -35,6 +36,7 @@ class BaseModelAbstractTest(TransactionTestCase):
         super().tearDownClass()
 
     def setUp(self):
+        CommonUtils().disable_welcome_signal()
         self.user = get_user_model().objects.create_user(
             username="tester",
             email="tester@example.com",

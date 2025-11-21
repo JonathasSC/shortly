@@ -2,13 +2,13 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
+# 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-15 16:38-0300\n"
+"POT-Creation-Date: 2025-11-17 08:01-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,151 +18,253 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: apps/account/forms.py:11 apps/account/forms.py:74
+#: src/apps/account/forms.py:11 src/apps/account/forms.py:75
 msgid "Username"
 msgstr "Nome de usuário"
 
-#: apps/account/forms.py:13
+#: src/apps/account/forms.py:13
 msgid "Your username"
 msgstr "Seu nome de usuário"
 
-#: apps/account/forms.py:19
+#: src/apps/account/forms.py:19
 msgid "E-mail address"
 msgstr "Endereço de E-mail"
 
-#: apps/account/forms.py:21
+#: src/apps/account/forms.py:21
 msgid "example@email.com"
 msgstr "exemplo@email.com"
 
-#: apps/account/forms.py:27 apps/account/forms.py:82
+#: src/apps/account/forms.py:27 src/apps/account/forms.py:83
 msgid "Password"
 msgstr "Senha"
 
-#: apps/account/forms.py:29
+#: src/apps/account/forms.py:29
 msgid "Your secure password"
 msgstr "Sua senha segura"
 
-#: apps/account/forms.py:35
+#: src/apps/account/forms.py:35
 msgid "Confirm password"
 msgstr "Confirme a senha"
 
-#: apps/account/forms.py:37
+#: src/apps/account/forms.py:37
 msgid "Confirm your password"
 msgstr "Confirme sua senha"
 
-#: apps/account/forms.py:60
+#: src/apps/account/forms.py:61
 msgid "Passwords do not match."
 msgstr "Senhas não coincidem"
 
-#: apps/account/forms.py:76
-msgid "Seu nome de usuário"
-msgstr ""
+#: src/apps/account/forms.py:77
+msgid "Your username"
+msgstr "Seu nome de usuário"
 
-#: apps/account/forms.py:84
-msgid "Sua senha"
-msgstr ""
+#: src/apps/account/forms.py:85
+msgid "Your password"
+msgstr "Sua senha"
 
-#: apps/account/models.py:8
+#: src/apps/account/models.py:9
 #, fuzzy
 #| msgid "E-mail address"
-msgid "email address"
+msgid "Email address"
 msgstr "Endereço de E-mail"
 
-#: apps/account/templates/account/login.html:22
+#: src/apps/account/templates/account/login.html:23
 msgid "Welcome back!"
 msgstr "Bem-vindo de volta!"
 
-#: apps/account/templates/account/login.html:25
+#: src/apps/account/templates/account/login.html:26
 msgid "Please log in to your account"
 msgstr "Entre na sua conta"
 
-#: apps/account/templates/account/login.html:46
+#: src/apps/account/templates/account/login.html:54
+#, fuzzy
+#| msgid "Confirm your password"
+msgid "Forgot your password?"
+msgstr "Confirme sua senha"
+
+#: src/apps/account/templates/account/login.html:62
 msgid "Signin"
 msgstr "Entrar"
 
-#: apps/account/templates/account/register.html:22
+#: src/apps/account/templates/account/password_reset.html:23
+#, fuzzy
+#| msgid "Create your account!"
+msgid "Recover your account"
+msgstr "Crie sua conta!"
+
+#: src/apps/account/templates/account/password_reset.html:26
+msgid "Enter your email to receive reset instructions"
+msgstr "Coloque seu e-mail para receber as instruções de redefinição"
+
+#: src/apps/account/templates/account/password_reset.html:52
+msgid "Send instructions"
+msgstr "Enviar instruções"
+
+#: src/apps/account/templates/account/password_reset.html:57
+msgid "Back to login"
+msgstr "Voltar ao login"
+
+#: src/apps/account/templates/account/password_reset_complete.html:19
+msgstr "Senha alterada com sucesso!"
+msgid "Password changed successfully!"
+
+#: src/apps/account/templates/account/password_reset_complete.html:23
+msgid "Agora você já pode entrar com sua nova senha."
+msgstr "Now you can login with your new password."
+
+#: src/apps/account/templates/account/password_reset_complete.html:28
+msgid "Ir para o login"
+msgstr "Go to login"
+
+#: src/apps/account/templates/account/password_reset_confirm.html:20
+msgid "Definir nova senha"
+msgstr "Define a new password"
+
+#: src/apps/account/templates/account/password_reset_confirm.html:40
+msgid "Salvar nova senha"
+msgstr "Save a new password"
+
+#: src/apps/account/templates/account/password_reset_done.html:19
+#, fuzzy
+#| msgid "E-mail address"
+msgstr "E-mail sended!"
+msgid "E-mail enviado!"
+
+#: src/apps/account/templates/account/password_reset_done.html:23
+msgstr ""
+"Se o e-mail informado estiver cadastrado, você receberá um link para "
+"redefinir sua senha."
+msgid "If the provided email is registered, you will receive a link to reset your password."
+
+#: src/apps/account/templates/account/password_reset_done.html:28
+msgid "Back to login"
+msgstr "Voltar ao login"
+
+#: src/apps/account/templates/account/register.html:22
 msgid "Create your account!"
 msgstr "Crie sua conta!"
 
-#: apps/account/templates/account/register.html:25
+#: src/apps/account/templates/account/register.html:25
 msgid "Join us! Create your account today"
 msgstr "Junte-se a nós! Crie sua conta agora"
 
-#: apps/account/templates/account/register.html:46
+#: src/apps/account/templates/account/register.html:46
 msgid "Register"
 msgstr "Registre-se"
 
-#: apps/account/utils.py:53
-msgid "A senha deve ter pelo menos 8 caracteres."
-msgstr ""
+#: src/apps/account/utils.py:53
+msgstr "A senha deve ter pelo menos 8 caracteres."
+msgid "The password must be at least 8 characters long."
 
-#: apps/account/utils.py:56
-msgid "A senha deve conter letras e números."
-msgstr ""
+#: src/apps/account/utils.py:56
+msgid "The password must contain letters and numbers."
+msgstr "A senha deve conter letras e números."
 
-#: apps/account/utils.py:59
+#: src/apps/account/utils.py:59
 msgid "A senha deve conter pelo menos um caractere especial."
-msgstr ""
+msgstr "The password must contain at least one special character."
 
-#: apps/common/templates/common/includes/aside.html:12
-#: templates/shared/aside.html:12
+#: src/apps/common/templates/common/includes/aside.html:12
 msgid "Home"
-msgstr ""
+msgstr "Inicio"
 
-#: apps/common/templates/common/includes/aside.html:16
-#: templates/shared/aside.html:16
+#: src/apps/common/templates/common/includes/aside.html:16
 msgid "About"
-msgstr ""
+msgstr "Sobre"
 
-#: apps/common/templates/common/includes/aside.html:20
-#: templates/shared/aside.html:20
+#: src/apps/common/templates/common/includes/aside.html:20
 msgid "Services"
-msgstr ""
+msgstr "Serviços"
 
-#: apps/common/templates/common/includes/aside.html:24
-#: templates/shared/aside.html:24
+#: src/apps/common/templates/common/includes/aside.html:24
 msgid "Contact"
-msgstr ""
+msgstr "Contato"
 
-#: apps/common/templates/common/includes/aside.html:34
-#: templates/shared/aside.html:34
+#: src/apps/common/templates/common/includes/aside.html:34
 msgid "Logout"
 msgstr "Sair"
 
-#: apps/common/templates/common/includes/header.html:13
-#: templates/shared/header.html:12
+#: src/apps/common/templates/common/includes/header.html:13
 msgid "Login"
 msgstr "Entrar"
 
-#: apps/common/templates/common/includes/header.html:21
-#: templates/shared/header.html:18
+#: src/apps/common/templates/common/includes/header.html:21
 msgid "Create Account"
 msgstr "Crie sua conta!"
 
-#: apps/common/templates/common/includes/header.html:29
-#: templates/shared/header.html:25
+#: src/apps/common/templates/common/includes/header.html:33
 msgid "Dashboard"
-msgstr ""
+msgstr "Dashboard"
 
-#: apps/converter/forms.py:14
+#: src/apps/converter/forms.py:14
 msgid "Original URL"
-msgstr ""
+msgstr "URL Original"
 
-#: apps/converter/forms.py:19
+#: src/apps/converter/forms.py:19
 msgid "Type or Paste your URL here..."
 msgstr "Digite ou Cole sua URL aqui..."
 
-#: apps/dashboard/templates/dashboard/home.html:21
+#: src/apps/converter/templates/converter/home.html:10
+msgid "Link Shortener"
+msgstr "Encurtador de Link"
+
+#: src/apps/converter/templates/converter/home.html:12
+#, fuzzy
+#| msgid "Turn long links into short, easy-to-share URLs in just a few clicks."
+msgid "Turn long links into short, shareable URLs"
+msgstr ""
+"Transforme links longos em URLs curtas e fáceis de compartilhar com apenas "
+"alguns cliques."
+
+#: src/apps/converter/templates/converter/home.html:33
+#, fuzzy
+#| msgid "Fast Shortening"
+msgid "Shorten"
+msgstr "Encurtamento Rápido"
+
+#: src/apps/converter/templates/converter/home.html:54
+msgid "URL already shortened"
+msgstr "URL já encurtada"
+
+#: src/apps/converter/templates/converter/home.html:56
+msgid ""
+"This URL has already been shortened and is still active. Do you want to "
+"create a new shortened URL for the same destination?"
+msgstr ""
+"Esta URL já foi encurtada e ainda está ativa. Você deseja criar uma nova "
+"URL encurtada para o mesmo destino?"
+
+#: src/apps/converter/templates/converter/home.html:60
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: src/apps/converter/templates/converter/home.html:67
+msgid "Create New"
+msgstr "Criar Nova"
+
+#: src/apps/converter/templates/converter/middle.html:12
+msgid "You will be redirected in..."
+msgstr "Você será redirecionado em..."
+
+#: src/apps/converter/templates/converter/middle.html:19
+msgid "If you are not automatically redirected,"
+msgstr "Caso você não seja redirecionado automaticamente,"
+
+#: src/apps/converter/templates/converter/middle.html:21
+msgid "click here"
+msgstr "clique aqui"
+
+#: src/apps/dashboard/templates/dashboard/home.html:21
 #, fuzzy
 #| msgid "Your URL"
 msgid "Short URL"
 msgstr "Encurtar URL"
 
-#: apps/institutional/templates/institutional/about-us.html:9
+#: src/apps/institutional/templates/institutional/about-us.html:9
 msgid "About Shortly"
 msgstr "Sobre o Shortly"
 
-#: apps/institutional/templates/institutional/about-us.html:11
+#: src/apps/institutional/templates/institutional/about-us.html:11
 msgid ""
 "Shortly is a modern platform for URL shortening, designed to make link "
 "sharing faster, smarter, and more efficient."
@@ -170,31 +272,31 @@ msgstr ""
 "O Shortly é uma plataforma moderna de encurtamento de URLs, projetada para "
 "tornar o compartilhamento de links mais rápido, inteligente e eficiente."
 
-#: apps/institutional/templates/institutional/about-us.html:18
+#: src/apps/institutional/templates/institutional/about-us.html:18
 msgid "Fast Shortening"
 msgstr "Encurtamento Rápido"
 
-#: apps/institutional/templates/institutional/about-us.html:20
+#: src/apps/institutional/templates/institutional/about-us.html:20
 msgid "Turn long links into short, easy-to-share URLs in just a few clicks."
 msgstr ""
 "Transforme links longos em URLs curtas e fáceis de compartilhar com apenas "
 "alguns cliques."
 
-#: apps/institutional/templates/institutional/about-us.html:26
+#: src/apps/institutional/templates/institutional/about-us.html:26
 msgid "Smart Monitoring"
 msgstr "Monitoramento Inteligente"
 
-#: apps/institutional/templates/institutional/about-us.html:28
+#: src/apps/institutional/templates/institutional/about-us.html:28
 msgid "Track usage metrics, number of clicks, devices, and access locations."
 msgstr ""
 "Acompanhe métricas de uso, número de cliques, dispositivos e localização dos "
 "acessos."
 
-#: apps/institutional/templates/institutional/about-us.html:34
+#: src/apps/institutional/templates/institutional/about-us.html:34
 msgid "Insights and Analytics"
 msgstr "Insights e Análises"
 
-#: apps/institutional/templates/institutional/about-us.html:36
+#: src/apps/institutional/templates/institutional/about-us.html:36
 msgid ""
 "Gain valuable data to optimize campaigns, understand your audience, and make "
 "better decisions."
@@ -202,7 +304,7 @@ msgstr ""
 "Obtenha dados valiosos para otimizar campanhas, entender seu público e tomar "
 "decisões melhores."
 
-#: apps/institutional/templates/institutional/about-us.html:42
+#: src/apps/institutional/templates/institutional/about-us.html:42
 msgid ""
 "Our goal is to provide a simple, secure, and powerful experience for "
 "creators, professionals, businesses, and anyone who needs to share links "
@@ -214,66 +316,108 @@ msgstr ""
 "compartilhar links com eficiência e inteligência. Com o Shortly, você tem "
 "controle total sobre seus links e acesso a insights que fazem a diferença."
 
-#: apps/institutional/templates/institutional/privacy-policy.html:8
+#: src/apps/institutional/templates/institutional/privacy-policy.html:8
 msgid "Privacy Policy"
 msgstr "Política de Privacidade"
 
-#: apps/institutional/templates/institutional/privacy-policy.html:11
-msgid "At Shortly, your privacy is our top priority. This Privacy Policy outlines the types of information we collect, how we use it, and the measures we take to safeguard your personal data."
-msgstr "No Shortly, sua privacidade é nossa prioridade máxima. Esta Política de Privacidade descreve os tipos de informações que coletamos, como as utilizamos e as medidas que adotamos para proteger seus dados pessoais."
+#: src/apps/institutional/templates/institutional/privacy-policy.html:11
+msgid ""
+"At Shortly, your privacy is our top priority. This Privacy Policy outlines "
+"the types of information we collect, how we use it, and the measures we take "
+"to safeguard your personal data."
+msgstr ""
+"No Shortly, sua privacidade é nossa prioridade máxima. Esta Política de "
+"Privacidade descreve os tipos de informações que coletamos, como as "
+"utilizamos e as medidas que adotamos para proteger seus dados pessoais."
 
-#: apps/institutional/templates/institutional/privacy-policy.html:18
+#: src/apps/institutional/templates/institutional/privacy-policy.html:18
 msgid "Information We Collect"
 msgstr "Informações que Coletamos"
 
-#: apps/institutional/templates/institutional/privacy-policy.html:21
-msgid "Information you provide when creating an account, including your name, email address, and encrypted password."
-msgstr "Informações fornecidas ao criar uma conta, incluindo seu nome, endereço de e-mail e senha criptografada."
+#: src/apps/institutional/templates/institutional/privacy-policy.html:21
+msgid ""
+"Information you provide when creating an account, including your name, email "
+"address, and encrypted password."
+msgstr ""
+"Informações fornecidas ao criar uma conta, incluindo seu nome, endereço de e-"
+"mail e senha criptografada."
 
-#: apps/institutional/templates/institutional/privacy-policy.html:22
-msgid "Data related to your use of our services, such as shortened URLs, click statistics, and dashboard activity."
-msgstr "Dados relacionados ao uso de nossos serviços, como URLs encurtadas, estatísticas de cliques e atividades no painel."
+#: src/apps/institutional/templates/institutional/privacy-policy.html:22
+msgid ""
+"Data related to your use of our services, such as shortened URLs, click "
+"statistics, and dashboard activity."
+msgstr ""
+"Dados relacionados ao uso de nossos serviços, como URLs encurtadas, "
+"estatísticas de cliques e atividades no painel."
 
-#: apps/institutional/templates/institutional/privacy-policy.html:23
-msgid "Technical information, including IP address, browser type, and device information, used for security and system optimization."
-msgstr "Informações técnicas, incluindo endereço IP, tipo de navegador e informações do dispositivo, utilizadas para segurança e otimização do sistema."
+#: src/apps/institutional/templates/institutional/privacy-policy.html:23
+msgid ""
+"Technical information, including IP address, browser type, and device "
+"information, used for security and system optimization."
+msgstr ""
+"Informações técnicas, incluindo endereço IP, tipo de navegador e informações "
+"do dispositivo, utilizadas para segurança e otimização do sistema."
 
-#: apps/institutional/templates/institutional/privacy-policy.html:29
+#: src/apps/institutional/templates/institutional/privacy-policy.html:29
 msgid "How We Use Your Information"
 msgstr "Como Utilizamos Suas Informações"
 
-#: apps/institutional/templates/institutional/privacy-policy.html:32
+#: src/apps/institutional/templates/institutional/privacy-policy.html:32
 msgid "To provide, maintain, and improve the functionality of our platform."
-msgstr "Para fornecer, manter e aprimorar a funcionalidade de nossa plataforma."
+msgstr ""
+"Para fornecer, manter e aprimorar a funcionalidade de nossa plataforma."
 
-#: apps/institutional/templates/institutional/privacy-policy.html:33
+#: src/apps/institutional/templates/institutional/privacy-policy.html:33
 msgid "To enhance the user experience and optimize system performance."
-msgstr "Para aprimorar a experiência do usuário e otimizar o desempenho do sistema."
+msgstr ""
+"Para aprimorar a experiência do usuário e otimizar o desempenho do sistema."
 
-#: apps/institutional/templates/institutional/privacy-policy.html:34
-msgid "To communicate important updates, support information, and service notifications."
-msgstr "Para comunicar atualizações importantes, informações de suporte e notificações sobre o serviço."
+#: src/apps/institutional/templates/institutional/privacy-policy.html:34
+msgid ""
+"To communicate important updates, support information, and service "
+"notifications."
+msgstr ""
+"Para comunicar atualizações importantes, informações de suporte e "
+"notificações sobre o serviço."
 
-#: apps/institutional/templates/institutional/privacy-policy.html:40
+#: src/apps/institutional/templates/institutional/privacy-policy.html:40
 msgid "Information Sharing and Disclosure"
 msgstr "Compartilhamento e Divulgação de Informações"
 
-#: apps/institutional/templates/institutional/privacy-policy.html:43
-msgid "We do not sell, trade, or otherwise transfer your personal information to outside parties, except as required by law, to comply with legal obligations, or to protect our rights and services."
-msgstr "Não vendemos, trocamos ou transferimos suas informações pessoais para terceiros, exceto quando exigido por lei, para cumprir obrigações legais ou para proteger nossos direitos e serviços."
+#: src/apps/institutional/templates/institutional/privacy-policy.html:43
+msgid ""
+"We do not sell, trade, or otherwise transfer your personal information to "
+"outside parties, except as required by law, to comply with legal "
+"obligations, or to protect our rights and services."
+msgstr ""
+"Não vendemos, trocamos ou transferimos suas informações pessoais para "
+"terceiros, exceto quando exigido por lei, para cumprir obrigações legais ou "
+"para proteger nossos direitos e serviços."
 
-#: apps/institutional/templates/institutional/privacy-policy.html:49
+#: src/apps/institutional/templates/institutional/privacy-policy.html:49
 msgid "Security Measures"
 msgstr "Medidas de Segurança"
 
-#: apps/institutional/templates/institutional/privacy-policy.html:52
-msgid "We implement appropriate technical, administrative, and physical safeguards to protect your information from unauthorized access, disclosure, alteration, or destruction."
-msgstr "Implementamos medidas técnicas, administrativas e físicas adequadas para proteger suas informações contra acesso não autorizado, divulgação, alteração ou destruição."
+#: src/apps/institutional/templates/institutional/privacy-policy.html:52
+msgid ""
+"We implement appropriate technical, administrative, and physical safeguards "
+"to protect your information from unauthorized access, disclosure, "
+"alteration, or destruction."
+msgstr ""
+"Implementamos medidas técnicas, administrativas e físicas adequadas para "
+"proteger suas informações contra acesso não autorizado, divulgação, "
+"alteração ou destruição."
 
-#: apps/institutional/templates/institutional/privacy-policy.html:58
+#: src/apps/institutional/templates/institutional/privacy-policy.html:58
 msgid "Cookies and Tracking Technologies"
 msgstr "Cookies e Tecnologias de Rastreamento"
 
-#: apps/institutional/templates/institutional/privacy-policy.html:61
-msgid "We may use cookies and similar tracking technologies to enhance site performance, provide personalized content, and improve your overall experience on Shortly."
-msgstr "Podemos utilizar cookies e tecnologias de rastreamento semelhantes para melhorar o desempenho do site, fornecer conteúdo personalizado e aprimorar sua experiência geral no Shortly."
+#: src/apps/institutional/templates/institutional/privacy-policy.html:61
+msgid ""
+"We may use cookies and similar tracking technologies to enhance site "
+"performance, provide personalized content, and improve your overall "
+"experience on Shortly."
+msgstr ""
+"Podemos utilizar cookies e tecnologias de rastreamento semelhantes para "
+"melhorar o desempenho do site, fornecer conteúdo personalizado e aprimorar "
+"sua experiência geral no Shortly."

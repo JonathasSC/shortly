@@ -1,8 +1,11 @@
+{% load static %}
 {% load i18n %}
 
 <header class="fixed w-full bg-white z-50 border-b border-zinc-200">
   <div class="border-box px-4 py-3 flex items-center justify-between">
-    <a href="{% url 'home' %}" class="text-2xl font-bold text-gray-800">Sh0rtly</a> 
+    <a href="{% url 'home' %}" class="text-2xl font-bold text-gray-800">
+      <img class='w-36' src={% static '/common/svg/logo/without_bg_with_text_blue.svg'%} alt='logo do shortly'>
+    </a> 
 
     <div class="flex gap-3 items-center">
         {% if not user.is_authenticated %}

@@ -13,7 +13,7 @@ urlpatterns = [
 
     path('', include('apps.converter.urls')),
 
-    path('notfound/', include('apps.common.urls'))
+    path('notfound/', include('apps.common.urls')),
 ]
 
 

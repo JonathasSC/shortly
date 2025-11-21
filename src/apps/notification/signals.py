@@ -15,6 +15,6 @@ def send_welcome_on_signup(sender, instance, created, **kwargs):
         transaction.on_commit(
             lambda: send_welcome_email_task.apply_async(
                 args=[instance.id],
-                countdown=30
+                countdown=5
             )
         )
