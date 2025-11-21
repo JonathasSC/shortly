@@ -37,24 +37,6 @@ services:
     networks:
       - shortly_net
 
-  rabbitmq:
-    container_name: shortly-rabbitmq
-    build:
-      context: ./infra/rabbitmq
-      dockerfile: Dockerfile
-    restart: always
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    networks:
-      - shortly_net
-    healthcheck:
-      test: ["CMD", "rabbitmqctl", "status"]
-      interval: 10s
-      timeout: 10s
-      retries: 5
-      start_period: 10s
-
   celery_worker:
     build: 
       context: ./src
@@ -69,14 +51,11 @@ services:
     env_file:
       - ${ENV_FILE} 
     depends_on:
-      rabbitmq:
-        condition: service_healthy
       shortly:
         condition: service_healthy
     networks:
       - shortly_net
     restart: always
-
 
   celery_beat:
     build: 
@@ -90,8 +69,6 @@ services:
     env_file:
       - ${ENV_FILE} 
     depends_on:
-      rabbitmq:
-        condition: service_healthy
       shortly:
         condition: service_healthy
     networks:
@@ -112,8 +89,6 @@ services:
       - ${ENV_FILE}
     working_dir: /usr/src
     depends_on:
-      rabbitmq:
-        condition: service_healthy
       celery_worker:
         condition: service_started
       celery_beat:
