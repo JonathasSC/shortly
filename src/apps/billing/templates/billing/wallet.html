@@ -119,7 +119,6 @@
             </div>
         </div>
         <div class="flex flex-col gap-2">
-            <h2 class="font-bold mb-2">Extrato</h2>
             {% for transaction in transactions %}
                 <div class="border rounded-md p-4 border-zinc-200 justify-between flex items-center gap-3">
                     {% if transaction.transaction_type == "CREDIT" %}
@@ -160,9 +159,23 @@
                     </p>
                 </div>
             {% empty %}
-                <p class="text-sm text-gray-500">Nenhuma transação encontrada.</p>
+            <div class="w-full flex flex-col items-center justify-center text-center py-10 px-4 bg-white border border-zinc-200 rounded-lg">
+                
+                <div class="flex items-center justify-center w-16 h-16 mb-4 bg-blue-100 text-blue-500 rounded-full">
+                    <span class="material-symbols-outlined text-4xl">receipt_long</span>
+                </div>
+
+                <h2 class="text-lg font-semibold text-zinc-700">
+                    Você ainda não tem transações
+                </h2>
+
+                <p class="text-sm text-zinc-500 mt-1 max-w-sm">
+                    Assim que você comprar créditos ou assinar um plano, seu histórico aparecerá aqui.
+                </p>
+            </div>
             {% endfor %}
         </div>
+        {% if transactions.object_list %}
         <div class="pagination-controls mt-4 flex justify-center items-center">
             {% if transactions.has_previous %}
             <a href="?page=1" class="btn-page text-sm border-r px-2" title="Primeira Página">
@@ -217,6 +230,7 @@
             </span>
             {% endif %}
         </div>
+        {% endif %}
     </div>
 </main>
 {% endblock %}
