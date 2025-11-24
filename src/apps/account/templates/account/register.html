@@ -47,10 +47,10 @@
             </button>
             
             <p class="text-center mt-2 text-sm sm:text-base">
-              Já possui uma conta?
-              <a href="{% url 'login' %}" class="text-blue-500">
-                Clique aqui
-              </a>
+                {% trans "Already have an account?" %}
+                <a href="{% url 'login' %}" class="text-blue-500">
+                    {% trans "Click here" %}
+                </a>
             </p>
         </form>
     </div>

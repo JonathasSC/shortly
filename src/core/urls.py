@@ -4,16 +4,14 @@ from django.urls import include, path
 from apps.common.views import NotFoundView
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-
-    path('info/', include('apps.institutional.urls')),
-    path('account/', include('apps.account.urls')),
-    path('dashboard/', include('apps.dashboard.urls')),
-    path('buy/', include('apps.billing.urls')),
-
-    path('', include('apps.converter.urls')),
-
-    path('notfound/', include('apps.common.urls')),
+    path("admin/", admin.site.urls),
+    path("i18n/", include("django.conf.urls.i18n")),
+    path("info/", include("apps.institutional.urls")),
+    path("account/", include("apps.account.urls")),
+    path("dashboard/", include("apps.dashboard.urls")),
+    path("buy/", include("apps.billing.urls")),
+    path("", include("apps.converter.urls")),
+    path("notfound/", include("apps.common.urls")),
 ]
 
 
