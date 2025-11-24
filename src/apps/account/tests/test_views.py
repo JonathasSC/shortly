@@ -19,7 +19,7 @@ class RegisterViewTests(TestCase):
             "confirm_password": "Strong@Password123",
         }
         response = self.client.post(reverse("register"), data)
-        
+
         form = response.context
         if form:
             print(form.errors)
@@ -40,7 +40,7 @@ class RegisterViewTests(TestCase):
         form = response.context["form"]
         self.assertEqual(response.status_code, 200)
         self.assertTrue(form.errors)
-        self.assertIn('Senhas não coincidem', form.errors['__all__'])
+        self.assertIn("Senhas não coincidem", form.errors["__all__"])
         self.assertFalse(User.objects.filter(username="user2").exists())
 
     def test_register_fails_with_invalid_password_size(self):
@@ -75,10 +75,7 @@ class RegisterViewTests(TestCase):
 class UserLoginViewTests(TestCase):
     def setUp(self):
         CommonUtils().disable_welcome_signal()
-        self.user = User.objects.create_user(
-            username="testuser",
-            password="12345"
-        )
+        self.user = User.objects.create_user(username="testuser", password="12345")
 
     def test_login_page_loads_successfully(self):
         response = self.client.get(reverse("login"))
@@ -86,16 +83,16 @@ class UserLoginViewTests(TestCase):
         self.assertTemplateUsed(response, "account/login.html")
 
     def test_valid_login_redirects_to_home(self):
-        response = self.client.post(reverse("login"), {
-            "username": "testuser",
-            "password": "12345"
-        })
+        response = self.client.post(
+            reverse("login"), {"username": "testuser", "password": "12345"}
+        )
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("home"))
 
     def test_authenticated_user_is_redirected(self):
-        self.client.login(username="testuser", password="12345")
-        response = self.client.get(reverse("login"))
+        response = self.client.post(
+            reverse("login"), {"username": "testuser", "password": "12345"}
+        )
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("home"))
 
@@ -103,14 +100,11 @@ class UserLoginViewTests(TestCase):
 class LogoutViewTests(TestCase):
     def setUp(self):
         CommonUtils().disable_welcome_signal()
-        self.user = User.objects.create_user(
-            username="logoutuser",
-            password="12345"
-        )
+        self.user = User.objects.create_user(username="logoutuser", password="12345")
 
     def test_logout_redirects_to_login(self):
-        self.client.login(username="logoutuser", password="12345")
-        response = self.client.get(reverse("logout"))
+        response = self.client.post(
+            reverse("logout"), {"username": "logoutuser", "password": "12345"}
+        )
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("login"))
-                                                                                                                                                        
