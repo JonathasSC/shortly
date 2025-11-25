@@ -21,6 +21,7 @@ dependencies = [
     "pre-commit>=4.4.0",
     "psycopg2-binary>=2.9.10",
     "python-dotenv>=1.1.0",
+    "redis>=7.1.0",
     "uuid6>=2025.0.0",
     "whitenoise>=6.9.0",
 ]

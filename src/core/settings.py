@@ -292,3 +292,19 @@ except KeyError as e:
 
 except ValueError as e:
     raise RuntimeError(f"Erro na configuração de e-mail: {e}")
+
+
+
+REDIS_URL = os.environ.get("REDIS_URL")
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": REDIS_URL,
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
+AXES_CACHE = "default"
