@@ -1,0 +1,41 @@
+<div x-data="{ modals: true, index: 0 }" x-init="
+    announcements = [...document.querySelectorAll('[data-modal]')];
+">
+
+    {% for announcement in announcements %}
+    <div 
+        x-show="index === {{ forloop.counter0 }}"
+        x-cloak
+        data-modal
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+    >
+        <div 
+            @click.away="index++; if(index >= {{ announcements|length }}) modals = false"
+            class="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 relative"
+        >
+            <h2 class="text-2xl font-semibold mb-4">
+                {{ announcement.title }}
+            </h2>
+
+            <p class="text-gray-600">{{ announcement.message }}</p>
+
+            <div class="mt-6 flex justify-end">
+                <button 
+                    @click="index++; if(index >= {{ announcements|length }}) modals = false"
+                    class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+                >
+                    Continuar
+                </button>
+            </div>
+
+            <button 
+                @click="modals = false"
+                class="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
+            >
+                ✕
+            </button>
+        </div>
+    </div>
+    {% endfor %}
+
+</div>
