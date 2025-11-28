@@ -13,6 +13,9 @@ PROJECT_ROOT = os.path.dirname(__file__)
 sys.path.insert(0, os.path.join(PROJECT_ROOT, "apps"))
 SITE_ID = 1
 
+DOMAIN = os.environ.get("DJANGO_DOMAIN", "")
+PROTOCOL = os.environ.get("DJANGO_PROTOCOL", "")
+
 # ================================================================
 # ENVIRONMENT VARIABLES
 # ================================================================
@@ -33,10 +36,8 @@ CSRF_TRUSTED_ORIGINS = [
     origin for origin in os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",") if origin
 ]
 
-SECURE_CROSS_ORIGIN_OPENER_POLICY = os.environ.get(
-    "DJANGO_SECURE_CROSS_ORIGIN_OPENER_POLICY")
-SECURE_SSL_REDIRECT = True if os.environ.get(
-    "DJANGO_SECURE_SSL_REDIRECT") == "TRUE" else False
+SECURE_CROSS_ORIGIN_OPENER_POLICY = os.environ.get("DJANGO_SECURE_CROSS_ORIGIN_OPENER_POLICY")
+SECURE_SSL_REDIRECT = True if os.environ.get("DJANGO_SECURE_SSL_REDIRECT") == "TRUE" else False
 
 # ================================================================
 # LOGGING
@@ -125,6 +126,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "apps.security.middleware.ExponentialBanMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -273,16 +275,13 @@ MERCADO_PAGO_WEBHOOK_SECRET = os.environ.get("MERCADO_PAGO_WEBHOOK_SECRET", "")
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
 try:
-    EMAIL_HOST = os.environ.get('DJANGO_EMAIL_HOST')
-    EMAIL_PORT = int(os.environ.get('DJANGO_EMAIL_PORT', 465))
-    EMAIL_USE_SSL = os.environ.get('DJANGO_EMAIL_USE_SSL', '').lower() in [
-        'true', '1', 'yes']
-    EMAIL_USE_TLS = os.environ.get('DJANGO_EMAIL_USE_TLS', '').lower() in [
-        'true', '1', 'yes']
-    EMAIL_HOST_USER = os.environ.get('DJANGO_EMAIL_HOST_USER')
-    EMAIL_HOST_PASSWORD = os.environ.get('DJANGO_EMAIL_HOST_PASSWORD')
-    DEFAULT_FROM_EMAIL = os.environ.get(
-        'DJANGO_DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
+    EMAIL_HOST = os.environ.get("DJANGO_EMAIL_HOST")
+    EMAIL_PORT = int(os.environ.get("DJANGO_EMAIL_PORT", 465))
+    EMAIL_USE_SSL = os.environ.get("DJANGO_EMAIL_USE_SSL", "").lower() in ["true", "1", "yes"]
+    EMAIL_USE_TLS = os.environ.get("DJANGO_EMAIL_USE_TLS", "").lower() in ["true", "1", "yes"]
+    EMAIL_HOST_USER = os.environ.get("DJANGO_EMAIL_HOST_USER")
+    EMAIL_HOST_PASSWORD = os.environ.get("DJANGO_EMAIL_HOST_PASSWORD")
+    DEFAULT_FROM_EMAIL = os.environ.get("DJANGO_DEFAULT_FROM_EMAIL", EMAIL_HOST_USER)
 
 except KeyError as e:
     missing_key = e.args[0]
@@ -292,3 +291,22 @@ except KeyError as e:
 
 except ValueError as e:
     raise RuntimeError(f"Erro na configuração de e-mail: {e}")
+
+
+REDIS_URL = os.environ.get("REDIS_URL")
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": REDIS_URL,
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+    }
+}
+
+# ================================================================
+# AXES
+# ================================================================
+AXES_CACHE = "default"
+AXES_LOCK_OUT_AT_FAILURE = False

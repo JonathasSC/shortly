@@ -7,7 +7,9 @@
 {% block header %}
 <header class="fixed w-full bg-white z-50 ">
   <div class="border-box px-4 py-3 flex items-center justify-start">
-    <a href="{% url 'home' %}" class="text-2xl font-bold text-gray-800">Sh0rtly</a> 
+    <a href="{% url 'home' %}" class="text-2xl font-bold text-gray-800">
+      <img class='w-36' src="{% static '/common/svg/logo/without_bg_with_text_blue.svg' %}" alt='logo do shortly'>
+    </a>  
   </div>
 </header>
 {% endblock %}
@@ -47,10 +49,10 @@
             </button>
             
             <p class="text-center mt-2 text-sm sm:text-base">
-              Já possui uma conta?
-              <a href="{% url 'login' %}" class="text-blue-500">
-                Clique aqui
-              </a>
+                {% trans "Already have an account?" %}
+                <a href="{% url 'login' %}" class="text-blue-500">
+                    {% trans "Click here" %}
+                </a>
             </p>
         </form>
     </div>

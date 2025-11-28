@@ -1,19 +1,20 @@
 {% load static %}
 {% load i18n %}
 
-
 <div class="bg-white border border-zinc-200 flex flex-col gap-4 rounded p-4">
-    <h2 class="text-md font-semibold">Meus Links Recentes</h2>
+    <h2 class="text-md font-semibold">{% trans "My Recent Links" %}</h2>
+
     <div class="overflow-x-auto flex flex-col gap-3">
         <table class="min-w-full border border-zinc-200 rounded-lg table-auto border-collapse">
             <thead class="hidden md:table-header-group">
                 <tr class="bg-zinc-50 border-b border-zinc-200">
-                    <th class="px-3 py-2 text-left text-sm text-zinc-600">URL Original</th>
-                    <th class="px-3 py-2 text-left text-sm text-zinc-600">Short Link</th>
-                    <th class="px-2 py-1 text-center text-sm text-zinc-600">Acessos</th>
-                    <th class="px-2 py-1 text-center text-sm text-zinc-600">Criado em</th>
+                    <th class="px-3 py-2 text-left text-sm text-zinc-600">{% trans "Original URL" %}</th>
+                    <th class="px-3 py-2 text-left text-sm text-zinc-600">{% trans "Short Link" %}</th>
+                    <th class="px-2 py-1 text-center text-sm text-zinc-600">{% trans "Clicks" %}</th>
+                    <th class="px-2 py-1 text-center text-sm text-zinc-600">{% trans "Created at" %}</th>
                 </tr>
             </thead>
+
             <tbody class="hidden md:table-row-group">
                 {% for link in recent_links %}
                 <tr class="hover:bg-gray-50 border-b border-zinc-200 transition">
@@ -23,7 +24,7 @@
                                 {{ link.original_url }}
                             </p>
                             <a href="{{ link.original_url }}" target="_blank"
-                            class="w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-200 transition">
+                               class="w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-200 transition">
                                 <span class="material-symbols-outlined text-xl text-gray-700">open_in_new</span>
                             </a>
                         </div>
@@ -32,14 +33,14 @@
                     <td class="px-3 py-2">
                         <div class="flex items-center gap-2">
                             <p id="shortCode-{{ link.id }}"
-                            class="bg-zinc-100 px-2 py-1 rounded-md font-mono text-sm">
+                               class="bg-zinc-100 px-2 py-1 rounded-md font-mono text-sm">
                                 {{ request.scheme }}://{{ request.get_host }}/{{ link.short_code }}
                             </p>
 
                             <button onclick="copyToClipboard('shortCode-{{ link.id }}', 'copyIcon-{{ link.id }}')"
                                     class="w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-200 transition">
                                 <span id="copyIcon-{{ link.id }}"
-                                    class="material-symbols-outlined text-xl text-gray-700">
+                                      class="material-symbols-outlined text-xl text-gray-700">
                                     content_copy
                                 </span>
                             </button>
@@ -56,6 +57,7 @@
                         {{ link.created_at|date:"d/m/Y" }}
                     </td>
                 </tr>
+
                 {% empty %}
                 <tr>
                     <td colspan="5" class="px-4 py-10 text-center">
@@ -65,23 +67,22 @@
                                 <span class="material-symbols-outlined text-3xl text-gray-500">link_off</span>
                             </div>
 
-                            <p class="text-sm font-medium">Você ainda não criou nenhum link</p>
+                            <p class="text-sm font-medium">{% trans "You haven't created any links yet" %}</p>
 
                             <p class="text-xs text-gray-400 max-w-xs">
-                                Assim que você encurtar uma URL, ela aparecerá aqui para você acompanhar cliques e estatísticas.
+                                {% trans "Once you shorten a URL, it will appear here so you can track clicks and statistics." %}
                             </p>
 
                             <a href="{% url 'user-url-list' %}"
-                            class="mt-2 flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 transition">
+                               class="mt-2 flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 transition">
                                 <span class="material-symbols-outlined text-sm">add</span>
-                                Criar primeiro link
+                                {% trans "Create first link" %}
                             </a>
                         </div>
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
-
 
             <div class="flex flex-col gap-3 md:hidden mt-2">
                 {% for link in recent_links %}
@@ -92,16 +93,16 @@
                             {{ link.original_url }}
                         </p>
                         <a href="{{ link.original_url }}" target="_blank"
-                            class="w-7 h-7 flex items-center justify-center rounded-md hover:bg-gray-200 transition">
+                           class="w-7 h-7 flex items-center justify-center rounded-md hover:bg-gray-200 transition">
                             <span class="material-symbols-outlined text-base text-gray-700">open_in_new</span>
                         </a>
                     </div>
 
                     <div>
-                        <p class="text-xs text-zinc-400 mb-1">Short link</p>
+                        <p class="text-xs text-zinc-400 mb-1">{% trans "Short link" %}</p>
                         <div class="flex items-center gap-2">
                             <p id="shortCodeMobile-{{ link.id }}"
-                            class="bg-zinc-100 px-2 py-1 rounded-md font-mono text-sm">
+                               class="bg-zinc-100 px-2 py-1 rounded-md font-mono text-sm">
                                 {{ request.scheme }}://{{ request.get_host }}/{{ link.short_code }}
                             </p>
 
@@ -114,7 +115,7 @@
 
                     <div class="flex items-center justify-between pt-2 text-sm">
                         <span class="flex items-center gap-1">
-                            <span class="text-zinc-400 text-xs">Acessos:</span>
+                            <span class="text-zinc-400 text-xs">{% trans "Clicks:" %}</span>
                             <strong>{{ link.clicks|default:0 }}</strong>
                         </span>
 
@@ -125,11 +126,12 @@
                 </div>
                 {% endfor %}
             </div>
-
         </table>
-        <a href="{% url 'user-url-list' %}" class="mt-2  w-fit flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 transition">
+
+        <a href="{% url 'user-url-list' %}"
+           class="mt-2 w-fit flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 transition">
             <span class="material-symbols-outlined text-sm">add</span>
-            Ver todas
+            {% trans "View all" %}
         </a>
     </div>
 </div>

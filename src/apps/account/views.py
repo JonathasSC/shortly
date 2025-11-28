@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.contrib.auth import logout
 from django.contrib.auth.views import (
     LoginView,
@@ -40,15 +39,6 @@ class RecoveryView(PasswordResetView):
     html_email_template_name = "notification/email/password_reset.html"
     subject_template_name = "account/password_reset_subject.txt"
     success_url = reverse_lazy("password_reset_done")
-
-    def form_valid(self, form):
-        use_https = self.request.is_secure()
-        form.save(
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            request=self.request,
-            use_https=use_https
-        )
-        return super().form_valid(form)
 
 
 class RecoveryDoneView(PasswordResetDoneView):
