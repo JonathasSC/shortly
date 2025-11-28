@@ -7,7 +7,9 @@
 {% block header %}
 <header class="fixed w-full bg-white z-50 ">
   <div class="border-box px-4 py-3 flex items-center justify-start">
-    <a href="{% url 'home' %}" class="text-2xl font-bold text-gray-800">Sh0rtly</a> 
+    <a href="{% url 'home' %}" class="text-2xl font-bold text-gray-800">
+      <img class='w-36' src="{% static '/common/svg/logo/without_bg_with_text_blue.svg' %}" alt='logo do shortly'>
+    </a>  
   </div>
 </header>
 {% endblock %}
