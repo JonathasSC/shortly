@@ -11,7 +11,7 @@ urlpatterns = [
     path("dashboard/", include("apps.dashboard.urls")),
     path("buy/", include("apps.billing.urls")),
     path("", include("apps.converter.urls")),
-    path("notfound/", include("apps.common.urls")),
+    path("", include("apps.common.urls")),
 ]
 
 

@@ -293,7 +293,7 @@ except ValueError as e:
     raise RuntimeError(f"Erro na configuração de e-mail: {e}")
 
 
-REDIS_URL = os.environ.get("REDIS_URL")
+REDIS_URL = os.environ.get("REDIS_URL", "localhost")
 
 CACHES = {
     "default": {
