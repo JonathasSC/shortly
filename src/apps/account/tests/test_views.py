@@ -40,7 +40,7 @@ class RegisterViewTests(TestCase):
         form = response.context["form"]
         self.assertEqual(response.status_code, 200)
         self.assertTrue(form.errors)
-        self.assertIn("Senhas não coincidem", form.errors["__all__"])
+        self.assertIn('As senhas não coincidem.', form.errors['__all__'])
         self.assertFalse(User.objects.filter(username="user2").exists())
 
     def test_register_fails_with_invalid_password_size(self):
@@ -90,9 +90,8 @@ class UserLoginViewTests(TestCase):
         self.assertRedirects(response, reverse("home"))
 
     def test_authenticated_user_is_redirected(self):
-        response = self.client.post(
-            reverse("login"), {"username": "testuser", "password": "12345"}
-        )
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("login"))
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("home"))
 
@@ -103,8 +102,7 @@ class LogoutViewTests(TestCase):
         self.user = User.objects.create_user(username="logoutuser", password="12345")
 
     def test_logout_redirects_to_login(self):
-        response = self.client.post(
-            reverse("logout"), {"username": "logoutuser", "password": "12345"}
-        )
+        self.client.force_login(self.user)
+        response = self.client.post(reverse("logout"))
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("login"))
