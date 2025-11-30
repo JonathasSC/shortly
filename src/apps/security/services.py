@@ -3,8 +3,6 @@ import time
 import redis
 from django.conf import settings
 
-
-
 BASE_DELAY = 15
 
 
