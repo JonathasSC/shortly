@@ -21,7 +21,7 @@ class Announcement(models.Model):
 
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Atualizado em")
 
-    display_order = models.PositiveIntegerField(default=0, verbose_name="Ordem de exibição")
+    display_order = models.PositiveIntegerField(default=0, unique=True, verbose_name="Ordem de exibição")
 
     class Meta:
         ordering = ["display_order", "-start_at"]

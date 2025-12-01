@@ -1,41 +1,50 @@
-<div x-data="{ modals: true, index: 0 }" x-init="
-    announcements = [...document.querySelectorAll('[data-modal]')];
-">
+{% load static %}
 
+<link rel="stylesheet" type="text/css" href="{% static '/notification/css/animations.css' %}">
+
+<div id="announcements-wrapper">
     {% for announcement in announcements %}
     <div 
-        x-show="index === {{ forloop.counter0 }}"
-        x-cloak
-        data-modal
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+        data-modal="{{ forloop.counter0 }}"
+        class="announcement-modal fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4"
     >
         <div 
-            @click.away="index++; if(index >= {{ announcements|length }}) modals = false"
-            class="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 relative"
+            class="bg-white rounded-xl flex flex-col justify-end shadow-2xl max-w-lg w-full relative animate-fade-in"
         >
-            <h2 class="text-2xl font-semibold mb-4">
-                {{ announcement.title }}
-            </h2>
 
-            <p class="text-gray-600">{{ announcement.message }}</p>
-
-            <div class="mt-6 flex justify-end">
+            <div class="flex items-center rounded-xl bg-blue-500 flex-col p-5 gap-6">
                 <button 
-                    @click="index++; if(index >= {{ announcements|length }}) modals = false"
-                    class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+                    class="close-btn w-full top-3 right-3 flex justify-end items-center gap-1 text-white hover:text-white transition-colors text-sm font-medium"
                 >
-                    Continuar
+                    Pular
+                    <span class="material-symbols-outlined text-base">close</span>
                 </button>
+
+                <div>
+                    <span class="material-symbols-outlined bg-blue-400 text-white rounded-full p-4 text-6xl">
+                        brand_awareness
+                    </span>
+                </div>
+    
+                <h2 class="text-xl sm:text-2xl text-center font-bold text-white">
+                    {{ announcement.title }}
+                </h2>
             </div>
 
-            <button 
-                @click="modals = false"
-                class="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
-            >
-                ✕
-            </button>
+            <div class="flex flex-col gap-3 p-5">
+                <p class="text-gray-600 leading-relaxed text-sm sm:text-base">
+                    {{ announcement.message }}
+                </p>
+    
+                <div class="flex justify-end">
+                    <button 
+                        class="continue-btn px-5 py-2.5 rounded-md bg-blue-500 text-white font-medium text-sm sm:text-base hover:bg-blue-600 transition-all active:scale-95"
+                    >
+                        Continuar
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
     {% endfor %}
-
 </div>

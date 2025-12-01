@@ -2,6 +2,7 @@ import secrets
 from datetime import timedelta
 
 from django.contrib import messages
+from django.db import models
 from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
@@ -109,14 +110,38 @@ class HomeView(View):
 
     def get(self, request):
         form = UrlForm()
-        announcements = [
-            announcement
-            for announcement in Announcement.objects.filter(is_active=True)
-            if announcement.is_available()
-        ]
+        announcements = []
+
+        now = timezone.now()
+
+        queryset = Announcement.objects.filter(
+            is_active=True,
+            start_at__lte=now
+        ).filter(
+            models.Q(end_at__isnull=True) | models.Q(end_at__gte=now)
+        )
+
+        seen = request.session.get("announcement_seen", [])
+
+        for announcement in queryset:
+            if announcement.show_only_once and announcement.id in seen:
+                continue
+
+            announcements.append(announcement)
+
+        if announcements:
+            updated_seen = seen[:]
+
+            for ann in announcements:
+                if ann.show_only_once and ann.id not in updated_seen:
+                    updated_seen.append(ann.id)
+
+            request.session["announcement_seen"] = updated_seen
 
         return render(
-            request, "converter/home.html", {"form": form, "announcements": announcements}
+            request,
+            "converter/home.html",
+            {"form": form, "announcements": announcements},
         )
 
     def post(self, request):
