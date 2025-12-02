@@ -10,6 +10,7 @@ def get_redis_client():
     url = getattr(settings, "REDIS_URL", None) or "redis://localhost:6379/0"
     return redis.Redis.from_url(url)
 
+
 class ExponentialBanService:
     @staticmethod
     def register_lockout(username):
@@ -25,8 +26,8 @@ class ExponentialBanService:
 
         return delay
 
-@staticmethod
-def get_ban_remaining(username):
+    @staticmethod
+    def get_ban_remaining(username):
         client = get_redis_client()
         ban_key = f"ban:{username}:until"
         ts = client.get(ban_key)

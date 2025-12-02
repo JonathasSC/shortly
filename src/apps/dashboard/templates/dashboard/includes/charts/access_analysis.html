@@ -60,7 +60,7 @@
 </div>
 
 {% block scripts %}
-<script src="{% static 'dashboard/js/access_analysis.js'%}"></script>
+<script src="{% static '/dashboard/js/access_analysis.js'%}"></script>
 
 {{ line_labels|json_script:"lineLabels" }}
 {{ line_data|json_script:"lineData" }}

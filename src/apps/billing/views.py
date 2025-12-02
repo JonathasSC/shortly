@@ -21,6 +21,7 @@ from apps.billing.services import MercadoPagoService
 
 logger = logging.getLogger(__name__)
 
+
 class BuyCoinsView(LoginRequiredMixin, View):
     prices = {
         10: 5.99,
@@ -36,7 +37,9 @@ class BuyCoinsView(LoginRequiredMixin, View):
         mp_service = MercadoPagoService(sdk)
 
         if credit_amount not in self.prices:
-            logger.warning(f"Tentativa de compra inválida de {credit_amount} créditos por {request.user.id}")
+            logger.warning(
+                f"Tentativa de compra inválida de {credit_amount} créditos por {request.user.id}"
+            )
             return redirect("payment_failure")
 
         success_url = request.build_absolute_uri(reverse("payment_success"))
@@ -52,14 +55,16 @@ class BuyCoinsView(LoginRequiredMixin, View):
                 "user_id": str(request.user.id),
                 "type": "credits",
                 "amount": credit_amount,
-            }
+            },
         )
 
         if preference.get("status") == 201:
             logger.info(f"Preferência de pagamento criada com sucesso para {request.user.id}")
             return redirect(preference["response"]["init_point"])
         else:
-            logger.error(f"Erro ao criar preferência de pagamento para {request.user.id}: {preference}")
+            logger.error(
+                f"Erro ao criar preferência de pagamento para {request.user.id}: {preference}"
+            )
             return HttpResponse("Erro ao criar preferência de pagamento", status=400)
 
 
@@ -84,24 +89,27 @@ class SubscribePlanView(LoginRequiredMixin, View):
             quantity=1,
             back_url_success=success_url,
             back_url_failure=failure_url,
-            metadata={
-                "user_id": str(request.user.id),
-                "type": "plan",
-                "plan_id": plan.id
-            }
+            metadata={"user_id": str(request.user.id), "type": "plan", "plan_id": plan.id},
         )
-       
-        logger.info(f"Preferência de pagamento criada para assinatura do plano {plan_id} pelo usuário {request.user.id}")
+
+        logger.info(
+            f"Preferência de pagamento criada para assinatura do plano {plan_id} pelo usuário {request.user.id}"
+        )
         return redirect(preference["response"]["init_point"])
 
 
-@method_decorator(csrf_exempt, name='dispatch')
+@method_decorator(csrf_exempt, name="dispatch")
 class MercadoPagoWebhookView(View):
     sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
     mp_service = MercadoPagoService(sdk)
 
+    def post(self, request, *args, **kwargs):
+        return self.handle_webhook(request)
+
     def _process_wallet_credit(self, user_id, amount, payment_id):
-        logger.info(f"Processando crédito na carteira: user={user_id}, amount={amount}, payment={payment_id}")
+        logger.info(
+            f"Processando crédito na carteira: user={user_id}, amount={amount}, payment={payment_id}"
+        )
         try:
             User = get_user_model()
             User.objects.get(pk=user_id)
@@ -128,7 +136,7 @@ class MercadoPagoWebhookView(View):
                 amount=amount,
                 transaction_type=WalletTransaction.TransactionType.CREDIT,
                 source=f"Crédito de {amount} coins via Mercado Pago",
-                external_reference=str(payment_id)
+                external_reference=str(payment_id),
             )
 
         logger.info(f"Crédito de {amount} coins aplicado ao usuário {user_id}")
@@ -138,8 +146,7 @@ class MercadoPagoWebhookView(View):
         logger.info(f"Ativando assinatura: user={user_id}, plan={plan_id}")
         plan = Plan.objects.get(id=plan_id)
         UserSubscription.objects.update_or_create(
-            user_id=user_id,
-            defaults={"plan": plan, "is_active": True}
+            user_id=user_id, defaults={"plan": plan, "is_active": True}
         )
         logger.info(f"Assinatura ativada com sucesso: user={user_id}, plan={plan_id}")
 
@@ -160,11 +167,7 @@ class MercadoPagoWebhookView(View):
             return False
 
         message = f"id:{payment_id};request-id:{x_request_id}".encode("utf-8")
-        expected_hmac = hmac.new(
-            secret.encode("utf-8"),
-            message,
-            hashlib.sha256
-        ).hexdigest()
+        expected_hmac = hmac.new(secret.encode("utf-8"), message, hashlib.sha256).hexdigest()
 
         valid = hmac.compare_digest(expected_hmac, x_signature)
         if not valid:
@@ -193,9 +196,7 @@ class MercadoPagoWebhookView(View):
             return JsonResponse({"status": "ignored"})
 
         payment_id = (
-            data.get("id")
-            or data.get("data.id")
-            or (data.get("data", {}) or {}).get("id")
+            data.get("id") or data.get("data.id") or (data.get("data", {}) or {}).get("id")
         )
 
         if not payment_id:
@@ -211,7 +212,9 @@ class MercadoPagoWebhookView(View):
             return JsonResponse({"error": f"failed to fetch payment: {str(e)}"}, status=500)
 
         if payment_data.get("status") != "approved":
-            logger.info(f"Pagamento {payment_id} não aprovado. Status: {payment_data.get('status')}")
+            logger.info(
+                f"Pagamento {payment_id} não aprovado. Status: {payment_data.get('status')}"
+            )
             return JsonResponse({"status": "pending_or_failed"})
 
         metadata = payment_data.get("metadata", {})
@@ -221,9 +224,7 @@ class MercadoPagoWebhookView(View):
         if payment_type == "credits":
             try:
                 result = self._process_wallet_credit(
-                    user_id=user_id,
-                    amount=metadata.get("amount"),
-                    payment_id=payment_id
+                    user_id=user_id, amount=metadata.get("amount"), payment_id=payment_id
                 )
                 logger.info(f"Créditos processados com resultado: {result}")
                 return JsonResponse(result)
@@ -235,15 +236,13 @@ class MercadoPagoWebhookView(View):
                 return JsonResponse({"error": "internal_error"}, status=500)
 
         if payment_type == "plan":
-            self._activate_subscription(
-                user_id=user_id,
-                plan_id=metadata.get("plan_id")
-            )
+            self._activate_subscription(user_id=user_id, plan_id=metadata.get("plan_id"))
             logger.info(f"Assinatura ativada via pagamento {payment_id}")
             return JsonResponse({"status": "subscription_activated"})
 
         logger.warning(f"Webhook ignorado: tipo de pagamento inválido ({payment_type})")
         return JsonResponse({"status": "ignored_no_valid_type"})
+
 
 class WalletPageView(View):
     template_name = "billing/wallet.html"
@@ -268,7 +267,7 @@ class WalletPageView(View):
     def get(self, request, *args, **kwargs):
         logger.info(f"Usuário {request.user.id} acessou a página da carteira.")
         prices_info = self.get_prices_with_value()
-        plans = Plan.objects.all().order_by('price')
+        plans = Plan.objects.all().order_by("price")
 
         wallet, _ = UserWallet.objects.get_or_create(user=request.user)
         transactions = WalletTransaction.objects.filter(wallet=wallet).order_by("-created_at")
@@ -276,10 +275,16 @@ class WalletPageView(View):
         paginator = Paginator(transactions, self.paginate_by)
         transactions_page = paginator.get_page(request.GET.get("page"))
 
-        logger.debug(f"Usuário {request.user.id} possui {wallet.balance} coins e {transactions.count()} transações.")
-        return render(request, self.template_name, {
-            "prices": prices_info,
-            "plans": plans,
-            "wallet": wallet,
-            "transactions": transactions_page
-        })
+        logger.debug(
+            f"Usuário {request.user.id} possui {wallet.balance} coins e {transactions.count()} transações."
+        )
+        return render(
+            request,
+            self.template_name,
+            {
+                "prices": prices_info,
+                "plans": plans,
+                "wallet": wallet,
+                "transactions": transactions_page,
+            },
+        )

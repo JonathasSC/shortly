@@ -5,7 +5,9 @@ class MercadoPagoService(PaymentAbstract):
     def __init__(self, sdk):
         self.sdk = sdk
 
-    def create_checkout_preference(self, title, price, quantity, back_url_success, back_url_failure, metadata=None):
+    def create_checkout_preference(
+        self, title, price, quantity, back_url_success, back_url_failure, metadata=None
+    ):
         preference_data = {
             "items": [
                 {
@@ -19,6 +21,7 @@ class MercadoPagoService(PaymentAbstract):
                 "success": str(back_url_success),
                 "failure": str(back_url_failure),
             },
+            "auto_return": "approved",
         }
 
         if metadata:
