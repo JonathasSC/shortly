@@ -18,7 +18,6 @@ def add_new_user_coins(sender, instance, created, **kwargs):
 
     def schedule_email():
         with transaction.atomic():
-            wallet.credit(amount)
             WalletTransaction.objects.create(
                 wallet=wallet,
                 amount=amount,

@@ -92,8 +92,6 @@ class HomeView(View):
         if wallet.balance < 1:
             return False
 
-        wallet.debit(1)
-
         WalletTransaction.objects.create(
             wallet=wallet,
             transaction_type=WalletTransaction.TransactionType.DEBIT,

@@ -47,20 +47,9 @@ class UserWallet(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="wallet")
     balance = models.PositiveIntegerField(default=0)
 
-    def credit(self, amount):
-        self.balance += amount
-        self.save()
-
-    def debit(self, amount):
-        if self.balance >= amount:
-            self.balance -= amount
-            self.save()
-            return True
-        return False
-
     def __str__(self):
         return f"{self.user} - {self.balance} coins"
-
+    
 
 class WalletTransaction(models.Model):
     class TransactionType(models.TextChoices):
@@ -73,6 +62,36 @@ class WalletTransaction(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     source = models.CharField(max_length=50, blank=True, null=True)
     external_reference = models.CharField(max_length=128, blank=True, null=True, unique=False)
+
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+
+        if not is_new:
+            raise ValueError("Transações não podem ser editadas após criadas.")
+
+        if self.amount <= 0:
+            raise ValueError("O valor da transação deve ser maior que zero.")
+
+        if self.transaction_type == self.TransactionType.DEBIT:
+            if self.wallet.balance < self.amount:
+                raise ValueError("Saldo insuficiente para débito.")
+
+        super().save(*args, **kwargs)
+
+
+        match self.transaction_type:
+            case self.TransactionType.CREDIT:
+                self.wallet.balance += self.amount
+            case self.transaction_type.DEBIT:
+                self.wallet.balance -= self.amount
+            case _:
+                raise ValueError("Tipo de transação inválida")
+            
+        self.wallet.save()
+
+
+    def delete(self, *args, **kwargs):
+        raise ValueError("Transações não podem ser apagadas por questões de auditoria.")
 
     def __str__(self):
         return f"{self.transaction_type} - {self.amount} for {self.wallet.user}"
