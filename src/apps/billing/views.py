@@ -42,8 +42,8 @@ class BuyCoinsView(LoginRequiredMixin, View):
             )
             return redirect("payment_failure")
 
-        success_url = request.build_absolute_uri(reverse("payment_success"))
-        failure_url = request.build_absolute_uri(reverse("payment_failure"))
+        success_url = request.build_absolute_uri(reverse("payment_success")).replace("http://", "https://")
+        failure_url = request.build_absolute_uri(reverse("payment_failure")).replace("http://", "https://")
 
         preference = mp_service.create_checkout_preference(
             title=f"{credit_amount} Créditos",
