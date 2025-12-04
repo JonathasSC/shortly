@@ -6,7 +6,7 @@ class MercadoPagoService(PaymentAbstract):
         self.sdk = sdk
 
     def create_checkout_preference(
-        self, title, price, quantity, back_url_success, back_url_failure, metadata=None
+        self, title, price, quantity, back_urls, auto_return="approved", metadata=None
     ):
         preference_data = {
             "items": [
@@ -17,21 +17,16 @@ class MercadoPagoService(PaymentAbstract):
                     "unit_price": float(price),
                 }
             ],
-            "back_urls": {
-                "success": str(back_url_success),
-                "failure": str(back_url_failure),
-            },
-            "auto_return": "approved",
+            "back_urls": back_urls,
+            "auto_return": auto_return,
         }
 
         if metadata:
-            safe_metadata = {}
-            for key, value in metadata.items():
-                safe_metadata[key] = str(value)
-            preference_data["metadata"] = safe_metadata
+            preference_data["metadata"] = {
+                key: str(value) for key, value in metadata.items()
+            }
 
         try:
-            response = self.sdk.preference().create(preference_data)
-            return response
+            return self.sdk.preference().create(preference_data)
         except Exception as e:
             return {"status": 500, "response": {"error": str(e)}}
