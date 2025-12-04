@@ -46,11 +46,15 @@ class BuyCoinsView(LoginRequiredMixin, View):
         failure_url = request.build_absolute_uri(reverse("payment_failure"))
 
         preference = mp_service.create_checkout_preference(
-            title=f"{credit_amount} Credit's",
+            title=f"{credit_amount} Créditos",
             price=self.prices[credit_amount],
             quantity=1,
-            back_url_success=success_url,
-            back_url_failure=failure_url,
+            back_urls={
+                "success": success_url,
+                "failure": failure_url,
+                "pending": failure_url,
+            },
+            auto_return="approved",
             metadata={
                 "user_id": str(request.user.id),
                 "type": "credits",
@@ -58,15 +62,12 @@ class BuyCoinsView(LoginRequiredMixin, View):
             },
         )
 
-        if preference.get("status") == 201:
-            logger.info(f"Preferência de pagamento criada com sucesso para {request.user.id}")
+        if preference.get("status") == 201 and \
+        preference.get("response", {}).get("init_point"):
             return redirect(preference["response"]["init_point"])
-        else:
-            logger.error(
-                f"Erro ao criar preferência de pagamento para {request.user.id}: {preference}"
-            )
-            return HttpResponse("Erro ao criar preferência de pagamento", status=400)
 
+        logger.error(f"Erro ao gerar init_point: {preference}")
+        return HttpResponse("Erro ao criar preferência", status=400)
 
 class SubscribePlanView(LoginRequiredMixin, View):
     def get(self, request, plan_id, *args, **kwargs):
