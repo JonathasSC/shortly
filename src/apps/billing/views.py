@@ -18,6 +18,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from apps.billing.models import Plan, UserSubscription, UserWallet, WalletTransaction
 from apps.billing.services import MercadoPagoService
+from apps.billing.tasks import process_payment_task
 
 logger = logging.getLogger(__name__)
 
@@ -179,70 +180,54 @@ class MercadoPagoWebhookView(View):
         logger.info("Recebendo webhook do Mercado Pago.")
 
         if not self._verify_signature(request):
-            logger.error("Assinatura HMAC inválida recebida.")
             return JsonResponse({"error": "invalid_signature"}, status=403)
 
-        if request.content_type == "application/json":
-            try:
-                data = json.loads(request.body.decode("utf-8"))
-            except Exception as e:
-                logger.error(f"Erro ao decodificar corpo JSON: {str(e)}")
-                data = {}
-        else:
-            data = request.GET or request.POST
+        try:
+            data = json.loads(request.body.decode("utf-8"))
+        except Exception:
+            data = {}
 
         topic = data.get("topic") or data.get("type")
         if topic != "payment":
-            logger.info("Webhook ignorado: tipo não é 'payment'.")
             return JsonResponse({"status": "ignored"})
 
         payment_id = (
             data.get("id") or data.get("data.id") or (data.get("data", {}) or {}).get("id")
         )
-
         if not payment_id:
-            logger.error("Webhook recebido sem ID de pagamento.")
             return JsonResponse({"error": "id not found"}, status=400)
 
-        try:
-            payment_info = self.mp_service.sdk.payment().get(payment_id)
-            payment_data = payment_info.get("response", {})
-            logger.info(f"Pagamento {payment_id} recuperado do Mercado Pago.")
-        except Exception as e:
-            logger.exception(f"Falha ao obter pagamento {payment_id}: {str(e)}")
-            return JsonResponse({"error": f"failed to fetch payment: {str(e)}"}, status=500)
-
-        if payment_data.get("status") != "approved":
-            logger.info(
-                f"Pagamento {payment_id} não aprovado. Status: {payment_data.get('status')}"
-            )
-            return JsonResponse({"status": "pending_or_failed"})
+        payment_info = self.mp_service.sdk.payment().get(payment_id)
+        payment_data = payment_info.get("response", {})
 
         metadata = payment_data.get("metadata", {})
         payment_type = metadata.get("type")
         user_id = metadata.get("user_id")
 
-        if payment_type == "credits":
-            try:
-                result = self._process_wallet_credit(
-                    user_id=user_id, amount=metadata.get("amount"), payment_id=payment_id
+        if payment_data.get("status") == "approved":
+            if payment_type == "credits":
+                process_payment_task.delay(
+                    user_id=user_id,
+                    payment_type=payment_type,
+                    amount=metadata.get("amount"),
+                    payment_id=payment_id
                 )
-                logger.info(f"Créditos processados com resultado: {result}")
-                return JsonResponse(result)
-            except ValueError as e:
-                logger.error(f"Erro de valor ao processar créditos: {str(e)}")
-                return JsonResponse({"error": str(e)}, status=400)
-            except Exception as e:
-                logger.exception(f"Erro inesperado ao processar créditos: {str(e)}")
-                return JsonResponse({"error": "internal_error"}, status=500)
+                logger.info(f"Pagamento {payment_id} enfileirado para processamento.")
+                return JsonResponse({"status": "queued"}, status=202)
 
-        if payment_type == "plan":
-            self._activate_subscription(user_id=user_id, plan_id=metadata.get("plan_id"))
-            logger.info(f"Assinatura ativada via pagamento {payment_id}")
-            return JsonResponse({"status": "subscription_activated"})
+            elif payment_type == "plan":
+                plan_id = metadata.get("plan_id")
+                self._activate_subscription(user_id, plan_id)
+                return JsonResponse({"status": "subscription_activated"})
 
-        logger.warning(f"Webhook ignorado: tipo de pagamento inválido ({payment_type})")
-        return JsonResponse({"status": "ignored_no_valid_type"})
+        if payment_type == "credits":
+            transaction = WalletTransaction.objects.filter(external_reference=str(payment_id)).first()
+            if transaction:
+                transaction.process_failed()
+            return JsonResponse({"status": "failed_or_pending"})
+
+        return JsonResponse({"status": "ignored"})
+
 
 
 class WalletPageView(View):
