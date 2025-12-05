@@ -1,11 +1,12 @@
 import time
+
 from django.contrib.auth import get_user_model
-from django.db import connection, models, transaction
+from django.db import connection, models
 from django.test import TransactionTestCase
 
+from apps.billing.models import UserWallet, WalletTransaction
 from apps.common.models import BaseModelAbstract
 from apps.common.utils import CommonUtils
-from apps.billing.models import UserWallet, WalletTransaction
 
 
 class ExampleModel(BaseModelAbstract):
