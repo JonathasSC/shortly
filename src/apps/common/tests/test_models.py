@@ -1,16 +1,14 @@
-import time
 
 from django.contrib.auth import get_user_model
-from django.db import connection, models
+from django.db import models
+from django.db.models.signals import post_save
 from django.test import TransactionTestCase
 
 from apps.billing.models import UserWallet, WalletTransaction
+from apps.billing.signals import add_new_user_coins
 from apps.common.models import BaseModelAbstract
 from apps.common.utils import CommonUtils
-from django.db.models.signals import post_save
-from apps.billing.signals import add_new_user_coins
 from apps.notification.signals import send_welcome_on_signup
-
 
 User = get_user_model()
 
