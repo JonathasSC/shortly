@@ -65,47 +65,76 @@ class WalletTransaction(models.Model):
     source = models.CharField(max_length=50, blank=True, null=True)
     external_reference = models.CharField(max_length=128, blank=True, null=True)
 
-    def process_success(self):
+    def _ensure_pending(self):
         if self.status != self.Status.PENDING:
-            return
+            raise ValueError("Transação já foi processada e não pode ser alterada.")
 
-        with transaction.atomic():
-            if self.transaction_type == self.TransactionType.CREDIT:
-                self.wallet.balance += self.amount
-            else:
-                if self.wallet.balance < self.amount:
-                    raise ValueError("Saldo insuficiente para débito.")
-                self.wallet.balance -= self.amount
+    @transaction.atomic
+    def process_success(self):
+        self._ensure_pending()
+        wallet = UserWallet.objects.select_for_update().get(pk=self.wallet.pk)
 
-            self.wallet.save()
+        if self.transaction_type == self.TransactionType.CREDIT:
+            wallet.balance += self.amount
+        elif self.transaction_type == self.TransactionType.DEBIT:
+            if wallet.balance < self.amount:
+                raise ValueError("Saldo insuficiente para débito.")
+            wallet.balance -= self.amount
 
-            self.status = self.Status.SUCCESS
-            self.processed_at = timezone.now()
-            self.save(update_fields=["status", "processed_at"])
+        wallet.save()
+        self.status = self.Status.SUCCESS
+        self.processed_at = timezone.now()
+        self.save(update_fields=["status", "processed_at"])
+
 
     def process_failed(self):
         if self.status == self.Status.PENDING:
             self.status = self.Status.FAILED
             self.save(update_fields=["status"])
 
+
+    @transaction.atomic
     def refund(self):
         if self.status != self.Status.SUCCESS:
             raise ValueError("Apenas transações concluídas podem ser estornadas.")
 
-        with transaction.atomic():
-            if self.transaction_type == self.TransactionType.CREDIT:
-                self.wallet.balance -= self.amount
-            else:
-                self.wallet.balance += self.amount
-            self.wallet.save()
+        reverse_type = (
+            self.TransactionType.DEBIT
+            if self.transaction_type == self.TransactionType.CREDIT
+            else self.TransactionType.CREDIT
+        )
 
-            self.status = self.Status.REFUNDED
-            self.processed_at = timezone.now()
-            self.save(update_fields=["status", "processed_at"])
+        if reverse_type == self.TransactionType.DEBIT:
+            if self.wallet.balance < self.amount:
+                raise ValueError("Saldo insuficiente para estorno.")
+            self.wallet.balance -= self.amount
+        else:
+            self.wallet.balance += self.amount
+
+        self.wallet.save(update_fields=["balance"])
+
+        WalletTransaction.objects.create(
+            wallet=self.wallet,
+            amount=self.amount,
+            transaction_type=reverse_type,
+            status=self.Status.SUCCESS,
+            source=f"Refund: {self.id}",
+            external_reference=self.external_reference,
+        )
+
+        self.status = self.Status.REFUNDED
+        super(WalletTransaction, self).save(update_fields=["status"])
+
 
     def save(self, *args, **kwargs):
+        if self.pk:  
+            original = WalletTransaction.objects.get(pk=self.pk)
+            if original.status == self.Status.SUCCESS:
+                raise ValueError("Transações concluídas não podem ser alteradas.")
+
         if not self.pk and self.amount <= 0:
             raise ValueError("Valor precisa ser maior que zero.")
+        
         super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):

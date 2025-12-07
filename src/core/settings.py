@@ -118,6 +118,7 @@ INSTALLED_APPS = [
     "apps.institutional",
     "apps.billing",
     "apps.notification",
+    "apps.toggler",
 ]
 
 # ================================================================
