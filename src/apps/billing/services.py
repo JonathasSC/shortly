@@ -1,5 +1,8 @@
+import logging
+
 from apps.billing.abstracts import PaymentAbstract
 
+logger = logging.getLogger(__name__)
 
 class MercadoPagoService(PaymentAbstract):
     def __init__(self, sdk):
@@ -8,6 +11,11 @@ class MercadoPagoService(PaymentAbstract):
     def create_checkout_preference(
         self, title, price, quantity, back_urls, auto_return="approved", metadata=None
     ):
+        logger.info(
+            f"[MP][CREATE_PREFERENCE] Criando preferência | "
+            f"title='{title}' price={price} qnt={quantity} metadata={metadata}"
+        )
+
         preference_data = {
             "items": [
                 {
@@ -27,6 +35,23 @@ class MercadoPagoService(PaymentAbstract):
             }
 
         try:
-            return self.sdk.preference().create(preference_data)
+            response = self.sdk.preference().create(preference_data)
+
+            logger.info(
+                f"[MP][CREATE_PREFERENCE] Resposta do MP | status={response.get('status')} "
+                f"init_point={response.get('response', {}).get('init_point')}"
+            )
+
+            if response.get("status") != 201:
+                logger.error(
+                    f"[MP][CREATE_PREFERENCE] Falha inesperada | response={response}"
+                )
+
+            return response
+
         except Exception as e:
-            return {"status": 500, "response": {"error": str(e)}}
+            logger.exception("[MP][CREATE_PREFERENCE] ERRO no request Mercado Pago")
+            return {
+                "status": 500,
+                "response": {"error": str(e)},
+            }

@@ -32,23 +32,28 @@ class BuyCoinsView(LoginRequiredMixin, View):
     }
 
     def get(self, request, credit_amount, *args, **kwargs):
-        logger.info(f"Usuário {request.user.id} iniciou compra de {credit_amount} créditos.")
+        logger.info(f"[COMPRA INICIADA] User={request.user.id} Credits={credit_amount}")
 
         sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
         mp_service = MercadoPagoService(sdk)
 
         if credit_amount not in self.prices:
             logger.warning(
-                f"Tentativa de compra inválida de {credit_amount} créditos por {request.user.id}"
+                f"[PACOTE INVÁLIDO] User={request.user.id} Tentou comprar: {credit_amount} créditos"
             )
             return redirect("payment_failure")
+
+        price = self.prices[credit_amount]
+        logger.debug(f"[VALIDAÇÃO OK] User={request.user.id} Package={credit_amount} Price={price}")
 
         success_url = request.build_absolute_uri(reverse("payment_success")).replace("http://", "https://")
         failure_url = request.build_absolute_uri(reverse("payment_failure")).replace("http://", "https://")
 
+        logger.debug(f"[BACK_URLS] Success={success_url} - Failure={failure_url}")
+
         preference = mp_service.create_checkout_preference(
             title=f"{credit_amount} Créditos",
-            price=self.prices[credit_amount],
+            price=price,
             quantity=1,
             back_urls={
                 "success": success_url,
@@ -63,12 +68,20 @@ class BuyCoinsView(LoginRequiredMixin, View):
             },
         )
 
-        if preference.get("status") == 201 and \
-        preference.get("response", {}).get("init_point"):
-            return redirect(preference["response"]["init_point"])
+        logger.info(f"[PREFERENCE RESPONSE] {preference}")
 
-        logger.error(f"Erro ao gerar init_point: {preference}")
+        if preference.get("status") == 201 and \
+           preference.get("response", {}).get("init_point"):
+
+            init_point = preference["response"]["init_point"]
+            logger.info(
+                f"[CHECKOUT REDIRECT] User={request.user.id} RedirectTo={init_point}"
+            )
+            return redirect(init_point)
+
+        logger.error(f"[ERRO MERCADO PAGO] Preferência inválida: {preference}")
         return HttpResponse("Erro ao criar preferência", status=400)
+    
 
 class SubscribePlanView(LoginRequiredMixin, View):
     def get(self, request, plan_id, *args, **kwargs):
@@ -106,27 +119,27 @@ class MercadoPagoWebhookView(View):
     mp_service = MercadoPagoService(sdk)
 
     def post(self, request, *args, **kwargs):
+        logger.info("[WEBHOOK] POST recebido")
         return self.handle_webhook(request)
 
     def _process_wallet_credit(self, user_id, amount, payment_id):
-        logger.info(
-            f"Processando crédito na carteira: user={user_id}, amount={amount}, payment={payment_id}"
-        )
+        logger.info(f"[CREDITO] Iniciando crédito | user={user_id} amount={amount} payment={payment_id}")
+
+        User = get_user_model()
         try:
-            User = get_user_model()
             User.objects.get(pk=user_id)
         except User.DoesNotExist:
-            logger.error(f"Usuário {user_id} não encontrado para crédito de carteira.")
+            logger.error(f"[CREDITO] Usuário não encontrado | user={user_id}")
             raise ValueError("user_not_found")
 
         try:
             amount = int(float(amount))
         except (TypeError, ValueError):
-            logger.error(f"Valor inválido para crédito de carteira: {amount}")
+            logger.error(f"[CREDITO] Valor inválido | user={user_id} amount={amount}")
             return {"status": "invalid_amount"}
 
         if WalletTransaction.objects.filter(external_reference=payment_id).exists():
-            logger.warning(f"Transação já processada: {payment_id}")
+            logger.warning(f"[CREDITO] Já processado | payment={payment_id}")
             return {"status": "already_processed"}
 
         wallet, _ = UserWallet.objects.get_or_create(user_id=user_id)
@@ -137,20 +150,20 @@ class MercadoPagoWebhookView(View):
                 wallet=wallet,
                 amount=amount,
                 transaction_type=WalletTransaction.TransactionType.CREDIT,
-                source=f"Crédito de {amount} coins via Mercado Pago",
+                source=f"Crédito via Mercado Pago: {amount}",
                 external_reference=str(payment_id),
             )
 
-        logger.info(f"Crédito de {amount} coins aplicado ao usuário {user_id}")
+        logger.info(f"[CREDITO] Sucesso | user={user_id} amount={amount}")
         return {"status": "wallet_updated"}
 
     def _activate_subscription(self, user_id, plan_id):
-        logger.info(f"Ativando assinatura: user={user_id}, plan={plan_id}")
+        logger.info(f"[ASSINATURA] Ativando | user={user_id} plan={plan_id}")
         plan = Plan.objects.get(id=plan_id)
         UserSubscription.objects.update_or_create(
             user_id=user_id, defaults={"plan": plan, "is_active": True}
         )
-        logger.info(f"Assinatura ativada com sucesso: user={user_id}, plan={plan_id}")
+        logger.info(f"[ASSINATURA] Ativada com sucesso | user={user_id} plan={plan_id}")
 
     def _verify_signature(self, request):
         secret = settings.MERCADO_PAGO_WEBHOOK_SECRET
@@ -159,16 +172,22 @@ class MercadoPagoWebhookView(View):
         request_id = request.headers.get("X-Request-Id")
         payment_id = request.GET.get("data.id")
 
+        logger.debug(f"[WEBHOOK] Verificando assinatura | payment={payment_id} request_id={request_id}")
+
         if not signature_header or not request_id or not payment_id:
-            logger.warning("Dados de assinatura ausentes.")
+            logger.warning("[WEBHOOK] Falha: cabeçalhos ausentes")
             return False
 
-        sig_parts = dict(x.split("=") for x in signature_header.split(",") if "=" in x)
-        signature_v1 = sig_parts.get("v1")
-        ts = sig_parts.get("ts")
+        try:
+            sig_parts = dict(x.split("=") for x in signature_header.split(",") if "=" in x)
+            signature_v1 = sig_parts.get("v1")
+            ts = sig_parts.get("ts")
+        except Exception:
+            logger.error("[WEBHOOK] Erro ao ler partes da assinatura")
+            return False
 
         if not signature_v1 or not ts:
-            logger.warning("Partes da assinatura ausentes.")
+            logger.warning("[WEBHOOK] Assinatura incompleta")
             return False
 
         raw_message = f"id:{payment_id};request-id:{request_id};ts:{ts};".encode("utf-8")
@@ -181,30 +200,40 @@ class MercadoPagoWebhookView(View):
 
         valid = hmac.compare_digest(expected_hmac, signature_v1)
         if not valid:
-            logger.warning(f"Assinatura inválida para pagamento {payment_id}")
+            logger.warning(f"[WEBHOOK] Assinatura inválida | payment={payment_id}")
 
         return valid
 
     def handle_webhook(self, request):
-        logger.info("Recebendo webhook do Mercado Pago.")
+        logger.info("[WEBHOOK] Payload recebido")
 
         if not self._verify_signature(request):
+            logger.error("[WEBHOOK] Assinatura negada")
             return JsonResponse({"error": "invalid_signature"}, status=403)
 
         try:
             data = json.loads(request.body.decode("utf-8"))
-        except Exception:
+            logger.debug(f"[WEBHOOK] Body: {data}")
+        except Exception as e:
+            logger.error(f"[WEBHOOK] JSON inválido: {e}")
             data = {}
 
         topic = data.get("topic") or data.get("type")
+        logger.debug(f"[WEBHOOK] Tipo: {topic}")
+
         if topic != "payment":
+            logger.info("[WEBHOOK] Evento ignorado (não é pagamento)")
             return JsonResponse({"status": "ignored"})
 
         payment_id = (
             data.get("id") or data.get("data.id") or (data.get("data", {}) or {}).get("id")
         )
+
         if not payment_id:
+            logger.error("[WEBHOOK] ID de pagamento não encontrado no payload")
             return JsonResponse({"error": "id not found"}, status=400)
+
+        logger.info(f"[WEBHOOK] Buscando detalhes do pagamento | id={payment_id}")
 
         payment_info = self.mp_service.sdk.payment().get(payment_id)
         payment_data = payment_info.get("response", {})
@@ -213,30 +242,35 @@ class MercadoPagoWebhookView(View):
         payment_type = metadata.get("type")
         user_id = metadata.get("user_id")
 
+        logger.info(f"[WEBHOOK] Status={payment_data.get('status')} Tipo={payment_type} User={user_id}")
+
         if payment_data.get("status") == "approved":
             if payment_type == "credits":
+                logger.info(f"[WEBHOOK] Pagamento aprovado (moedas), enviando para fila | payment={payment_id}")
                 process_payment_task.delay(
                     user_id=user_id,
                     payment_type=payment_type,
                     amount=metadata.get("amount"),
                     payment_id=payment_id
                 )
-                logger.info(f"Pagamento {payment_id} enfileirado para processamento.")
                 return JsonResponse({"status": "queued"}, status=202)
 
             elif payment_type == "plan":
                 plan_id = metadata.get("plan_id")
+                logger.info(f"[WEBHOOK] Pagamento aprovado (plano) | payment={payment_id}")
                 self._activate_subscription(user_id, plan_id)
                 return JsonResponse({"status": "subscription_activated"})
 
         if payment_type == "credits":
+            logger.warning(f"[WEBHOOK] Pagamento não aprovado | payment={payment_id}")
             transaction = WalletTransaction.objects.filter(external_reference=str(payment_id)).first()
             if transaction:
+                logger.info(f"[WEBHOOK] Marcando transação falhada | payment={payment_id}")
                 transaction.process_failed()
             return JsonResponse({"status": "failed_or_pending"})
 
+        logger.info("[WEBHOOK] Evento ignorado (não é créditos nem plano)")
         return JsonResponse({"status": "ignored"})
-
 
 
 class WalletPageView(View):
