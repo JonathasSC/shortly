@@ -15,10 +15,12 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import TemplateView
 
 from apps.billing.models import Plan, UserSubscription, UserWallet, WalletTransaction
 from apps.billing.services import MercadoPagoService
 from apps.billing.tasks import process_payment_task
+from apps.toggler.utilities import is_feature_enabled
 
 logger = logging.getLogger(__name__)
 
@@ -46,13 +48,18 @@ class BuyCoinsView(LoginRequiredMixin, View):
         price = self.prices[credit_amount]
         logger.debug(f"[VALIDAÇÃO OK] User={request.user.id} Package={credit_amount} Price={price}")
 
-        success_url = request.build_absolute_uri(reverse("payment_success")).replace("http://", "https://")
-        failure_url = request.build_absolute_uri(reverse("payment_failure")).replace("http://", "https://")
+        base = request.build_absolute_uri("").replace("http://", "https://")
+
+        success_url = f"{base}payment/success/?payment_id={{payment_id}}"
+        failure_url = f"{base}payment/failure/?payment_id={{payment_id}}"
+        pending_url = f"{base}payment/pending/?payment_id={{payment_id}}"
 
         logger.debug(f"[BACK_URLS] Success={success_url} - Failure={failure_url}")
 
-        notification_url = request.build_absolute_uri(reverse("mp_webhook")).replace("http://", "https://")
-        
+        notification_url = request.build_absolute_uri(
+            reverse("mp_webhook")
+        ).replace("http://", "https://")
+                
         logger.info(notification_url)
         
         preference = mp_service.create_checkout_preference(
@@ -62,7 +69,7 @@ class BuyCoinsView(LoginRequiredMixin, View):
             back_urls={
                 "success": success_url,
                 "failure": failure_url,
-                "pending": failure_url,
+                "pending": pending_url,
             },
             auto_return="approved",
             metadata={
@@ -391,6 +398,27 @@ class WalletPageView(View):
                 "plans": plans,
                 "wallet": wallet,
                 "transactions": transactions_page,
+                "market_open": is_feature_enabled("open_market")
             },
         )
 
+
+class PaymentSuccessView(TemplateView):
+    template_name = "billing/payment/success.html"
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+class PaymentPendingView(TemplateView):
+    template_name = "billing/payment/pending.html"
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        payment_id = self.request.GET.get("payment_id") or kwargs.get("payment_id") or ""
+        ctx["payment_id"] = payment_id
+        return ctx
+
+class PaymentFailureView(TemplateView):
+    template_name = "billing/payment/failure.html"
+
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)

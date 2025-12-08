@@ -1,0 +1,44 @@
+{% extends 'common/base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block extrahead %}
+<script>
+        const paymentId = "{{ payment_id }}";
+
+        function checkStatus() {
+            fetch(`/api/payment/status/?payment_id=${paymentId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === "approved") {
+                        window.location.href = "/payment/success/";
+                    }
+                })
+                .catch(err => console.error("Erro ao consultar status:", err));
+        }
+
+        setInterval(checkStatus, 5000);
+    </script>
+{% endblock %}
+
+{% block content %}
+<div class="bg-gray-900 rounded-2xl shadow-lg max-w-md w-full p-8 text-center border border-gray-800">
+    <div class="flex flex-col items-center justify-center space-y-6">
+ 
+        <div class="w-20 h-20 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+
+        <h1 class="text-2xl font-semibold text-purple-400">
+            Aguardando pagamento
+        </h1>
+
+        <p class="text-sm text-gray-400 leading-relaxed">
+            Estamos processando o pagamento.<br>
+            Pode levar alguns segundos para o banco confirmar.
+        </p>
+
+        <p class="text-xs text-purple-300 animate-pulse">
+            Você será redirecionado automaticamente quando for aprovado
+        </p>
+    </div>
+</div>
+{% endblock %}

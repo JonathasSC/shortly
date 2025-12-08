@@ -183,7 +183,7 @@ class HomeView(View):
             )
             return redirect("home")
 
-        if user and not self.__debit_user_wallet(user):
+        if user.is_authenticated and not self.__debit_user_wallet(user):
             messages.error(
                 request,
                 mark_safe("""
@@ -194,7 +194,12 @@ class HomeView(View):
             )
             return redirect("home")
 
-        created_url = self.__create_short_url(url_object, None, client_ip)
+        created_url = self.__create_short_url(
+            url_object,
+            user=user if user.is_authenticated else None,
+            client_ip=client_ip
+        )
+
         short_url = request.build_absolute_uri(f"/{created_url.short_code}/")
 
         html_message = render_to_string(
@@ -202,77 +207,3 @@ class HomeView(View):
         )
         messages.success(request, mark_safe(html_message))
         return redirect("home")
-
-    # def post(self, request):
-    #     form = UrlForm(request.POST)
-    #     client_ip = user_request_util.get_client_ip(request)
-    #     create_new = request.POST.get("create_new", "false") == "true"
-    #     user = request.user
-    #     user_is_authenticated = user.is_authenticated
-
-    #     if not form.is_valid():
-    #         messages.error(request, "Erro ao criar o link. Verifique o formulário.")
-    #         return redirect("home")
-
-    #     url_object = form.save(commit=False)
-
-    #     if user.is_authenticated:
-    #         existing_url = self.__get_existing_url(url_object, request.user, client_ip)
-
-    #         if existing_url and not create_new:
-    #             messages.info(
-    #                 request,
-    #                 mark_safe(f'''
-    #                 <div class="existing-url-message" data-original-url="{existing_url.original_url}"></div>
-    #             '''),
-    #             )
-    #             return redirect("home")
-
-    #         if user and not self.__debit_user_wallet(user):
-    #             messages.error(
-    #                 request,
-    #                 mark_safe("""
-    #                 <p class="text-center bg-red-100 w-full max-w-lg px-4 py-2 w-80 rounded text-red-600">
-    #                     Saldo insuficiente! Adicione mais coins para encurtar mais URL's
-    #                 </p>
-    #             """),
-    #             )
-    #             return redirect("home")
-
-    #         created_url = self.__create_short_url(url_object, user, client_ip)
-    #         short_url = request.build_absolute_uri(f"/{created_url.short_code}/")
-
-    #         html_message = render_to_string(
-    #             "converter/includes/success_message.html", {"short_url": short_url}
-    #         )
-
-    #         messages.success(request, mark_safe(html_message))
-    #         return redirect("home")
-
-    #     today_start = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
-    #     today_end = today_start + timedelta(days=1)
-
-    #     count_today = Url.objects.filter(
-    #         created_by_ip=client_ip, created_at__range=(today_start, today_end)
-    #     ).count()
-
-    #     MAX_IP_PER_DAY = 5
-    #     if count_today >= MAX_IP_PER_DAY:
-    #         messages.error(
-    #             request,
-    #             mark_safe("""
-    #             <p class="text-center bg-yellow-100 px-4 py-2 w-full rounded text-yellow-600">
-    #                 Você atingiu o limite de 5 links por dia. Tente novamente amanhã ou faça login para continuar.
-    #             </p>
-    #         """),
-    #         )
-    #         return redirect("home")
-
-    #     created_url = self.__create_short_url(url_object, None, client_ip)
-    #     short_url = request.build_absolute_uri(f"/{created_url.short_code}/")
-
-    #     html_message = render_to_string(
-    #         "converter/includes/success_message.html", {"short_url": short_url}
-    #     )
-    #     messages.success(request, mark_safe(html_message))
-    #     return redirect("home")
