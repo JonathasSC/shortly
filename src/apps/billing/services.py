@@ -9,7 +9,7 @@ class MercadoPagoService(PaymentAbstract):
         self.sdk = sdk
 
     def create_checkout_preference(
-        self, title, price, quantity, back_urls, auto_return="approved", metadata=None
+        self, title, price, quantity, back_urls, auto_return="approved", metadata=None, notification_url=None
     ):
         logger.info(
             f"[MP][CREATE_PREFERENCE] Criando preferência | "
@@ -34,10 +34,13 @@ class MercadoPagoService(PaymentAbstract):
                 key: str(value) for key, value in metadata.items()
             }
 
+        if notification_url:
+            preference_data["notification_url"] = notification_url
+            logger.info(f"[MP][CREATE_PREFERENCE] Notification URL registrada: {notification_url}")
+
         try:
             response = self.sdk.preference().create(preference_data)
-            print('self.sdk.preference().create(preference_data)', response)
-            
+
             logger.info(
                 f"[MP][CREATE_PREFERENCE] Resposta do MP | status={response.get('status')} "
                 f"init_point={response.get('response', {}).get('init_point')}"
