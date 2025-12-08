@@ -212,7 +212,7 @@ class MercadoPagoWebhookView(View):
                 print("[SIGNATURE] ts ou v1 ausentes")
                 return False
 
-            secret = settings.MERCADOPAGO_WEBHOOK_SECRET
+            secret = settings.MERCADO_PAGO_WEBHOOK_SECRET
 
             signed_parts = []
 
