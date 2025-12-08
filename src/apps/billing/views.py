@@ -4,6 +4,7 @@ import json
 import logging
 
 import mercadopago
+from axes.decorators import axes_dispatch
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -265,6 +266,32 @@ class MercadoPagoWebhookView(View):
             data = {}
 
         topic = data.get("topic") or data.get("type")
+
+        if topic in ("merchant_order", "topic_merchant_order_wh"):
+            logger.info("[WEBHOOK] merchant_order recebido, buscando dados...")
+
+            merchant_order_id = (
+                data.get("id") 
+                or data.get("data.id") 
+                or (data.get("data", {}) or {}).get("id")
+            )
+
+            if not merchant_order_id:
+                return JsonResponse({"error": "merchant_order_id_missing"}, status=400)
+
+            merchant_order = self.mp_service.sdk.merchant_order().get(merchant_order_id)
+            payments = merchant_order.get("response", {}).get("payments", [])
+
+            if not payments:
+                logger.info("[WEBHOOK] Sem pagamentos vinculados ainda")
+                return JsonResponse({"status": "waiting_payment"})
+
+            payment_id = payments[0].get("id")
+            logger.info(f"[WEBHOOK] merchant_order encontrou pagamento | id={payment_id}")
+
+            data["id"] = payment_id
+            topic = "payment"
+
         if topic not in ("payment", "approved", "payment.updated", "payment.created"):
             logger.info(f"[WEBHOOK] Evento ignorado | topic={topic}")
             return JsonResponse({"status": "ignored"})
@@ -286,7 +313,9 @@ class MercadoPagoWebhookView(View):
 
         status = payment_data.get("status")
         metadata = payment_data.get("metadata") or {}
+        
         print('metadata: ', metadata)
+        
         payment_type = metadata.get("type")
         user_id = metadata.get("user_id")
 
@@ -318,6 +347,7 @@ class MercadoPagoWebhookView(View):
 
         logger.info("[WEBHOOK] Tipo desconhecido. Ignorando.")
         return JsonResponse({"status": "ignored"})
+
 
 
 class WalletPageView(View):
