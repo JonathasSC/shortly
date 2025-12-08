@@ -255,8 +255,8 @@ class MercadoPagoWebhookView(View):
         logger.info("[WEBHOOK] Payload recebido")
 
         if not self._verify_signature(request):
-            logger.error("[WEBHOOK] Assinatura negada")
-            return JsonResponse({"error": "invalid_signature"}, status=403)
+            logger.warning("[WEBHOOK] Assinatura inválida — ignorada")
+            return JsonResponse({"status": "ignored"}, status=200)
 
         try:
             data = json.loads(request.body.decode("utf-8"))
