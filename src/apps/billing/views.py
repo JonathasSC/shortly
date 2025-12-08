@@ -155,25 +155,34 @@ class MercadoPagoWebhookView(View):
     def _verify_signature(self, request):
         secret = settings.MERCADO_PAGO_WEBHOOK_SECRET
 
-        x_signature = request.headers.get("X-Signature")
-        x_request_id = request.headers.get("X-Request-Id")
+        signature_header = request.headers.get("X-Signature")
+        request_id = request.headers.get("X-Request-Id")
+        payment_id = request.GET.get("data.id")
 
-        payment_id = (
-            request.GET.get("id")
-            or request.GET.get("data.id")
-            or (json.loads(request.body.decode("utf-8")).get("data", {}) or {}).get("id")
-        )
-
-        if not x_signature or not payment_id:
-            logger.warning("Assinatura ausente ou ID de pagamento não encontrado.")
+        if not signature_header or not request_id or not payment_id:
+            logger.warning("Dados de assinatura ausentes.")
             return False
 
-        message = f"id:{payment_id};request-id:{x_request_id}".encode("utf-8")
-        expected_hmac = hmac.new(secret.encode("utf-8"), message, hashlib.sha256).hexdigest()
+        sig_parts = dict(x.split("=") for x in signature_header.split(",") if "=" in x)
+        signature_v1 = sig_parts.get("v1")
+        ts = sig_parts.get("ts")
 
-        valid = hmac.compare_digest(expected_hmac, x_signature)
+        if not signature_v1 or not ts:
+            logger.warning("Partes da assinatura ausentes.")
+            return False
+
+        raw_message = f"id:{payment_id};request-id:{request_id};ts:{ts};".encode("utf-8")
+
+        expected_hmac = hmac.new(
+            key=secret.encode("utf-8"),
+            msg=raw_message,
+            digestmod=hashlib.sha256
+        ).hexdigest()
+
+        valid = hmac.compare_digest(expected_hmac, signature_v1)
         if not valid:
             logger.warning(f"Assinatura inválida para pagamento {payment_id}")
+
         return valid
 
     def handle_webhook(self, request):
