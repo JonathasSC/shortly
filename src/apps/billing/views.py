@@ -52,7 +52,7 @@ class BuyCoinsView(LoginRequiredMixin, View):
         logger.debug(f"[BACK_URLS] Success={success_url} - Failure={failure_url}")
 
         notification_url = request.build_absolute_uri(
-            reverse("mercado_pago_webhook")
+            reverse("mp_webhook")
         ).replace("http://", "https://")
         
         logger.info(notification_url)
