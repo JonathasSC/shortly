@@ -219,10 +219,8 @@ class MercadoPagoWebhookView(View):
             data = {}
 
         topic = data.get("topic") or data.get("type")
-        logger.debug(f"[WEBHOOK] Tipo: {topic}")
-
-        if topic != "payment":
-            logger.info("[WEBHOOK] Evento ignorado (não é pagamento)")
+        if topic not in ("payment", "approved", "payment.updated", "payment.created"):
+            logger.info(f"[WEBHOOK] Evento ignorado | topic={topic}")
             return JsonResponse({"status": "ignored"})
 
         payment_id = (
@@ -230,46 +228,49 @@ class MercadoPagoWebhookView(View):
         )
 
         if not payment_id:
-            logger.error("[WEBHOOK] ID de pagamento não encontrado no payload")
-            return JsonResponse({"error": "id not found"}, status=400)
+            logger.error("[WEBHOOK] ID de pagamento não encontrado")
+            return JsonResponse({"error": "id_missing"}, status=400)
 
         logger.info(f"[WEBHOOK] Buscando detalhes do pagamento | id={payment_id}")
 
         payment_info = self.mp_service.sdk.payment().get(payment_id)
         payment_data = payment_info.get("response", {})
 
-        metadata = payment_data.get("metadata", {})
+        logger.debug(f"[WEBHOOK] PaymentData={payment_data}")
+
+        status = payment_data.get("status")
+        metadata = payment_data.get("metadata") or {}
+
         payment_type = metadata.get("type")
         user_id = metadata.get("user_id")
 
-        logger.info(f"[WEBHOOK] Status={payment_data.get('status')} Tipo={payment_type} User={user_id}")
+        logger.info(f"[WEBHOOK] Status={status} Tipo={payment_type} User={user_id}")
 
-        if payment_data.get("status") == "approved":
-            if payment_type == "credits":
-                logger.info(f"[WEBHOOK] Pagamento aprovado (moedas), enviando para fila | payment={payment_id}")
-                process_payment_task.delay(
-                    user_id=user_id,
-                    payment_type=payment_type,
-                    amount=metadata.get("amount"),
-                    payment_id=payment_id
-                )
-                return JsonResponse({"status": "queued"}, status=202)
+        if status != "approved":
+            logger.info("[WEBHOOK] Pagamento pendente/negado. Aguardando atualização.")
+            return JsonResponse({"status": "pending"})
 
-            elif payment_type == "plan":
-                plan_id = metadata.get("plan_id")
-                logger.info(f"[WEBHOOK] Pagamento aprovado (plano) | payment={payment_id}")
-                self._activate_subscription(user_id, plan_id)
-                return JsonResponse({"status": "subscription_activated"})
+        if WalletTransaction.objects.filter(external_reference=str(payment_id)).exists():
+            logger.warning(f"[WEBHOOK] Já processado | payment={payment_id}")
+            return JsonResponse({"status": "already_processed"}, status=200)
 
         if payment_type == "credits":
-            logger.warning(f"[WEBHOOK] Pagamento não aprovado | payment={payment_id}")
-            transaction = WalletTransaction.objects.filter(external_reference=str(payment_id)).first()
-            if transaction:
-                logger.info(f"[WEBHOOK] Marcando transação falhada | payment={payment_id}")
-                transaction.process_failed()
-            return JsonResponse({"status": "failed_or_pending"})
+            logger.info(f"[WEBHOOK] Aprovado (créditos), enviando para fila | payment={payment_id}")
+            process_payment_task.delay(
+                user_id=user_id,
+                payment_type=payment_type,
+                amount=metadata.get("amount"),
+                payment_id=payment_id
+            )
+            return JsonResponse({"status": "queued"}, status=202)
 
-        logger.info("[WEBHOOK] Evento ignorado (não é créditos nem plano)")
+        if payment_type == "plan":
+            plan_id = metadata.get("plan_id")
+            logger.info(f"[WEBHOOK] Aprovado (plano) | payment={payment_id}")
+            self._activate_subscription(user_id, plan_id)
+            return JsonResponse({"status": "subscription_activated"})
+
+        logger.info("[WEBHOOK] Tipo desconhecido. Ignorando.")
         return JsonResponse({"status": "ignored"})
 
 
@@ -317,3 +318,4 @@ class WalletPageView(View):
                 "transactions": transactions_page,
             },
         )
+
