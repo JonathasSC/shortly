@@ -36,7 +36,8 @@ class MercadoPagoService(PaymentAbstract):
 
         try:
             response = self.sdk.preference().create(preference_data)
-
+            print('self.sdk.preference().create(preference_data)', response)
+            
             logger.info(
                 f"[MP][CREATE_PREFERENCE] Resposta do MP | status={response.get('status')} "
                 f"init_point={response.get('response', {}).get('init_point')}"

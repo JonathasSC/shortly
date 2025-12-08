@@ -6,4 +6,4 @@ class BillingConfig(AppConfig):
     name = "apps.billing"
 
     def ready(self):
-        pass
+        import apps.billing.signals

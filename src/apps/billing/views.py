@@ -51,9 +51,15 @@ class BuyCoinsView(LoginRequiredMixin, View):
 
         logger.debug(f"[BACK_URLS] Success={success_url} - Failure={failure_url}")
 
+        notification_url = request.build_absolute_uri(
+            reverse("mercado_pago_webhook")
+        ).replace("http://", "https://")
+        
+        logger.info(notification_url)
+        
         preference = mp_service.create_checkout_preference(
             title=f"{credit_amount} Créditos",
-            price=price,
+            price=self.prices[credit_amount],
             quantity=1,
             back_urls={
                 "success": success_url,
@@ -66,8 +72,9 @@ class BuyCoinsView(LoginRequiredMixin, View):
                 "type": "credits",
                 "amount": credit_amount,
             },
+            notification_url=notification_url
         )
-
+        
         logger.info(f"[PREFERENCE RESPONSE] {preference}")
 
         if preference.get("status") == 201 and \
@@ -240,7 +247,7 @@ class MercadoPagoWebhookView(View):
 
         status = payment_data.get("status")
         metadata = payment_data.get("metadata") or {}
-
+        print('metadata: ', metadata)
         payment_type = metadata.get("type")
         user_id = metadata.get("user_id")
 
