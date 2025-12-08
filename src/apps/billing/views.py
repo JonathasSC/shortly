@@ -2,7 +2,6 @@ import hashlib
 import hmac
 import json
 import logging
-import base64
 
 import mercadopago
 from django.conf import settings
@@ -189,7 +188,7 @@ class MercadoPagoWebhookView(View):
             # Caso não exista, tenta extrair do corpo JSON
             if not data_id:
                 try:
-                    payload = request.json if hasattr(request, "json") else request.body
+                    request.json if hasattr(request, "json") else request.body
                     body = request.data if hasattr(request, "data") else {}
                     data_id = body.get("data", {}).get("id")
                 except Exception:
