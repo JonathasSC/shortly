@@ -1,3 +1,4 @@
+import base64
 import hashlib
 import hmac
 import json
@@ -175,41 +176,57 @@ class MercadoPagoWebhookView(View):
     def _verify_signature(self, request):
         secret = settings.MERCADO_PAGO_WEBHOOK_SECRET
 
-        signature_header = request.headers.get("X-Signature")
-        request_id = request.headers.get("X-Request-Id")
-        payment_id = request.GET.get("data.id")
+        signature_header = request.headers.get("x-signature")
+        request_id = request.headers.get("x-request-id")
 
-        logger.debug(f"[WEBHOOK] Verificando assinatura | payment={payment_id} request_id={request_id}")
-
-        if not signature_header or not request_id or not payment_id:
+        if not signature_header or not request_id:
             logger.warning("[WEBHOOK] Falha: cabeçalhos ausentes")
             return False
 
+        # Extraindo parâmetros
         try:
-            sig_parts = dict(x.split("=") for x in signature_header.split(",") if "=" in x)
-            signature_v1 = sig_parts.get("v1")
-            ts = sig_parts.get("ts")
+            params = dict(part.split("=", 1) for part in signature_header.split(","))
+            ts = params.get("ts")
+            v1 = params.get("v1")
         except Exception:
-            logger.error("[WEBHOOK] Erro ao ler partes da assinatura")
+            logger.error("[WEBHOOK] Cabeçalho inválido")
             return False
 
-        if not signature_v1 or not ts:
-            logger.warning("[WEBHOOK] Assinatura incompleta")
+        if not v1 or not ts:
+            logger.error("[WEBHOOK] Assinatura incompleta")
             return False
 
-        raw_message = f"id:{payment_id};request-id:{request_id};ts:{ts};".encode("utf-8")
+        url = request.build_absolute_uri()
 
-        expected_hmac = hmac.new(
+        try:
+            payload = json.loads(request.body.decode("utf-8"))
+            payment_id = payload.get("data", {}).get("id")
+        except Exception:
+            logger.error("[WEBHOOK] Falha ao ler JSON")
+            return False
+
+        if not payment_id:
+            logger.error("[WEBHOOK] ID não encontrado no payload")
+            return False
+
+        # String oficial do Mercado Pago
+        data = f"id:{payment_id};request-id:{request_id};ts:{ts};url:{url}"
+
+        digest = hmac.new(
             key=secret.encode("utf-8"),
-            msg=raw_message,
+            msg=data.encode("utf-8"),
             digestmod=hashlib.sha256
-        ).hexdigest()
+        ).digest()
 
-        valid = hmac.compare_digest(expected_hmac, signature_v1)
-        if not valid:
-            logger.warning(f"[WEBHOOK] Assinatura inválida | payment={payment_id}")
+        expected_v1 = base64.b64encode(digest).decode()
 
-        return valid
+        if not hmac.compare_digest(expected_v1, v1):
+            logger.error("[WEBHOOK] Assinatura inválida")
+            return False
+
+        logger.info("[WEBHOOK] Assinatura válida")
+        return True
+
 
     def handle_webhook(self, request):
         logger.info("[WEBHOOK] Payload recebido")
