@@ -4,7 +4,6 @@ import json
 import logging
 
 import mercadopago
-from axes.decorators import axes_dispatch
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -119,7 +118,6 @@ class SubscribePlanView(LoginRequiredMixin, View):
         return redirect(preference["response"]["init_point"])
 
 @method_decorator(csrf_exempt, name="dispatch")
-@method_decorator(axes_dispatch(disable=True), name="dispatch")
 class MercadoPagoWebhookView(View):
     sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
     mp_service = MercadoPagoService(sdk)
