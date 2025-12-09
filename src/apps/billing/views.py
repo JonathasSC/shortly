@@ -429,3 +429,29 @@ class PaymentFailureView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
+    
+class PaymentStatusAPI(View):
+    def get(self, request, *args, **kwargs):
+        payment_id = request.GET.get("payment_id")
+
+        if not payment_id:
+            return JsonResponse({"error": "payment_id_required"}, status=400)
+
+        logger.info(f"[STATUS API] Consulta de status | payment_id={payment_id}")
+
+        try:
+            sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
+            payment_info = sdk.payment().get(payment_id)
+            response = payment_info.get("response", {})
+        except Exception as e:
+            logger.error(f"[STATUS API] Erro ao consultar MP: {e}")
+            return JsonResponse({"status": "unknown"}, status=500)
+
+        status = response.get("status")
+
+        logger.info(f"[STATUS API] Status do MP retornou: {status}")
+
+        if status == "approved":
+            return JsonResponse({"status": "approved"})
+
+        return JsonResponse({"status": status or "unknown"})
