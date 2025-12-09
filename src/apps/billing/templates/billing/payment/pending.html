@@ -7,7 +7,7 @@
         const paymentId = "{{ payment_id }}";
 
         function checkStatus() {
-            fetch(`/api/payment/status/?payment_id=${paymentId}`)
+            fetch(`/buy/payment/status/?payment_id=${paymentId}`)
                 .then(res => res.json())
                 .then(data => {
                     if (data.status === "approved") {

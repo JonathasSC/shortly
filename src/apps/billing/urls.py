@@ -27,6 +27,6 @@ urlpatterns = [
          PaymentFailureView.as_view(), name='payment_failure'),
      path('payment/pending/', 
          PaymentPendingView.as_view(), name='payment_pending'),
-     path("api/payment/status/", PaymentStatusAPI.as_view(), name="payment_status_api"),
+     path("payment/status/", PaymentStatusAPI.as_view(), name="payment_status_api"),
 
 ]
