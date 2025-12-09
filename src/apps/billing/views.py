@@ -44,16 +44,20 @@ class BuyCoinsView(LoginRequiredMixin, View):
 
         success_url = request.build_absolute_uri(
             reverse("payment_success")
-        )
+        ).replace("http://", "https://")
 
         failure_url = request.build_absolute_uri(
             reverse("payment_failure")
-        )
+        ).replace("http://", "https://")
 
         pending_url = request.build_absolute_uri(
             reverse("payment_pending")
-        )
+        ).replace("http://", "https://")
 
+
+        print(success_url)
+        print(pending_url)
+        print(failure_url)
         logger.debug(f"[BACK_URLS] Success={success_url} - Failure={failure_url}")
 
         notification_url = request.build_absolute_uri(
