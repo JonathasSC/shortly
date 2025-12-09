@@ -5,10 +5,10 @@ from apps.billing.views import (
     MercadoPagoWebhookView,
     PaymentFailureView,
     PaymentPendingView,
+    PaymentStatusAPI,
     PaymentSuccessView,
     SubscribePlanView,
     WalletPageView,
-    PaymentStatusAPI
 )
 
 urlpatterns = [
