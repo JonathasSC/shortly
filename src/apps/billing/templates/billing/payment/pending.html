@@ -11,7 +11,7 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.status === "approved") {
-                        window.location.href = "/payment/success/";
+                        window.location.href = "buy/payment/success/";
                     }
                 })
                 .catch(err => console.error("Erro ao consultar status:", err));
