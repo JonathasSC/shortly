@@ -49,7 +49,7 @@ class BuyCoinsView(LoginRequiredMixin, View):
             reverse("payment_failure") + "?payment_id={payment_id}"
         )
         pending_url = request.build_absolute_uri(
-            reverse("payment_pending") + f"?payment_id={{payment_id}}"
+            reverse("payment_pending") + "?payment_id={payment_id}"
         )
 
         logger.debug(f"[BACK_URLS] Success={success_url} - Failure={failure_url}")
