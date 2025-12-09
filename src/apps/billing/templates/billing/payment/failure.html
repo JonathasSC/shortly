@@ -2,32 +2,47 @@
 {% load static %}
 {% load i18n %}
 
-{% block content %}
-<div class="bg-gray-900 rounded-2xl shadow-lg max-w-md w-full p-8 text-center border border-red-700">
-    <div class="flex flex-col items-center justify-center space-y-6">
+{% block header %}
+<header class="fixed w-full bg-white border-b z-50">
+  <div class="px-4 py-3 flex items-center justify-start">
+    <a href="{% url 'home' %}">
+      <img class='w-36' src="{% static 'common/svg/logo/without_bg_with_text_blue.svg' %}" alt="Shortly Logo">
+    </a>
+  </div>
+</header>
+{% endblock %}
 
-        <div class="w-20 h-20 flex items-center justify-center rounded-full bg-red-600">
+{% block footer %}{% endblock %}
+
+{% block content %}
+<main class="min-h-screen w-full flex items-center justify-center bg-white mt-14 px-4">
+    <div class="flex flex-col items-center gap-8 text-center max-w-md p-8 border border-red-200 rounded-2xl shadow-sm bg-white">
+
+        <div class="w-20 h-20 flex items-center justify-center rounded-full bg-red-500 shadow-md">
             <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" stroke-width="3"
                  viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round"
                       d="M6 18L18 6M6 6l12 12" />
-            </path>
-        </svg>
+            </svg>
         </div>
 
-        <h1 class="text-2xl font-semibold text-red-400">
+        <h1 class="text-xl font-bold text-red-600">
             Pagamento não aprovado
         </h1>
 
-        <p class="text-sm text-gray-300 leading-relaxed">
+        <p class="text-sm text-zinc-600 leading-relaxed">
             O pagamento foi recusado ou cancelado.<br>
             Nenhuma cobrança foi realizada.
         </p>
 
         <a href="/billing/wallet/"
-           class="bg-red-600 text-white px-5 py-2 rounded-lg hover:bg-red-500 transition">
+           class="w-full bg-red-600 text-white py-2 rounded-xl hover:bg-red-700 transition shadow-sm font-medium">
             Tentar novamente
         </a>
+
+        <a href="{% url 'home' %}" class="text-sm text-blue-600 hover:underline transition">
+            Voltar ao início
+        </a>
     </div>
-</div>
+</main>
 {% endblock %}
