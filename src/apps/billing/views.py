@@ -21,31 +21,25 @@ from apps.billing.models import Plan, UserSubscription, UserWallet, WalletTransa
 from apps.billing.services import MercadoPagoService
 from apps.billing.tasks import process_payment_task
 from apps.toggler.utilities import is_feature_enabled
+from apps.billing.domain import Pricing
 
 logger = logging.getLogger(__name__)
 
 
-class BuyCoinsView(LoginRequiredMixin, View):
-    prices = {
-        10: 5.99,
-        20: 10.99,
-        50: 24.99,
-        100: 39.99,
-    }
+class BuyCoinsView(LoginRequiredMixin, View):   
+    pricing = Pricing()
 
     def get(self, request, credit_amount, *args, **kwargs):
+        price = self.pricing.get_package_price(credit_amount)
+
         logger.info(f"[COMPRA INICIADA] User={request.user.id} Credits={credit_amount}")
 
         sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
         mp_service = MercadoPagoService(sdk)
 
-        if credit_amount not in self.prices:
-            logger.warning(
-                f"[PACOTE INVÁLIDO] User={request.user.id} Tentou comprar: {credit_amount} créditos"
-            )
+        if not price:
             return redirect("payment_failure")
 
-        price = self.prices[credit_amount]
         logger.debug(f"[VALIDAÇÃO OK] User={request.user.id} Package={credit_amount} Price={price}")
 
         base = request.build_absolute_uri("").replace("http://", "https://")
@@ -387,6 +381,9 @@ class WalletPageView(View):
         paginator = Paginator(transactions, self.paginate_by)
         transactions_page = paginator.get_page(request.GET.get("page"))
 
+        market_open = is_feature_enabled("open_market")
+        show_purchase_section = market_open or request.user.is_superuser
+
         logger.debug(
             f"Usuário {request.user.id} possui {wallet.balance} coins e {transactions.count()} transações."
         )
@@ -397,8 +394,8 @@ class WalletPageView(View):
                 "prices": prices_info,
                 "plans": plans,
                 "wallet": wallet,
+                "show_purchase_section": show_purchase_section,
                 "transactions": transactions_page,
-                "market_open": is_feature_enabled("open_market")
             },
         )
 

@@ -72,6 +72,8 @@
         </div>
     </div>
     {% endif %}
+
+    {% if show_purchase_section %}
     <div class="p-6 w-full max-w-[1440px] space-y-6">
         <div class="flex justify-between items-center">
             <div>
@@ -81,12 +83,6 @@
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {% if market_open or request.user.is_superuser %}
-                {% set disabled = False %}
-            {% else %}
-                {% set disabled = True %}
-            {% endif %}
-
             {% for amount, info in prices.items %}
             <form method="get" action="{% url 'buy_credits' amount %}"
                 class="relative border rounded-md p-4 flex flex-col items-center gap-4 bg-gradient-to-b from-blue-50 to-white
@@ -138,6 +134,7 @@
         </div>
         {% endif %}
     </div>
+    {% endif %}
 
 
     <div class="p-6 w-full max-w-[1440px] space-y-6">

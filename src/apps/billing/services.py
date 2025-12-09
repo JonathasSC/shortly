@@ -1,6 +1,8 @@
 import logging
 
 from apps.billing.abstracts import PaymentAbstract
+from apps.billing.models import UserWallet, WalletTransaction, UserSubscription
+from django.db import transaction
 
 logger = logging.getLogger(__name__)
 
@@ -59,3 +61,29 @@ class MercadoPagoService(PaymentAbstract):
                 "status": 500,
                 "response": {"error": str(e)},
             }
+            
+            
+class WalletCreditService:
+
+    @staticmethod
+    def apply_credit(user_id, amount, payment_id):
+        wallet, _ = UserWallet.objects.get_or_create(user_id=user_id)
+
+        if WalletTransaction.objects.filter(external_reference=payment_id).exists():
+            return
+
+        with transaction.atomic():
+            wallet.credit(amount)
+            WalletTransaction.objects.create(
+                wallet=wallet,
+                amount=amount,
+                transaction_type="credit",
+                external_reference=payment_id,
+            )
+            
+class SubscriptionService:
+    @staticmethod
+    def activate(user_id, plan_id):
+        UserSubscription.objects.update_or_create(
+            user_id=user_id, defaults={"plan_id": plan_id, "is_active": True}
+        )
