@@ -17,11 +17,11 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 
+from apps.billing.domain import Pricing
 from apps.billing.models import Plan, UserSubscription, UserWallet, WalletTransaction
 from apps.billing.services import MercadoPagoService
 from apps.billing.tasks import process_payment_task
 from apps.toggler.utilities import is_feature_enabled
-from apps.billing.domain import Pricing
 
 logger = logging.getLogger(__name__)
 
