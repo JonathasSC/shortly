@@ -58,7 +58,7 @@ class BuyCoinsView(LoginRequiredMixin, View):
         
         preference = mp_service.create_checkout_preference(
             title=f"{credit_amount} Créditos",
-            price=self.prices[credit_amount],
+            price=price,
             quantity=1,
             back_urls={
                 "success": success_url,
