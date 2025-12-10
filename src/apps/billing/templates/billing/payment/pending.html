@@ -21,42 +21,29 @@
 </script>
 {% endblock %}
 
-{% block header %}
-<header class="fixed w-full bg-white border-b z-50">
-  <div class="px-4 py-3 flex items-center justify-start">
-    <a href="{% url 'home' %}">
-      <img class='w-36' src="{% static 'common/svg/logo/without_bg_with_text_blue.svg' %}" alt="Shortly Logo">
-    </a>
-  </div>
-</header>
-{% endblock %}
-
+{% block header %}{% endblock %}
 {% block footer %}{% endblock %}
 
 {% block content %}
-<main class="min-h-screen w-full flex items-center justify-center bg-white mt-14 px-4">
-    <div class="flex flex-col w-full max-w-md justify-center gap-6 p-6 text-center">
-        
-        <div class="flex flex-col items-center gap-3">
-            <div class="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+<main class="min-h-screen w-full flex items-center justify-center px-4">
+    <img class='w-full max-w-[992px] absolute blur-sm -z-10 opacity-5' src={% static '/common/svg/logo/without_bg_icon_blue.svg'%} alt='logo do shortly'>   
+    <div class="flex flex-col items-center gap-4">
+        <span class="material-symbols-outlined text-6xl text-blue-600 animate-spin">
+            progress_activity
+        </span>
 
-            <h1 class="text-xl font-bold text-blue-600">
-                Aguardando confirmação do pagamento
-            </h1>
+        <h1 class="text-2xl font-bold text-blue-600">
+            Aguardando confirmação do pagamento
+        </h1>
 
-            <p class="text-sm text-zinc-500">
-                Estamos verificando a aprovação com o banco.<br>
-                Isso pode levar alguns segundos.
-            </p>
+        <p class="text-base text-center text-slate-500">
+            Estamos verificando a aprovação com o banco.<br>
+            Isso pode levar alguns segundos.
+        </p>
 
-            <p class="text-xs text-blue-400 animate-pulse font-medium">
-                Você será redirecionado automaticamente
-            </p>
-        </div>
-
-        <div class="text-xs text-zinc-400 mt-4">
-            <span class="font-semibold text-blue-500">ID:</span> {{ payment_id }}
-        </div>
+        <p class="bg-blue-100 mt-5 rounded-full px-3 p-2 text-xs text-blue-400 font-medium">
+            Você será redirecionado automaticamente
+        </p>
     </div>
 </main>
 {% endblock %}

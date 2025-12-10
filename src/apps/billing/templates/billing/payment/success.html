@@ -2,46 +2,64 @@
 {% load static %}
 {% load i18n %}
 
-{% block header %}
-<header class="fixed w-full bg-white border-b z-50">
-  <div class="px-4 py-3 flex items-center justify-start">
-    <a href="{% url 'home' %}">
-      <img class='w-36' src="{% static 'common/svg/logo/without_bg_with_text_blue.svg' %}" alt="Shortly Logo">
-    </a>
-  </div>
-</header>
+{% block extrahead %}
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        confetti({
+            particleCount: 140,
+            spread: 90,
+            origin: { y: 0.6 }
+        });
+
+        let end = Date.now() + 1000;
+        (function frame() {
+            confetti({
+                particleCount: 20,
+                spread: 80,
+                startVelocity: 45,
+                origin: { x: Math.random(), y: Math.random() - 0.2 }
+            });
+
+            if (Date.now() < end) {
+                requestAnimationFrame(frame);
+            }
+        })();
+    });
+
+    setTimeout(() => {
+        window.location.href = "/buy/wallet/";
+    }, 5000);
+</script>
 {% endblock %}
 
+{% block header %}{% endblock %}
 {% block footer %}{% endblock %}
 
 {% block content %}
-<main class="min-h-screen w-full flex items-center justify-center bg-white mt-14 px-4">
-    <div class="flex flex-col items-center gap-8 text-center max-w-md p-8 border border-green-200 rounded-2xl shadow-sm bg-white">
+<main class="min-h-screen w-full flex items-center justify-center px-4">
+    <img class='w-full max-w-[992px] absolute blur-sm -z-10 opacity-5'
+         src={% static '/common/svg/logo/without_bg_icon_blue.svg'%}
+         alt='logo do Shortly'>   
 
-        <div class="w-20 h-20 flex items-center justify-center rounded-full bg-green-600 shadow-md">
-            <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" stroke-width="3"
-                 viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M5 13l4 4L19 7" />
-            </svg>
-        </div>
+    <div class="flex flex-col items-center gap-4 text-center">
 
-        <h1 class="text-xl font-bold text-green-600">
+        <span class="material-symbols-outlined text-6xl text-green-600">
+            check_circle
+        </span>
+
+        <h1 class="text-2xl font-bold text-green-600">
             Pagamento aprovado! 🎉
         </h1>
 
-        <p class="text-sm text-zinc-600 leading-relaxed">
-            Seus créditos já foram adicionados à sua carteira!
+        <p class="text-base text-center text-slate-600 leading-relaxed">
+            Seus créditos já foram adicionados à sua carteira!<br>
+            Obrigado por confiar na Shortly.
         </p>
 
-        <a href="/buy/wallet/"
-           class="w-full bg-green-600 text-white py-2 rounded-xl hover:bg-green-700 transition shadow-sm font-medium">
-            Ver minha carteira
-        </a>
-
-        <a href="{% url 'home' %}" class="text-sm text-blue-600 hover:underline transition">
-            Voltar ao início
-        </a>
+        <p class="bg-blue-100 mt-5 rounded-full px-3 p-2 text-xs text-blue-400 font-medium">
+            Você será redirecionado automaticamente
+        </p>
     </div>
 </main>
 {% endblock %}
