@@ -21,7 +21,6 @@ from apps.billing.domain import Pricing
 from apps.billing.models import Plan, UserSubscription, UserWallet, WalletTransaction
 from apps.billing.services import MercadoPagoService
 from apps.billing.tasks import process_payment_task
-from apps.toggler.utilities import is_feature_enabled
 
 logger = logging.getLogger(__name__)
 
@@ -391,9 +390,6 @@ class WalletPageView(View):
         paginator = Paginator(transactions, self.paginate_by)
         transactions_page = paginator.get_page(request.GET.get("page"))
 
-        market_open = is_feature_enabled("open_market")
-        show_purchase_section = market_open or request.user.is_superuser
-
         logger.debug(
             f"Usuário {request.user.id} possui {wallet.balance} coins e {transactions.count()} transações."
         )
@@ -404,7 +400,6 @@ class WalletPageView(View):
                 "prices": prices_info,
                 "plans": plans,
                 "wallet": wallet,
-                "show_purchase_section": show_purchase_section,
                 "transactions": transactions_page,
             },
         )

@@ -1,5 +1,6 @@
 {% load static %}
 {% load i18n %}
+{% load toggler_tags %}
 
 <header id="main-header" class="fixed w-full z-50 border-zinc-100 bg-transparent transition-all duration-300 ease-in-out">
   <div class="border-box px-4 py-3 flex items-center justify-between">
@@ -91,11 +92,13 @@
               {% trans "Dashboard" %}
             </a>
 
+            {% if user|feature_enabled:"profile_unavailable" %}
             <a href="{% url 'dashboard-home' %}" 
               class="flex items-center gap-2 px-4 py-2 text-sm hover:bg-zinc-100">
               <span class="material-symbols-outlined text-blue-500">person</span>
               {% trans "My Account" %}
             </a>
+            {% endif %}
 
             <div class="border-t border-zinc-200"></div>
 
