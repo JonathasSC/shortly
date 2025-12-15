@@ -1,11 +1,16 @@
-import time
 
 from django.contrib.auth import get_user_model
-from django.db import connection, models
+from django.db import models
+from django.db.models.signals import post_save
 from django.test import TransactionTestCase
 
+from apps.billing.models import UserWallet, WalletTransaction
+from apps.billing.signals import add_new_user_coins
 from apps.common.models import BaseModelAbstract
 from apps.common.utils import CommonUtils
+from apps.notification.signals import send_welcome_on_signup
+
+User = get_user_model()
 
 
 class ExampleModel(BaseModelAbstract):
@@ -15,24 +20,19 @@ class ExampleModel(BaseModelAbstract):
         app_label = 'common'
 
 
-class BaseModelAbstractTest(TransactionTestCase):
+class WalletTransactionTestCase(TransactionTestCase):
     reset_sequences = True
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-
-        with connection.cursor() as cursor:
-            tables = connection.introspection.table_names(cursor)
-
-        if ExampleModel._meta.db_table not in tables:
-            with connection.schema_editor() as schema_editor:
-                schema_editor.create_model(ExampleModel)
+        post_save.disconnect(add_new_user_coins, sender=User)
+        post_save.disconnect(send_welcome_on_signup, sender=User)
 
     @classmethod
     def tearDownClass(cls):
-        with connection.schema_editor() as schema_editor:
-            schema_editor.delete_model(ExampleModel)
+        post_save.connect(add_new_user_coins, sender=User)
+        post_save.connect(send_welcome_on_signup, sender=User)
         super().tearDownClass()
 
     def setUp(self):
@@ -42,45 +42,88 @@ class BaseModelAbstractTest(TransactionTestCase):
             email="tester@example.com",
             password="testpass123"
         )
+        self.wallet = UserWallet.objects.create(user=self.user, balance=0)
 
-    def test_create_instance(self):
-        instance = ExampleModel.objects.create(
-            name="teste", created_by=self.user)
-        self.assertIsNotNone(instance.id)
-        self.assertEqual(instance.created_by, self.user)
+    # ------------------------
+    # WalletTransaction tests
+    # ------------------------
+    def test_create_pending_transaction(self):
+        wallet_transaction = WalletTransaction.objects.create(
+            wallet=self.wallet,
+            amount=100,
+            transaction_type=WalletTransaction.TransactionType.CREDIT,
+            status=WalletTransaction.Status.PENDING,
+            source="Test",
+        )
+        self.assertEqual(wallet_transaction.status, WalletTransaction.Status.PENDING)
+        self.assertEqual(self.wallet.balance, 0)  # saldo não aplicado ainda
 
-    def test_created_by_and_updated_by_fields(self):
-        instance = ExampleModel.objects.create(
-            name="Exemplo", created_by=self.user)
-        self.assertEqual(instance.created_by, self.user)
-        self.assertIsNone(instance.updated_by)
+    def test_process_success_adds_balance(self):
+        wallet_transaction = WalletTransaction.objects.create(
+            wallet=self.wallet,
+            amount=50,
+            transaction_type=WalletTransaction.TransactionType.CREDIT,
+            status=WalletTransaction.Status.PENDING,
+            source="Test",
+        )
+        wallet_transaction.process_success()
+        self.wallet.refresh_from_db()
+        self.assertEqual(wallet_transaction.status, WalletTransaction.Status.SUCCESS)
+        self.assertEqual(self.wallet.balance, 50)
 
-        instance.updated_by = self.user
-        instance.save()
-        instance.refresh_from_db()
-        self.assertEqual(instance.updated_by, self.user)
+    def test_process_failed_does_not_change_balance(self):
+        wallet_transaction = WalletTransaction.objects.create(
+            wallet=self.wallet,
+            amount=50,
+            transaction_type=WalletTransaction.TransactionType.CREDIT,
+            status=WalletTransaction.Status.PENDING,
+            source="Test",
+        )
+        wallet_transaction.process_failed()
+        self.wallet.refresh_from_db()
+        self.assertEqual(wallet_transaction.status, WalletTransaction.Status.FAILED)
+        self.assertEqual(self.wallet.balance, 0)
 
-    def test_auto_now_and_auto_now_add_behavior(self):
-        instance = ExampleModel.objects.create(
-            name="Teste", created_by=self.user)
-        old_updated_at = instance.updated_at
+    def test_refund_transaction(self):
+        wallet_transaction = WalletTransaction.objects.create(
+            wallet=self.wallet,
+            amount=80,
+            transaction_type=WalletTransaction.TransactionType.CREDIT,
+            status=WalletTransaction.Status.PENDING,
+            source="Test",
+        )
 
-        instance.name = "Teste atualizado"
-        time.sleep(1)
-        instance.save()
-        instance.refresh_from_db()
+        wallet_transaction.process_success()
+        self.wallet.refresh_from_db()
+        wallet_transaction.refund()
 
-        self.assertGreater(instance.updated_at, old_updated_at)
+        self.wallet.refresh_from_db()
+        self.assertEqual(wallet_transaction.status, WalletTransaction.Status.REFUNDED)
+        self.assertEqual(self.wallet.balance, 0)
 
-    def test_fields_editable_false_behavior(self):
-        field_names = [
-            f.name for f in ExampleModel._meta.fields if not f.editable]
-        self.assertIn("id", field_names)
-        self.assertIn("created_at", field_names)
-        self.assertIn("created_by", field_names)
-        self.assertIn("updated_by", field_names)
+    def test_debit_transaction(self):
+        self.wallet.balance = 100
+        self.wallet.save()
 
-    def test_string_representation(self):
-        instance = ExampleModel.objects.create(
-            name="Meu exemplo", created_by=self.user)
-        self.assertEqual(str(instance), f"ExampleModel object ({instance.id})")
+        wallet_transaction = WalletTransaction.objects.create(
+            wallet=self.wallet,
+            amount=40,
+            transaction_type=WalletTransaction.TransactionType.DEBIT,
+            status=WalletTransaction.Status.PENDING,
+            source="Test",
+        )
+        wallet_transaction.process_success()
+        self.wallet.refresh_from_db()
+        self.assertEqual(wallet_transaction.status,
+                         WalletTransaction.Status.SUCCESS)
+        self.assertEqual(self.wallet.balance, 60)
+
+    def test_debit_transaction_insufficient_balance_raises(self):
+        with self.assertRaises(ValueError):
+            WalletTransaction.objects.create(
+                wallet=self.wallet,
+                amount=10,
+                transaction_type=WalletTransaction.TransactionType.DEBIT,
+                status=WalletTransaction.Status.PENDING,
+                source="Test",
+            ).process_success()

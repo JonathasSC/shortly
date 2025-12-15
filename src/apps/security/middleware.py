@@ -1,4 +1,5 @@
 from django.http import JsonResponse
+
 from apps.security.services import ExponentialBanService
 
 
@@ -9,7 +10,6 @@ class ExponentialBanMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-
         if request.path in self.LOGIN_URLS:
             username = request.POST.get("username")
             if username:

@@ -1,12 +1,15 @@
-from django.http import HttpResponse
 from django.urls import path
 
 from apps.billing.views import (
     BuyCoinsView,
-    MercadoPagoWebhookView,
+    PaymentFailureView,
+    PaymentPendingView,
+    PaymentStatusAPI,
+    PaymentSuccessView,
     SubscribePlanView,
     WalletPageView,
 )
+from apps.billing.webhook import MercadoPagoWebhookView
 
 urlpatterns = [
     path('wallet/', WalletPageView.as_view(), name='wallet_page'),
@@ -15,11 +18,16 @@ urlpatterns = [
          BuyCoinsView.as_view(), name='buy_credits'),
     path('subscribe/<int:plan_id>/',
          SubscribePlanView.as_view(), name='subscribe_plan'),
+
     path('mercado-pago/webhook/',
          MercadoPagoWebhookView.as_view(), name='mp_webhook'),
 
-    path('payment/success/', lambda request: HttpResponse("Pagamento aprovado!"),
-         name='payment_success'),
-    path('payment/failure/', lambda request: HttpResponse("Pagamento falhou!"),
-         name='payment_failure'),
+    path('payment/success/',
+         PaymentSuccessView.as_view(), name='payment_success'),
+    path('payment/failure/',
+         PaymentFailureView.as_view(), name='payment_failure'),
+    path('payment/pending/',
+         PaymentPendingView.as_view(), name='payment_pending'),
+    path("payment/status/", PaymentStatusAPI.as_view(), name="payment_status_api"),
+
 ]

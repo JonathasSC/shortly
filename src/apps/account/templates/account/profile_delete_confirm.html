@@ -1,0 +1,31 @@
+{% extends 'common/base.html' %}
+
+{% block content %}
+<main class="min-h-screen w-full flex items-center justify-center p-6 bg-gray-50">
+
+    <div class="bg-white shadow-lg rounded-2xl p-8 w-full max-w-lg text-center">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Excluir Conta</h2>
+
+        <p class="text-gray-600 mb-6">
+            Tem certeza que deseja excluir sua conta? <br>
+            <strong>Esta ação não pode ser desfeita.</strong>
+        </p>
+
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+
+            <button 
+                type="submit" 
+                class="w-full py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-medium transition">
+                Sim, excluir
+            </button>
+
+            <a href="{% url 'profile_edit' %}" 
+               class="block w-full py-3 rounded-xl bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium transition">
+                Cancelar
+            </a>
+        </form>
+    </div>
+
+</main>
+{% endblock %}

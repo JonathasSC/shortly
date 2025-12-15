@@ -1,34 +1,58 @@
+import logging
+
 from apps.billing.abstracts import PaymentAbstract
+from apps.billing.dto import CheckoutPreferenceDTO
+from apps.billing.models import UserSubscription
+
+logger = logging.getLogger(__name__)
 
 
 class MercadoPagoService(PaymentAbstract):
     def __init__(self, sdk):
         self.sdk = sdk
 
-    def create_checkout_preference(self, title, price, quantity, back_url_success, back_url_failure, metadata=None):
+    def create_checkout_preference(self, data: CheckoutPreferenceDTO):
+        logger.info(
+            f"[MP][CREATE_PREFERENCE] Criando preferência | "
+            f"title='{data.title}' price={data.price} qnt={data.quantity} metadata={data.metadata}"
+        )
+
         preference_data = {
             "items": [
                 {
-                    "title": title,
-                    "quantity": int(quantity),
+                    "title": data.title,
+                    "quantity": int(data.quantity),
                     "currency_id": "BRL",
-                    "unit_price": float(price),
+                    "unit_price": float(data.price),
                 }
             ],
-            "back_urls": {
-                "success": str(back_url_success),
-                "failure": str(back_url_failure),
-            },
+            "back_urls": data.back_urls,
+            "auto_return": data.auto_return,
         }
 
-        if metadata:
-            safe_metadata = {}
-            for key, value in metadata.items():
-                safe_metadata[key] = str(value)
-            preference_data["metadata"] = safe_metadata
+        if data.metadata:
+            preference_data["metadata"] = {
+                key: str(value) for key, value in data.metadata.items()
+            }
+
+        if data.notification_url:
+            preference_data["notification_url"] = data.notification_url
 
         try:
             response = self.sdk.preference().create(preference_data)
             return response
         except Exception as e:
-            return {"status": 500, "response": {"error": str(e)}}
+            logger.exception(
+                "[MP][CREATE_PREFERENCE] ERRO no request Mercado Pago")
+            return {
+                "status": 500,
+                "response": {"error": str(e)},
+            }
+
+
+class SubscriptionService:
+    @staticmethod
+    def activate(user_id, plan_id):
+        UserSubscription.objects.update_or_create(
+            user_id=user_id, defaults={"plan_id": plan_id, "is_active": True}
+        )

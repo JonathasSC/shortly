@@ -2,6 +2,10 @@
 {% load static %}
 {% load i18n %}
 
+{% block extrahead %}
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+{% endblock %}
+
 {% block content %}
 <main class="min-h-screen p-4 flex flex-col items-center justify-center">
     <img class='w-full max-w-[1080px] absolute blur-sm -z-10 opacity-5' src={% static '/common/svg/logo/without_bg_icon_blue.svg'%} alt='logo do shortly'>
@@ -70,28 +74,12 @@
         </div>
     </div>
 </div>
+
+{% include 'notification/includes/news_modal.html' %}
+
 {% endblock %}
 
 {% block scripts %}
-<script src="{% static 'converter/utils.js' %}"></script>
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const existingUrlMessage = document.querySelector('.existing-url-message');
-        if (existingUrlMessage) {
-            const modal = document.getElementById('existing-url-modal');
-            const cancelBtn = document.getElementById('cancel-modal');
-            const createNewInput = document.getElementById('modal-original-url');
-
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-
-            createNewInput.value = existingUrlMessage.dataset.originalUrl;
-
-            cancelBtn.addEventListener('click', () => {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-            });
-        }
-    });
-</script>
+<script src="{% static 'converter/js/utilities.js' %}"></script>
+<script src="{% static 'converter/js/announcements.js' %}"></script>
 {% endblock %}
