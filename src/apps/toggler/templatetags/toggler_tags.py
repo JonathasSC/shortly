@@ -1,4 +1,5 @@
 from django import template
+
 from apps.toggler.models import FeatureFlag
 
 register = template.Library()

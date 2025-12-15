@@ -2,8 +2,10 @@ import hashlib
 import hmac
 import json
 import logging
+from datetime import timezone
 
 import mercadopago
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import transaction
@@ -14,164 +16,243 @@ from django.views.decorators.csrf import csrf_exempt
 
 from apps.billing.models import Plan, UserSubscription, UserWallet, WalletTransaction
 from apps.billing.services import MercadoPagoService
+from apps.billing.tasks import process_payment_task
 
 logger = logging.getLogger(__name__)
 
 
-@method_decorator(csrf_exempt, name='dispatch')
+@method_decorator(csrf_exempt, name="dispatch")
 class MercadoPagoWebhookView(View):
     sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
     mp_service = MercadoPagoService(sdk)
 
+    def post(self, request, *args, **kwargs):
+        logger.info("[WEBHOOK] POST recebido")
+        return self.handle_webhook(request)
+
     def _process_wallet_credit(self, user_id, amount, payment_id):
         logger.info(
-            f"Processando crédito na carteira: user={user_id}, amount={amount}, payment={payment_id}")
+            f"[CREDITO] Iniciando crédito | user={user_id} amount={amount} payment={payment_id}")
+
+        User = get_user_model()
         try:
-            User = get_user_model()
             User.objects.get(pk=user_id)
         except User.DoesNotExist:
-            logger.error(
-                f"Usuário {user_id} não encontrado para crédito de carteira.")
+            logger.error(f"[CREDITO] Usuário não encontrado | user={user_id}")
             raise ValueError("user_not_found")
 
         try:
             amount = int(float(amount))
         except (TypeError, ValueError):
-            logger.error(f"Valor inválido para crédito de carteira: {amount}")
+            logger.error(
+                f"[CREDITO] Valor inválido | user={user_id} amount={amount}")
             return {"status": "invalid_amount"}
 
         if WalletTransaction.objects.filter(external_reference=payment_id).exists():
-            logger.warning(f"Transação já processada: {payment_id}")
+            logger.warning(f"[CREDITO] Já processado | payment={payment_id}")
             return {"status": "already_processed"}
 
         wallet, _ = UserWallet.objects.get_or_create(user_id=user_id)
 
         with transaction.atomic():
-            wallet.credit(amount)
-            WalletTransaction.objects.create(
+            wallet_transaction = WalletTransaction.objects.create(
                 wallet=wallet,
                 amount=amount,
                 transaction_type=WalletTransaction.TransactionType.CREDIT,
-                source=f"Crédito de {amount} coins via Mercado Pago",
-                external_reference=str(payment_id)
+                source=f"Crédito via Mercado Pago: {amount}",
+                external_reference=str(payment_id),
             )
+            wallet_transaction.process_success()
 
-        logger.info(f"Crédito de {amount} coins aplicado ao usuário {user_id}")
+        logger.info(f"[CREDITO] Sucesso | user={user_id} amount={amount}")
         return {"status": "wallet_updated"}
 
-    def _activate_subscription(self, user_id, plan_id):
-        logger.info(f"Ativando assinatura: user={user_id}, plan={plan_id}")
+    @transaction.atomic
+    def _activate_subscription(self, user_id, plan_id, payment_id):
         plan = Plan.objects.get(id=plan_id)
-        UserSubscription.objects.update_or_create(
+
+        subscription, created = UserSubscription.objects.select_for_update().get_or_create(
             user_id=user_id,
-            defaults={"plan": plan, "is_active": True}
+            plan=plan,
+            defaults={
+                "status": UserSubscription.Status.INACTIVE,
+            }
         )
-        logger.info(
-            f"Assinatura ativada com sucesso: user={user_id}, plan={plan_id}")
+
+        if subscription.status == UserSubscription.Status.ACTIVE:
+            return
+
+        wallet_transaction = WalletTransaction.objects.get(
+            external_reference=str(payment_id))
+        wallet_transaction.process_success()
+
+        subscription.status = UserSubscription.Status.ACTIVE
+        subscription.start_date = timezone.now()
+        subscription.end_date = timezone.now() + relativedelta(months=1)
+        subscription.save(update_fields=["status", "start_date", "end_date"])
 
     def _verify_signature(self, request):
-        secret = settings.MERCADO_PAGO_WEBHOOK_SECRET
+        try:
+            x_signature = request.headers.get("x-signature")
+            x_request_id = request.headers.get("x-request-id")
+            url = request.build_absolute_uri()
 
-        x_signature = request.headers.get("X-Signature")
-        x_request_id = request.headers.get("X-Request-Id")
+            if not x_signature:
+                return False
 
-        payment_id = (
-            request.GET.get("id")
-            or request.GET.get("data.id")
-            or (json.loads(request.body.decode("utf-8")).get("data", {}) or {}).get("id")
-        )
+            data_id = request.GET.get("data.id")
 
-        if not x_signature or not payment_id:
-            logger.warning(
-                "Assinatura ausente ou ID de pagamento não encontrado.")
+            if not data_id:
+                try:
+                    request.json if hasattr(request, "json") else request.body
+                    body = request.data if hasattr(request, "data") else {}
+                    data_id = body.get("data", {}).get("id")
+                except Exception:
+                    pass
+
+            parts = x_signature.split(",")
+            ts = None
+            hash_v1 = None
+
+            for p in parts:
+                key, value = p.split("=")
+                if key == "ts":
+                    ts = value
+                elif key == "v1":
+                    hash_v1 = value
+
+            if not ts or not hash_v1:
+                return False
+
+            secret = settings.MERCADO_PAGO_WEBHOOK_SECRET
+
+            signed_parts = []
+
+            if data_id:
+                signed_parts.append(f"id:{data_id};")
+
+            if x_request_id:
+                signed_parts.append(f"request-id:{x_request_id};")
+
+            if ts:
+                signed_parts.append(f"ts:{ts};")
+
+            if "url=" in x_signature.lower():
+                signed_parts.append(f"url:{url}")
+
+            signed_string = ''.join(signed_parts)
+
+            hmac_result = hmac.new(
+                key=secret.encode("utf-8"),
+                msg=signed_string.encode("utf-8"),
+                digestmod=hashlib.sha256
+            ).hexdigest()
+
+            if hmac.compare_digest(hmac_result, hash_v1):
+                return True
+
             return False
 
-        message = f"id:{payment_id};request-id:{x_request_id}".encode("utf-8")
-        expected_hmac = hmac.new(
-            secret.encode("utf-8"),
-            message,
-            hashlib.sha256
-        ).hexdigest()
-
-        valid = hmac.compare_digest(expected_hmac, x_signature)
-        if not valid:
-            logger.warning(f"Assinatura inválida para pagamento {payment_id}")
-        return valid
+        except Exception:
+            return False
 
     def handle_webhook(self, request):
-        logger.info("Recebendo webhook do Mercado Pago.")
+        logger.info("[WEBHOOK] Payload recebido")
 
         if not self._verify_signature(request):
-            logger.error("Assinatura HMAC inválida recebida.")
-            return JsonResponse({"error": "invalid_signature"}, status=403)
+            logger.warning("[WEBHOOK] Assinatura inválida — ignorada")
+            return JsonResponse({"status": "ignored"}, status=200)
 
-        if request.content_type == "application/json":
-            try:
-                data = json.loads(request.body.decode("utf-8"))
-            except Exception as e:
-                logger.error(f"Erro ao decodificar corpo JSON: {str(e)}")
-                data = {}
-        else:
-            data = request.GET or request.POST
+        try:
+            data = json.loads(request.body.decode("utf-8"))
+            logger.debug(f"[WEBHOOK] Body: {data}")
+        except Exception as e:
+            logger.error(f"[WEBHOOK] JSON inválido: {e}")
+            data = {}
 
         topic = data.get("topic") or data.get("type")
-        if topic != "payment":
-            logger.info("Webhook ignorado: tipo não é 'payment'.")
+
+        if topic in ("merchant_order", "topic_merchant_order_wh"):
+            logger.info("[WEBHOOK] merchant_order recebido, buscando dados...")
+
+            merchant_order_id = (
+                data.get("id")
+                or data.get("data.id")
+                or (data.get("data", {}) or {}).get("id")
+            )
+
+            if not merchant_order_id:
+                return JsonResponse({"error": "merchant_order_id_missing"}, status=400)
+
+            merchant_order = self.mp_service.sdk.merchant_order().get(merchant_order_id)
+            payments = merchant_order.get("response", {}).get("payments", [])
+
+            if not payments:
+                logger.info("[WEBHOOK] Sem pagamentos vinculados ainda")
+                return JsonResponse({"status": "waiting_payment"})
+
+            payment_id = payments[0].get("id")
+            logger.info(
+                f"[WEBHOOK] merchant_order encontrou pagamento | id={payment_id}")
+
+            data["id"] = payment_id
+            topic = "payment"
+
+        if topic not in ("payment", "approved", "payment.updated", "payment.created"):
+            logger.info(f"[WEBHOOK] Evento ignorado | topic={topic}")
             return JsonResponse({"status": "ignored"})
 
         payment_id = (
-            data.get("id")
-            or data.get("data.id")
-            or (data.get("data", {}) or {}).get("id")
+            data.get("id") or data.get("data.id") or (
+                data.get("data", {}) or {}).get("id")
         )
 
         if not payment_id:
-            logger.error("Webhook recebido sem ID de pagamento.")
-            return JsonResponse({"error": "id not found"}, status=400)
+            logger.error("[WEBHOOK] ID de pagamento não encontrado")
+            return JsonResponse({"error": "id_missing"}, status=400)
 
-        try:
-            payment_info = self.mp_service.sdk.payment().get(payment_id)
-            payment_data = payment_info.get("response", {})
-            logger.info(f"Pagamento {payment_id} recuperado do Mercado Pago.")
-        except Exception as e:
-            logger.exception(
-                f"Falha ao obter pagamento {payment_id}: {str(e)}")
-            return JsonResponse({"error": f"failed to fetch payment: {str(e)}"}, status=500)
+        logger.info(
+            f"[WEBHOOK] Buscando detalhes do pagamento | id={payment_id}")
 
-        if payment_data.get("status") != "approved":
-            logger.info(
-                f"Pagamento {payment_id} não aprovado. Status: {payment_data.get('status')}")
-            return JsonResponse({"status": "pending_or_failed"})
+        payment_info = self.mp_service.sdk.payment().get(payment_id)
+        payment_data = payment_info.get("response", {})
 
-        metadata = payment_data.get("metadata", {})
+        logger.debug(f"[WEBHOOK] PaymentData={payment_data}")
+
+        status = payment_data.get("status")
+        metadata = payment_data.get("metadata") or {}
+
         payment_type = metadata.get("type")
         user_id = metadata.get("user_id")
 
+        logger.info(
+            f"[WEBHOOK] Status={status} Tipo={payment_type} User={user_id}")
+
+        if status != "approved":
+            logger.info(
+                "[WEBHOOK] Pagamento pendente/negado. Aguardando atualização.")
+            return JsonResponse({"status": "pending"})
+
+        if WalletTransaction.objects.filter(external_reference=str(payment_id)).exists():
+            logger.warning(f"[WEBHOOK] Já processado | payment={payment_id}")
+            return JsonResponse({"status": "already_processed"}, status=200)
+
         if payment_type == "credits":
-            try:
-                result = self._process_wallet_credit(
-                    user_id=user_id,
-                    amount=metadata.get("amount"),
-                    payment_id=payment_id
-                )
-                logger.info(f"Créditos processados com resultado: {result}")
-                return JsonResponse(result)
-            except ValueError as e:
-                logger.error(f"Erro de valor ao processar créditos: {str(e)}")
-                return JsonResponse({"error": str(e)}, status=400)
-            except Exception as e:
-                logger.exception(
-                    f"Erro inesperado ao processar créditos: {str(e)}")
-                return JsonResponse({"error": "internal_error"}, status=500)
+            logger.info(
+                f"[WEBHOOK] Aprovado (créditos), enviando para fila | payment={payment_id}")
+            process_payment_task.delay(
+                user_id=user_id,
+                payment_type=payment_type,
+                amount=metadata.get("amount"),
+                payment_id=payment_id
+            )
+            return JsonResponse({"status": "queued"}, status=202)
 
         if payment_type == "plan":
-            self._activate_subscription(
-                user_id=user_id,
-                plan_id=metadata.get("plan_id")
-            )
-            logger.info(f"Assinatura ativada via pagamento {payment_id}")
+            plan_id = metadata.get("plan_id")
+            logger.info(f"[WEBHOOK] Aprovado (plano) | payment={payment_id}")
+            self._activate_subscription(user_id, plan_id)
             return JsonResponse({"status": "subscription_activated"})
 
-        logger.warning(
-            f"Webhook ignorado: tipo de pagamento inválido ({payment_type})")
-        return JsonResponse({"status": "ignored_no_valid_type"})
+        logger.info("[WEBHOOK] Tipo desconhecido. Ignorando.")
+        return JsonResponse({"status": "ignored"})

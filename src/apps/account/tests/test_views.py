@@ -20,10 +20,6 @@ class RegisterViewTests(TestCase):
         }
         response = self.client.post(reverse("register"), data)
 
-        form = response.context
-        if form:
-            print(form.errors)
-
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("login"))
 
@@ -75,7 +71,8 @@ class RegisterViewTests(TestCase):
 class UserLoginViewTests(TestCase):
     def setUp(self):
         CommonUtils().disable_welcome_signal()
-        self.user = User.objects.create_user(username="testuser", password="12345")
+        self.user = User.objects.create_user(
+            username="testuser", password="12345")
 
     def test_login_page_loads_successfully(self):
         response = self.client.get(reverse("login"))
@@ -99,7 +96,8 @@ class UserLoginViewTests(TestCase):
 class LogoutViewTests(TestCase):
     def setUp(self):
         CommonUtils().disable_welcome_signal()
-        self.user = User.objects.create_user(username="logoutuser", password="12345")
+        self.user = User.objects.create_user(
+            username="logoutuser", password="12345")
 
     def test_logout_redirects_to_login(self):
         self.client.force_login(self.user)

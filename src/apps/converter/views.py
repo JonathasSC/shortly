@@ -87,7 +87,7 @@ class HomeView(View):
             ).first()
 
     def __debit_user_wallet(self, user):
-        wallet, created = UserWallet.objects.get_or_create(user=user)
+        wallet, _ = UserWallet.objects.get_or_create(user=user)
 
         if wallet.balance < 1:
             return False
@@ -147,7 +147,8 @@ class HomeView(View):
         user = request.user
 
         if not form.is_valid():
-            messages.error(request, "Erro ao criar o link. Verifique o formulário.")
+            messages.error(
+                request, "Erro ao criar o link. Verifique o formulário.")
             return redirect("home")
 
         url_object = form.save(commit=False)
@@ -158,7 +159,8 @@ class HomeView(View):
             today_end = today_start + timedelta(days=1)
 
             count_today = Url.objects.filter(
-                created_by_ip=client_ip, created_at__range=(today_start, today_end)
+                created_by_ip=client_ip, created_at__range=(
+                    today_start, today_end)
             ).count()
 
             if count_today >= MAX_IP_PER_DAY:
@@ -172,7 +174,8 @@ class HomeView(View):
                 )
                 return redirect("home")
 
-        existing_url = self.__get_existing_url(url_object, request.user, client_ip)
+        existing_url = self.__get_existing_url(
+            url_object, request.user, client_ip)
 
         if existing_url and not create_new:
             messages.info(

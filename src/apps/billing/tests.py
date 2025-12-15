@@ -53,29 +53,29 @@ class TestModels(TestCase):
         user = User.objects.create_user("ana", "ana@test.com", "123")
         wallet = UserWallet.objects.create(user=user)
         amount = 10
-        
-        transaction = WalletTransaction.objects.create(
-            wallet=wallet, 
+
+        wallet_transaction = WalletTransaction.objects.create(
+            wallet=wallet,
             transaction_type=WalletTransaction.TransactionType.CREDIT,
             amount=amount,
             source=f"Crédito de {amount} coins para teste",
             external_reference='',
         )
-        transaction.process_success()
+        wallet_transaction.process_success()
         wallet.refresh_from_db()
-        
+
         self.assertEqual(wallet.balance, 10)
 
         amount = 5
-        transaction = WalletTransaction.objects.create(
-            wallet=wallet, 
+        wallet_transaction = WalletTransaction.objects.create(
+            wallet=wallet,
             transaction_type=WalletTransaction.TransactionType.CREDIT,
             amount=amount,
             source=f"Crédito de {amount} coins para teste",
             external_reference='',
         )
-        transaction.process_success()
-        
+        wallet_transaction.process_success()
+
         wallet.refresh_from_db()
         self.assertEqual(wallet.balance, 15)
 
@@ -83,35 +83,35 @@ class TestModels(TestCase):
         user = User.objects.create_user("mark", "mark@test.com", "123")
         wallet = UserWallet.objects.create(user=user, balance=10)
         amount = 4
-        
-        transaction = WalletTransaction.objects.create(
-            wallet=wallet, 
+
+        wallet_transaction = WalletTransaction.objects.create(
+            wallet=wallet,
             transaction_type=WalletTransaction.TransactionType.DEBIT,
             amount=amount,
             source=f"Débito de {amount} coins para teste",
             external_reference='',
         )
 
-        transaction.process_success()
+        wallet_transaction.process_success()
         wallet.refresh_from_db()
 
-        self.assertTrue(transaction)
+        self.assertTrue(wallet_transaction)
         self.assertEqual(wallet.balance, 6)
 
     def test_wallet_debit_fail(self):
         user = User.objects.create_user("maria", "maria@test.com", "123")
         wallet = UserWallet.objects.create(user=user, balance=2)
 
-        transaction = WalletTransaction.objects.create(
+        wallet_transaction = WalletTransaction.objects.create(
             wallet=wallet,
             amount=50,
             transaction_type=WalletTransaction.TransactionType.DEBIT,
             source="Teste",
         )
-        
+
         with self.assertRaises(ValueError):
-            transaction.process_success()
-            
+            wallet_transaction.process_success()
+
         wallet.refresh_from_db()
         self.assertEqual(wallet.balance, 2)
 
@@ -137,18 +137,18 @@ class TestModels(TestCase):
         user = User.objects.create_user("alice", "alice@test.com", "123")
         wallet = UserWallet.objects.create(user=user, balance=100)
 
-        transaction = WalletTransaction.objects.create(
+        wallet_transaction = WalletTransaction.objects.create(
             wallet=wallet,
             transaction_type=WalletTransaction.TransactionType.CREDIT,
             amount=10,
             source="Teste"
         )
-        
-        transaction.process_success()
-        
+
+        wallet_transaction.process_success()
+
         with self.assertRaises(ValueError):
-            transaction.amount = 999
-            transaction.save()
+            wallet_transaction.amount = 999
+            wallet_transaction.save()
 
         wallet.refresh_from_db()
         self.assertEqual(wallet.balance, 110)
@@ -158,18 +158,18 @@ class TestModels(TestCase):
         user = User.objects.create_user("carlos", "carlos@test.com", "123")
         wallet = UserWallet.objects.create(user=user, balance=50)
 
-        transaction = WalletTransaction.objects.create(
+        wallet_transaction = WalletTransaction.objects.create(
             wallet=wallet,
             transaction_type=WalletTransaction.TransactionType.DEBIT,
             amount=20,
             source="Teste"
         )
-        
-        transaction.process_success()
-        
+
+        wallet_transaction.process_success()
+
         with self.assertRaises(ValueError):
-            transaction.source = "Novo valor"
-            transaction.save()
+            wallet_transaction.source = "Novo valor"
+            wallet_transaction.save()
 
         wallet.refresh_from_db()
         self.assertEqual(wallet.balance, 30)
