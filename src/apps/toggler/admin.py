@@ -1,4 +1,5 @@
 from django.contrib import admin
+
 from apps.toggler.models import FeatureFlag
 
 

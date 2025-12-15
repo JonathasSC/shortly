@@ -3,10 +3,11 @@ from django.urls import path
 
 from apps.billing.views import (
     BuyCoinsView,
-    MercadoPagoWebhookView,
     SubscribePlanView,
     WalletPageView,
 )
+from apps.billing.webhook import MercadoPagoWebhookView
+
 
 urlpatterns = [
     path('wallet/', WalletPageView.as_view(), name='wallet_page'),

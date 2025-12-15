@@ -176,9 +176,20 @@ class WalletTransaction(models.Model):
     def save(self, *args, **kwargs):
         if self.pk:
             original = WalletTransaction.objects.get(pk=self.pk)
-            if original.status == self.Status.SUCCESS:
-                raise ValueError(
-                    "Transações concluídas não podem ser alteradas.")
+
+            immutable_fields = [
+                "amount",
+                "transaction_type",
+                "wallet_id",
+                "source",
+                "external_reference",
+            ]
+
+            for field in immutable_fields:
+                if getattr(original, field) != getattr(self, field):
+                    raise ValueError(
+                        "Transações financeiras são imutáveis após criação."
+                    )
 
         if not self.pk and self.amount <= 0:
             raise ValueError("Valor precisa ser maior que zero.")

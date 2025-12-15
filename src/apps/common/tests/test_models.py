@@ -6,6 +6,7 @@ from django.test import TransactionTestCase
 
 from apps.common.models import BaseModelAbstract
 from apps.common.utils import CommonUtils
+from django.test import TestCase, override_settings
 
 
 class ExampleModel(BaseModelAbstract):
@@ -15,6 +16,10 @@ class ExampleModel(BaseModelAbstract):
         app_label = 'common'
 
 
+@override_settings(
+    CELERY_TASK_ALWAYS_EAGER=True,
+    CELERY_TASK_EAGER_PROPAGATES=True,
+)
 class BaseModelAbstractTest(TransactionTestCase):
     reset_sequences = True
 

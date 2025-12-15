@@ -1,5 +1,3 @@
-<<<<<<< Updated upstream
-=======
 from django.contrib.auth import get_user_model
 from django.db.models.signals import post_save
 from django.test import TestCase, override_settings
@@ -55,24 +53,29 @@ class TestModels(TestCase):
         user = User.objects.create_user("ana", "ana@test.com", "123")
         wallet = UserWallet.objects.create(user=user)
         amount = 10
-        
-        WalletTransaction.objects.create(
-            wallet=wallet, 
+
+        transaction = WalletTransaction.objects.create(
+            wallet=wallet,
             transaction_type=WalletTransaction.TransactionType.CREDIT,
             amount=amount,
             source=f"Crédito de {amount} coins para teste",
             external_reference='',
         )
+        transaction.process_success()
+        wallet.refresh_from_db()
+
         self.assertEqual(wallet.balance, 10)
 
         amount = 5
-        WalletTransaction.objects.create(
-            wallet=wallet, 
+        transaction = WalletTransaction.objects.create(
+            wallet=wallet,
             transaction_type=WalletTransaction.TransactionType.CREDIT,
-            amount=amount ,
+            amount=amount,
             source=f"Crédito de {amount} coins para teste",
             external_reference='',
         )
+        transaction.process_success()
+
         wallet.refresh_from_db()
         self.assertEqual(wallet.balance, 15)
 
@@ -80,30 +83,34 @@ class TestModels(TestCase):
         user = User.objects.create_user("mark", "mark@test.com", "123")
         wallet = UserWallet.objects.create(user=user, balance=10)
         amount = 4
-        result = WalletTransaction.objects.create(
-            wallet=wallet, 
+
+        transaction = WalletTransaction.objects.create(
+            wallet=wallet,
             transaction_type=WalletTransaction.TransactionType.DEBIT,
-            amount=amount ,
+            amount=amount,
             source=f"Débito de {amount} coins para teste",
             external_reference='',
         )
-        print(result)
 
-        self.assertTrue(result)
+        transaction.process_success()
         wallet.refresh_from_db()
+
+        self.assertTrue(transaction)
         self.assertEqual(wallet.balance, 6)
 
     def test_wallet_debit_fail(self):
         user = User.objects.create_user("maria", "maria@test.com", "123")
         wallet = UserWallet.objects.create(user=user, balance=2)
 
+        transaction = WalletTransaction.objects.create(
+            wallet=wallet,
+            amount=50,
+            transaction_type=WalletTransaction.TransactionType.DEBIT,
+            source="Teste",
+        )
+
         with self.assertRaises(ValueError):
-            WalletTransaction.objects.create(
-                wallet=wallet,
-                amount=50,
-                transaction_type=WalletTransaction.TransactionType.DEBIT,
-                source="Teste",
-            )
+            transaction.process_success()
 
         wallet.refresh_from_db()
         self.assertEqual(wallet.balance, 2)
@@ -126,45 +133,44 @@ class TestModels(TestCase):
         self.assertEqual(transaction.source, "Teste")
         self.assertEqual(transaction.transaction_type, "credit")
 
-
     def test_transaction_edit_blocked_credit(self):
         user = User.objects.create_user("alice", "alice@test.com", "123")
         wallet = UserWallet.objects.create(user=user, balance=100)
 
-        tx = WalletTransaction.objects.create(
+        transaction = WalletTransaction.objects.create(
             wallet=wallet,
             transaction_type=WalletTransaction.TransactionType.CREDIT,
             amount=10,
             source="Teste"
         )
 
+        transaction.process_success()
+
         with self.assertRaises(ValueError):
-            tx.amount = 999
-            tx.save()
+            transaction.amount = 999
+            transaction.save()
 
         wallet.refresh_from_db()
         self.assertEqual(wallet.balance, 110)
         self.assertEqual(wallet.transactions.count(), 1)
 
-
     def test_transaction_edit_blocked_debit(self):
         user = User.objects.create_user("carlos", "carlos@test.com", "123")
         wallet = UserWallet.objects.create(user=user, balance=50)
 
-        tx = WalletTransaction.objects.create(
+        transaction = WalletTransaction.objects.create(
             wallet=wallet,
             transaction_type=WalletTransaction.TransactionType.DEBIT,
             amount=20,
             source="Teste"
         )
 
+        transaction.process_success()
+
         with self.assertRaises(ValueError):
-            tx.source = "Novo valor"
-            tx.save()
+            transaction.source = "Novo valor"
+            transaction.save()
 
         wallet.refresh_from_db()
         self.assertEqual(wallet.balance, 30)
         self.assertEqual(wallet.transactions.count(), 1)
->>>>>>> Stashed changes
-
-# Create your tests here.

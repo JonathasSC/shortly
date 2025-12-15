@@ -1,4 +1,5 @@
 from django.http import JsonResponse
+
 from apps.security.services import ExponentialBanService
 
 
