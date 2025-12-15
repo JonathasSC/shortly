@@ -1,11 +1,12 @@
 {% extends 'common/base.html' %}
+{% load toggler_tags %}
 {% load static %}
 {% load i18n %}
 
 {% block content %}
 <main class="w-full flex-col mt-16 flex items-center justify-center">
     <div class="p-6 w-full max-w-[1440px] space-y-6">
-        {% if request.user.is_superuser %}
+        {% if user|feature_enabled:"market_closed" %}
         <div class="flex justify-between items-center">
             <div>
                 <h1 class="font-bold text-xl">{% trans "Subscriptions" %}</h1>
@@ -72,6 +73,8 @@
         </div>
     </div>
     {% endif %}
+
+    {% if user|feature_enabled:"market_closed" %}
     <div class="p-6 w-full max-w-[1440px] space-y-6">
         <div class="flex justify-between items-center">
             <div>
@@ -82,24 +85,36 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {% for amount, info in prices.items %}
-            <form method="get" action="{% url 'buy_credits' amount %}" 
-                class="relative border rounded-md p-4 flex flex-col items-center gap-4 bg-gradient-to-b from-blue-50 to-white {% if amount == 100 %}border-green-500 border-2{% endif %}">                
+            <form method="get" action="{% url 'buy_credits' amount %}"
+                class="relative border rounded-md p-4 flex flex-col items-center gap-4 bg-gradient-to-b from-blue-50 to-white
+                {% if best_value %}border-green-500 border-2{% endif %}">
                 
                 <div class="flex flex-col items-center justify-center gap-2">
                     <div class="flex items-center justify-center w-14 h-14 bg-blue-500 text-white text-xl font-extrabold rounded-full">
                         {{ amount }}
                     </div>
-    
+
                     <p class="text-lg font-bold">{% trans "Credits" %}</p>
                 </div>
 
                 <p class="text-xl font-semibold text-gray-800">R$ {{ info.total_price }}</p>
 
-                <button type="submit" class="mt-2 w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600 transition">
-                    {% trans "Buy" %}
+                <button type="submit"
+                    class="mt-2 w-full font-bold py-2 px-4 rounded-md transition
+                        {% if disabled %}
+                            cursor-not-allowed bg-gray-300 text-gray-600
+                        {% else %}
+                            bg-blue-500 text-white hover:bg-blue-600
+                        {% endif %}"
+                    {% if disabled %}disabled{% endif %}>
+                    {% if disabled %}
+                        {% trans "Market temporarily closed" %}
+                    {% else %}
+                        {% trans "Buy" %}
+                    {% endif %}
                 </button>
 
-                {% if amount == 100 %}
+                {% if best_value %}
                 <span class="absolute top-[-24px] left-auto bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-xs shadow">
                     {% trans "Best value" %}
                 </span>
@@ -120,6 +135,7 @@
         </div>
         {% endif %}
     </div>
+    {% endif %}
 
 
     <div class="p-6 w-full max-w-[1440px] space-y-6">

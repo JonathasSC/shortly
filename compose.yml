@@ -12,6 +12,9 @@ services:
       - static_volume:/usr/share/nginx/html
     networks:
       - shortly_net
+    depends_on:
+      redis:
+        condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8000 || exit 1"]
       interval: 10s
@@ -98,30 +101,41 @@ services:
     restart: always
 
   redis:
-      image: redis:7.0-alpine
-      container_name: shortly-redis
-      restart: always
-      command: >
-        redis-server --appendonly yes
-                    --maxmemory 256mb
-                    --maxmemory-policy allkeys-lru
-      ports:
-        - "6379:6379"
-      volumes:
-        - redis_data:/data
-      networks:
-        - shortly_net
-      healthcheck:
-        test: ["CMD", "redis-cli", "ping"]
-        interval: 5s
-        timeout: 3s
-        retries: 10
-        start_period: 5s
+    image: redis:7.0-alpine
+    container_name: shortly-redis
+    restart: always
+    command: >
+      redis-server --appendonly yes
+                  --maxmemory 256mb
+                  --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - shortly_net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
 
-
+  dozzle:
+    image: amir20/dozzle:latest
+    container_name: dozzle
+    restart: always
+    ports:
+      - "9999:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - shortly_net
+      
 networks:
   shortly_net:
     driver: bridge
 
 volumes:
   static_volume:
+  redis_data:

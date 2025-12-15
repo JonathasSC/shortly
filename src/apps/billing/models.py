@@ -6,33 +6,14 @@ User = get_user_model()
 
 
 class Plan(models.Model):
-    name = models.CharField(
-        max_length=50,
-        unique=True
-    )
-    monthly_credits = models.PositiveIntegerField(
-        default=0
-    )
-    price = models.DecimalField(
-        max_digits=8,
-        decimal_places=2,
-        default=0.00
-    )
-    disable_interstitial_page = models.BooleanField(
-        default=True
-    )
-    advanced_stats = models.BooleanField(
-        default=False
-    )
-    longtime_expiration_date = models.BooleanField(
-        default=False
-    )
-    conditional_redirect = models.BooleanField(
-        default=False
-    )
-    priority_support = models.BooleanField(
-        default=False
-    )
+    name = models.CharField(max_length=50, unique=True)
+    monthly_credits = models.PositiveIntegerField(default=0)
+    price = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
+    disable_interstitial_page = models.BooleanField(default=True)
+    advanced_stats = models.BooleanField(default=False)
+    longtime_expiration_date = models.BooleanField(default=False)
+    conditional_redirect = models.BooleanField(default=False)
+    priority_support = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.name} - R$ {self.price}"
@@ -84,9 +65,12 @@ class UserWallet(models.Model):
         default=0
     )
 
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="wallet")
+    balance = models.PositiveIntegerField(default=0)
+
     def __str__(self):
         return f"{self.user} - {self.balance} coins"
-
+    
 
 class WalletTransaction(models.Model):
     class TransactionType(models.TextChoices):
@@ -105,18 +89,27 @@ class WalletTransaction(models.Model):
         max_length=10, choices=TransactionType.choices)
     status = models.CharField(
         max_length=10, choices=Status.choices, default=Status.PENDING)
+    class Status(models.TextChoices):
+        PENDING = "pending", "Pendente"
+        SUCCESS = "success", "Concluída"
+        FAILED = "failed", "Falhou"
+        REFUNDED = "refunded", "Estornada"
+
+    wallet = models.ForeignKey(UserWallet, on_delete=models.CASCADE, related_name="transactions")
+    transaction_type = models.CharField(max_length=10, choices=TransactionType.choices)
+    status = models.CharField(max_length=10, choices=Status.choices, default=Status.PENDING)
     amount = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     processed_at = models.DateTimeField(null=True, blank=True)
 
+    processed_at = models.DateTimeField(null=True, blank=True)
+    
     source = models.CharField(max_length=50, blank=True, null=True)
-    external_reference = models.CharField(
-        max_length=128, blank=True, null=True)
+    external_reference = models.CharField(max_length=128, blank=True, null=True)
 
     def _ensure_pending(self):
         if self.status != self.Status.PENDING:
-            raise ValueError(
-                "Transação já foi processada e não pode ser alterada.")
+            raise ValueError("Transação já foi processada e não pode ser alterada.")
 
     @transaction.atomic
     def process_success(self):
@@ -135,16 +128,17 @@ class WalletTransaction(models.Model):
         self.processed_at = timezone.now()
         self.save(update_fields=["status", "processed_at"])
 
+
     def process_failed(self):
         if self.status == self.Status.PENDING:
             self.status = self.Status.FAILED
             self.save(update_fields=["status"])
 
+
     @transaction.atomic
     def refund(self):
         if self.status != self.Status.SUCCESS:
-            raise ValueError(
-                "Apenas transações concluídas podem ser estornadas.")
+            raise ValueError("Apenas transações concluídas podem ser estornadas.")
 
         reverse_type = (
             self.TransactionType.DEBIT
@@ -173,27 +167,16 @@ class WalletTransaction(models.Model):
         self.status = self.Status.REFUNDED
         super(WalletTransaction, self).save(update_fields=["status"])
 
+
     def save(self, *args, **kwargs):
-        if self.pk:
+        if self.pk:  
             original = WalletTransaction.objects.get(pk=self.pk)
-
-            immutable_fields = [
-                "amount",
-                "transaction_type",
-                "wallet_id",
-                "source",
-                "external_reference",
-            ]
-
-            for field in immutable_fields:
-                if getattr(original, field) != getattr(self, field):
-                    raise ValueError(
-                        "Transações financeiras são imutáveis após criação."
-                    )
+            if original.status == self.Status.SUCCESS:
+                raise ValueError("Transações concluídas não podem ser alteradas.")
 
         if not self.pk and self.amount <= 0:
             raise ValueError("Valor precisa ser maior que zero.")
-
+        
         super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):

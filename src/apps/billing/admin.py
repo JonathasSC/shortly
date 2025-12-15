@@ -36,12 +36,19 @@ class UserSubscriptionAdmin(admin.ModelAdmin):
 @admin.register(UserWallet)
 class UserWalletAdmin(admin.ModelAdmin):
     list_display = ("user", "balance")
-    search_fields = ("user__username",)
+    readonly_fields = ("balance",) 
+    fields = ("user", "balance") 
 
 
 @admin.register(WalletTransaction)
 class WalletTransactionAdmin(admin.ModelAdmin):
-    list_display = ("wallet", "transaction_type",
-                    "amount", "source", "created_at")
+    list_display = ("wallet", "transaction_type", "amount", "created_at")
     list_filter = ("transaction_type", "created_at")
-    search_fields = ("wallet__user__username", "source")
+    search_fields = ("wallet__user__username", "external_reference")
+
+
+    def has_change_permission(self, request, obj=None):
+        return False
+    
+    def has_delete_permission(self, request, obj=None):
+        return False

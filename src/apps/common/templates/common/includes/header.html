@@ -1,5 +1,6 @@
 {% load static %}
 {% load i18n %}
+{% load toggler_tags %}
 
 <header id="main-header" class="fixed w-full z-50 border-zinc-100 bg-transparent transition-all duration-300 ease-in-out">
   <div class="border-box px-4 py-3 flex items-center justify-between">
@@ -70,7 +71,7 @@
         <a href="{% url 'wallet_page' %}" 
           class="bg-blue-100 rounded-full text-blue-500 text-base font-bold flex items-center gap-2 px-3 py-2 shadow-sm">
           <span class="text-white bg-blue-500 rounded-full w-8 h-8 flex items-center justify-center">
-            {{ user.first_name|default:user.username|first|upper }}
+            C
           </span>
           {{ user_balance }}
         </a>
@@ -91,11 +92,13 @@
               {% trans "Dashboard" %}
             </a>
 
+            {% if user|feature_enabled:"profile_unavailable" %}
             <a href="{% url 'dashboard-home' %}" 
               class="flex items-center gap-2 px-4 py-2 text-sm hover:bg-zinc-100">
               <span class="material-symbols-outlined text-blue-500">person</span>
               {% trans "My Account" %}
             </a>
+            {% endif %}
 
             <div class="border-t border-zinc-200"></div>
 
@@ -107,10 +110,8 @@
                 {% trans "Logout" %}
               </button>
             </form>
-
           </div>
         </div>
-
       {% endif %}
     </div>
   </div>

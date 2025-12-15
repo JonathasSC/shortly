@@ -19,7 +19,7 @@ class RegisterViewTests(TestCase):
             "confirm_password": "Strong@Password123",
         }
         response = self.client.post(reverse("register"), data)
-        
+
         form = response.context
         if form:
             print(form.errors)
@@ -75,10 +75,7 @@ class RegisterViewTests(TestCase):
 class UserLoginViewTests(TestCase):
     def setUp(self):
         CommonUtils().disable_welcome_signal()
-        self.user = User.objects.create_user(
-            username="testuser",
-            password="12345"
-        )
+        self.user = User.objects.create_user(username="testuser", password="12345")
 
     def test_login_page_loads_successfully(self):
         response = self.client.get(reverse("login"))
@@ -86,10 +83,9 @@ class UserLoginViewTests(TestCase):
         self.assertTemplateUsed(response, "account/login.html")
 
     def test_valid_login_redirects_to_home(self):
-        response = self.client.post(reverse("login"), {
-            "username": "testuser",
-            "password": "12345"
-        })
+        response = self.client.post(
+            reverse("login"), {"username": "testuser", "password": "12345"}
+        )
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("home"))
 
@@ -103,14 +99,10 @@ class UserLoginViewTests(TestCase):
 class LogoutViewTests(TestCase):
     def setUp(self):
         CommonUtils().disable_welcome_signal()
-        self.user = User.objects.create_user(
-            username="logoutuser",
-            password="12345"
-        )
+        self.user = User.objects.create_user(username="logoutuser", password="12345")
 
     def test_logout_redirects_to_login(self):
         self.client.force_login(self.user)
         response = self.client.post(reverse("logout"))
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("login"))
-                                                                                                                                                        

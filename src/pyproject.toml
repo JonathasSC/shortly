@@ -23,6 +23,7 @@ dependencies = [
     "psycopg2-binary>=2.9.10",
     "python-dotenv>=1.1.0",
     "redis>=7.1.0",
+    "ruff>=0.13.2",
     "uuid6>=2025.0.0",
     "whitenoise>=6.9.0",
 ]

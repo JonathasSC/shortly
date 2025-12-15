@@ -1,2 +1,8 @@
+from django.contrib import admin
 
-# Register your models here.
+from apps.notification.models import Announcement
+
+
+@admin.register(Announcement)
+class AnnouncementAdmin(admin.ModelAdmin):
+    pass

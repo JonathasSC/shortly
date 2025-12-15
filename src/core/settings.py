@@ -311,3 +311,7 @@ CACHES = {
 # ================================================================
 AXES_CACHE = "default"
 AXES_LOCK_OUT_AT_FAILURE = False
+AXES_EXCLUDE_PATHS = [
+    '/buy/mercado-pago/webhook',
+    '/buy/mercado-pago/webhook/',
+]
