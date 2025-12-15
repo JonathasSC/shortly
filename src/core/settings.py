@@ -36,8 +36,10 @@ CSRF_TRUSTED_ORIGINS = [
     origin for origin in os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",") if origin
 ]
 
-SECURE_CROSS_ORIGIN_OPENER_POLICY = os.environ.get("DJANGO_SECURE_CROSS_ORIGIN_OPENER_POLICY")
-SECURE_SSL_REDIRECT = True if os.environ.get("DJANGO_SECURE_SSL_REDIRECT") == "TRUE" else False
+SECURE_CROSS_ORIGIN_OPENER_POLICY = os.environ.get(
+    "DJANGO_SECURE_CROSS_ORIGIN_OPENER_POLICY")
+SECURE_SSL_REDIRECT = True if os.environ.get(
+    "DJANGO_SECURE_SSL_REDIRECT") == "TRUE" else False
 
 # ================================================================
 # LOGGING
@@ -264,6 +266,10 @@ CELERY_BEAT_SCHEDULE = {
         "task": "apps.billing.tasks.disable_user_subscription",
         "schedule": crontab(minute=0, hour=0),
     },
+    'deposit-monthly-credits-daily': {
+        'task': 'apps.billing.tasks.deposit_monthly_credits',
+        'schedule': crontab(hour=0, minute=0),
+    },
 }
 
 MERCADO_PAGO_ACCESS_TOKEN = os.environ.get("MERCADO_PAGO_ACCESS_TOKEN", "")
@@ -278,11 +284,14 @@ EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 try:
     EMAIL_HOST = os.environ.get("DJANGO_EMAIL_HOST")
     EMAIL_PORT = int(os.environ.get("DJANGO_EMAIL_PORT", 465))
-    EMAIL_USE_SSL = os.environ.get("DJANGO_EMAIL_USE_SSL", "").lower() in ["true", "1", "yes"]
-    EMAIL_USE_TLS = os.environ.get("DJANGO_EMAIL_USE_TLS", "").lower() in ["true", "1", "yes"]
+    EMAIL_USE_SSL = os.environ.get("DJANGO_EMAIL_USE_SSL", "").lower() in [
+        "true", "1", "yes"]
+    EMAIL_USE_TLS = os.environ.get("DJANGO_EMAIL_USE_TLS", "").lower() in [
+        "true", "1", "yes"]
     EMAIL_HOST_USER = os.environ.get("DJANGO_EMAIL_HOST_USER")
     EMAIL_HOST_PASSWORD = os.environ.get("DJANGO_EMAIL_HOST_PASSWORD")
-    DEFAULT_FROM_EMAIL = os.environ.get("DJANGO_DEFAULT_FROM_EMAIL", EMAIL_HOST_USER)
+    DEFAULT_FROM_EMAIL = os.environ.get(
+        "DJANGO_DEFAULT_FROM_EMAIL", EMAIL_HOST_USER)
 
 except KeyError as e:
     missing_key = e.args[0]

@@ -114,15 +114,27 @@ class SubscribePlanView(LoginRequiredMixin, View):
         sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
         mp_service = MercadoPagoService(sdk)
 
-        success_url = request.build_absolute_uri(reverse("payment_success"))
-        failure_url = request.build_absolute_uri(reverse("payment_failure"))
+        success_url = request.build_absolute_uri(
+            reverse("payment_success")
+        ).replace("http://", "https://")
+
+        failure_url = request.build_absolute_uri(
+            reverse("payment_failure")
+        ).replace("http://", "https://")
+
+        pending_url = request.build_absolute_uri(
+            reverse("payment_pending")
+        ).replace("http://", "https://")
 
         checkout_data = CheckoutPreferenceDTO(
             title=f"Assinatura: {plan.name}",
             price=plan.price,
             quantity=1,
-            back_url_success=success_url,
-            back_url_failure=failure_url,
+            back_urls={
+                "success": success_url,
+                "failure": failure_url,
+                "pending": pending_url,
+            },
             external_reference=str(subscription.id),
             metadata={
                 "type": "subscription",
@@ -133,7 +145,17 @@ class SubscribePlanView(LoginRequiredMixin, View):
 
         preference = mp_service.create_checkout_preference(checkout_data)
 
-        return redirect(preference["response"]["init_point"])
+        if preference.get("status") == 201 and \
+           preference.get("response", {}).get("init_point"):
+
+            init_point = preference["response"]["init_point"]
+            logger.info(
+                f"[CHECKOUT REDIRECT] User={request.user.id} RedirectTo={init_point}"
+            )
+            return redirect(init_point)
+
+        logger.error(f"[ERRO MERCADO PAGO] Preferência inválida: {preference}")
+        return HttpResponse("Erro ao criar preferência", status=400)
 
 
 class WalletPageView(View):

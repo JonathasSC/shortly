@@ -16,6 +16,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {% for plan in plans %}
             <form method="post" action="{% url 'subscribe_plan' plan.id %}" class="relative border rounded-md p-4 flex flex-col items-center gap-4 bg-gradient-to-b from-blue-50 to-white flex-col justify-between border">
+                {% csrf_token %}    
                 <div class="flex flex-col w-full gap-4">
                     <div class="flex items-center justify-center gap-4 flex-col">
                         <h2 class="text-lg font-bold flex items-center gap-2 flex-col">

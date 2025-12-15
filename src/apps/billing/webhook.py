@@ -17,6 +17,7 @@ from django.views.decorators.csrf import csrf_exempt
 from apps.billing.models import Plan, UserSubscription, UserWallet, WalletTransaction
 from apps.billing.services import MercadoPagoService
 from apps.billing.tasks import process_payment_task
+from apps.billing.dto import PaymentDataDTO
 
 logger = logging.getLogger(__name__)
 
@@ -240,12 +241,15 @@ class MercadoPagoWebhookView(View):
         if payment_type == "credits":
             logger.info(
                 f"[WEBHOOK] Aprovado (créditos), enviando para fila | payment={payment_id}")
-            process_payment_task.delay(
-                user_id=user_id,
-                payment_type=payment_type,
-                amount=metadata.get("amount"),
-                payment_id=payment_id
-            )
+
+            payment_data = PaymentDataDTO({
+                "user_id": user_id,
+                "payment_type": payment_type,
+                "amount": metadata.get("amount"),
+                "payment_id": payment_id
+            })
+
+            process_payment_task.delay(payment_data)
             return JsonResponse({"status": "queued"}, status=202)
 
         if payment_type == "plan":
