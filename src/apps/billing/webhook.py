@@ -14,10 +14,10 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 
+from apps.billing.dto import PaymentDataDTO
 from apps.billing.models import Plan, UserSubscription, UserWallet, WalletTransaction
 from apps.billing.services import MercadoPagoService
 from apps.billing.tasks import process_payment_task
-from apps.billing.dto import PaymentDataDTO
 
 logger = logging.getLogger(__name__)
 
