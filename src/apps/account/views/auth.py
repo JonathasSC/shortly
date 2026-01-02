@@ -29,7 +29,7 @@ User = get_user_model()
 class UserRegisterView(CreateView):
     form_class = CustomRegisterForm
     template_name = "account/auth/register.html"
-    success_url = reverse_lazy("login")
+    success_url = reverse_lazy("account:login")
 
 
 class UserLoginView(View):
@@ -115,7 +115,7 @@ class RecoveryView(PasswordResetView):
     email_template_name = "notification/email/password_reset.html"
     html_email_template_name = "notification/email/password_reset.html"
     subject_template_name = "account/auth/password_reset_subject.txt"
-    success_url = reverse_lazy("password_reset_done")
+    success_url = reverse_lazy("account:password_reset_done")
 
 
 class RecoveryDoneView(PasswordResetDoneView):
@@ -124,7 +124,7 @@ class RecoveryDoneView(PasswordResetDoneView):
 
 class RecoveryConfirmView(PasswordResetConfirmView):
     template_name = "account/auth/password_reset_confirm.html"
-    success_url = reverse_lazy("password_reset_complete")
+    success_url = reverse_lazy("account:password_reset_complete")
 
 
 class RecoveryCompleteView(PasswordResetCompleteView):

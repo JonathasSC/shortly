@@ -20,7 +20,7 @@ class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
 class UserDeleteView(LoginRequiredMixin, DeleteView):
     model = User
     template_name = "account/profile/profile_delete_confirm.html"
-    success_url = reverse_lazy("login")
+    success_url = reverse_lazy("account:login")
 
     def get_object(self, queryset=None):
         return self.request.user

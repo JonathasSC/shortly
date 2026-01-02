@@ -19,6 +19,6 @@ class UrlViewTests(TestCase):
         }
 
     def test_home_view_get(self):
-        response = self.client.get(reverse('home'))
+        response = self.client.get(reverse('converter:home'))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'converter/home.html')

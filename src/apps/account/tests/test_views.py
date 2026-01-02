@@ -7,9 +7,9 @@ from apps.common.utils import CommonUtils
 
 class RegisterViewTests(TestCase):
     def test_register_page_loads_successfully(self):
-        response = self.client.get(reverse("register"))
+        response = self.client.get(reverse("account:register"))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "account/register.html")
+        self.assertTemplateUsed(response, "account/auth/register.html")
 
     def test_register_creates_user(self):
         data = {
@@ -18,7 +18,7 @@ class RegisterViewTests(TestCase):
             "password": "Strong@Password123",
             "confirm_password": "Strong@Password123",
         }
-        response = self.client.post(reverse("register"), data)
+        response = self.client.post(reverse("account:register"), data)
 
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("account:login"))
@@ -32,7 +32,7 @@ class RegisterViewTests(TestCase):
             "password": "Strong@Password123",
             "confirm_password": "WrongPassword456",
         }
-        response = self.client.post(reverse("register"), data)
+        response = self.client.post(reverse("account:register"), data)
         form = response.context["form"]
         self.assertEqual(response.status_code, 200)
         self.assertTrue(form.errors)
@@ -46,7 +46,7 @@ class RegisterViewTests(TestCase):
             "password": "J@2",
             "confirm_password": "J@2",
         }
-        response = self.client.post(reverse("register"), data)
+        response = self.client.post(reverse("account:register"), data)
         form = response.context["form"]
         self.assertEqual(response.status_code, 200)
         self.assertTrue(form.errors)
@@ -60,7 +60,7 @@ class RegisterViewTests(TestCase):
             "password": "J2323",
             "confirm_password": "J2323",
         }
-        response = self.client.post(reverse("register"), data)
+        response = self.client.post(reverse("account:register"), data)
         form = response.context["form"]
         self.assertEqual(response.status_code, 200)
         self.assertTrue(form.errors)
@@ -77,7 +77,7 @@ class UserLoginViewTests(TestCase):
     def test_login_page_loads_successfully(self):
         response = self.client.get(reverse("account:login"))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "account/login.html")
+        self.assertTemplateUsed(response, "account/auth/login.html")
 
     def test_valid_login_redirects_to_home(self):
         response = self.client.post(
@@ -85,13 +85,13 @@ class UserLoginViewTests(TestCase):
                 "username": "testuser", "password": "12345"}
         )
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse("home"))
+        self.assertRedirects(response, reverse("converter:home"))
 
     def test_authenticated_user_is_redirected(self):
         self.client.force_login(self.user)
         response = self.client.get(reverse("account:login"))
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse("home"))
+        self.assertRedirects(response, reverse("converter:home"))
 
 
 class LogoutViewTests(TestCase):
@@ -102,6 +102,6 @@ class LogoutViewTests(TestCase):
 
     def test_logout_redirects_to_login(self):
         self.client.force_login(self.user)
-        response = self.client.post(reverse("logout"))
+        response = self.client.post(reverse("account:logout"))
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("account:login"))

@@ -1,7 +1,6 @@
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from apps.billing.models import UserSubscription
@@ -17,22 +16,20 @@ class User(BaseModelAbstract, AbstractUser):
 
     @property
     def active_subscription(self):
-        now = timezone.now()
         return self.subscriptions.filter(
             status=UserSubscription.Status.ACTIVE,
-            current_period_end__gte=now
-        ).select_related("plan").order_by("-current_period_end").first()
+            end_date__isnull=True
+        ).select_related("plan").first()
 
     @property
     def has_active_subscription(self):
-        now = timezone.now()
         return self.subscriptions.filter(
             status=UserSubscription.Status.ACTIVE,
-            current_period_end__gte=now
+            end_date__isnull=True
         ).exists()
 
 
-class UserDeletionSchedule(BaseModelAbstract):
+class UserDeletionSchedule(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     requested_at = models.DateTimeField(auto_now_add=True)
     scheduled_for = models.DateTimeField()

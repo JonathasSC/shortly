@@ -41,12 +41,12 @@ class UserSubscription(BaseModelAbstract):
         null=True
     )
     start_date = models.DateTimeField(
-        default=default_subscription_end
+        default=timezone.now
     )
     end_date = models.DateTimeField(
         null=True,
-        blank=True
-
+        blank=True,
+        default=default_subscription_end
     )
     status = models.CharField(
         max_length=20,
