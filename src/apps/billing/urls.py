@@ -6,7 +6,6 @@ from apps.billing.views import (
     PaymentPendingView,
     PaymentStatusAPI,
     PaymentSuccessView,
-    SubscribePlanView,
     WalletPageView,
 )
 from apps.billing.webhook import MercadoPagoWebhookView
@@ -16,8 +15,6 @@ urlpatterns = [
 
     path('buy-coins/<int:credit_amount>/',
          BuyCoinsView.as_view(), name='buy_credits'),
-    path('subscribe/<int:plan_id>/',
-         SubscribePlanView.as_view(), name='subscribe_plan'),
 
     path('mercado-pago/webhook/',
          MercadoPagoWebhookView.as_view(), name='mp_webhook'),
@@ -28,6 +25,6 @@ urlpatterns = [
          PaymentFailureView.as_view(), name='payment_failure'),
     path('payment/pending/',
          PaymentPendingView.as_view(), name='payment_pending'),
-    path("payment/status/", PaymentStatusAPI.as_view(), name="payment_status_api"),
 
+    path("payment/status/", PaymentStatusAPI.as_view(), name="payment_status_api"),
 ]

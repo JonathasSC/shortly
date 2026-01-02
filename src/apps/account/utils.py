@@ -16,7 +16,7 @@ class AbstractLoginData(ABC):
 class ProfileUtils:
     @staticmethod
     def generate_image_path(instance, filename):
-        filename_base, filename_ext = os.path.splitext(filename)
+        _, filename_ext = os.path.splitext(filename)
         return f"profile_images/{slugify(instance.user.username)}_{datetime.now().date()}{filename_ext}"
 
     @staticmethod
@@ -56,5 +56,5 @@ class AuthenticationUtils:
             raise ValueError(_("A senha deve conter letras e números."))
 
         if not any(char in "!@#$%^&*()-_=+[]{}|;:,.<>?/" for char in password):
-            raise ValueError(_("A senha deve conter pelo menos um caractere especial."))
-            
+            raise ValueError(
+                _("A senha deve conter pelo menos um caractere especial."))

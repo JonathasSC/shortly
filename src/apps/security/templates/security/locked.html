@@ -1,0 +1,28 @@
+{% extends 'common/base.html'%}
+
+{% load widget_tweaks %}
+{% load static %}
+{% load i18n %}
+
+{% block header %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="alert alert-warning text-center">
+    <h4>🚫 Acesso temporariamente bloqueado</h4>
+
+    <p>
+        Detectamos várias tentativas de login sem sucesso.
+        Por segurança, seu acesso foi <strong>temporariamente bloqueado</strong>.
+    </p>
+
+    <p>
+        Aguarde alguns minutos e tente novamente.
+        Caso tenha esquecido sua senha, utilize a recuperação de senha.
+    </p>
+
+    <p class="text-muted">
+        Se você acredita que isso é um engano, entre em contato com o suporte.
+    </p>
+</div>
+{% endblock %}

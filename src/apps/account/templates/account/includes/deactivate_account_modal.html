@@ -1,0 +1,29 @@
+{% load i18n %}
+
+<div id="delete-modal"
+     class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+
+  <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-6">
+    <h2 class="text-lg font-semibold text-red-600">
+      {% trans "Delete my account" %}
+    </h2>
+
+    <p class="text-sm text-gray-600">
+      {% trans "Your account will be deactivated and permanently deleted after 30 days." %}
+    </p>
+
+    <form method="post" action="{% url 'account:profile_deactivate' %}">
+      {% csrf_token %}
+      <div class="flex justify-end gap-3">
+        <button type="button" data-close-modal
+                class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300">
+          {% trans "Cancel" %}
+        </button>
+        <button type="submit"
+                class="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700">
+          {% trans "Deactivate" %}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -7,7 +7,7 @@
 {% block header %}
 <header class="fixed w-full bg-white z-50 ">
   <div class="border-box px-4 py-3 flex items-center justify-start">
-    <a href="{% url 'home' %}" class="text-2xl font-bold text-gray-800">
+    <a href="{% url 'converter:home' %}" class="text-2xl font-bold text-gray-800">
       <img class='w-36' src="{% static '/common/svg/logo/without_bg_with_text_blue.svg' %}" alt='logo do shortly'>
     </a>  
   </div>
@@ -32,14 +32,22 @@
         <form method="post" class="border rounded-xl flex flex-col gap-3 p-4 border-zinc-200">
             {% csrf_token %}
             
+            {% if messages %}
+            {% for message in messages %}
+                <p class="text-center bg-red-100 px-4 py-2 rounded text-red-600">
+                    {{ message }}
+                </p>
+            {% endfor %}
+            {% endif %}
+
             {% if form.non_field_errors %}
-              {% for error in form.non_field_errors %}
+            {% for error in form.non_field_errors %}
                 <p class="text-center bg-red-100 px-4 py-2 rounded text-red-600">
                     {{ error }}
                 </p>
-              {% endfor %}
+            {% endfor %}
             {% endif %}
-
+            
             {% for field in form %}
             <div>
                 <label for="{{ field.id_for_label }}" class="block font-medium text-xs sm:text-sm mb-1">
@@ -52,7 +60,7 @@
 
                 {% if field.name == "password" %}
                 <div class="text-right mt-2">
-                    <a href="{% url 'recovery' %}" class="text-blue-500 text-sm hover:underline">
+                    <a href="{% url 'account:recovery' %}" class="text-blue-500 text-sm hover:underline">
                         {% trans "Forgot your password?" %}
                     </a>
                 </div>
@@ -66,7 +74,7 @@
 
             <p class="text-center mt-2 text-sm sm:text-base">
                 Ainda não possui uma conta?
-                <a href="{% url 'register' %}" class="text-blue-500">
+                <a href="{% url 'account:register' %}" class="text-blue-500">
                     Clique aqui
                 </a>
             </p>

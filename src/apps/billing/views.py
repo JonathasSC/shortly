@@ -5,14 +5,14 @@ from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views import View
 from django.views.generic import TemplateView
 
 from apps.billing.domain import Pricing
 from apps.billing.dto import CheckoutPreferenceDTO
-from apps.billing.models import Plan, UserSubscription, UserWallet, WalletTransaction
+from apps.billing.models import Plan, UserWallet, WalletTransaction
 from apps.billing.services import MercadoPagoService
 
 logger = logging.getLogger(__name__)
@@ -92,72 +92,6 @@ class BuyCoinsView(LoginRequiredMixin, View):
         return HttpResponse("Erro ao criar preferência", status=400)
 
 
-class SubscribePlanView(LoginRequiredMixin, View):
-    def post(self, request, plan_id, *args, **kwargs):
-        plan = get_object_or_404(Plan, id=plan_id)
-
-        subscription = UserSubscription.objects.create(
-            user=request.user,
-            plan=plan,
-            status=UserSubscription.Status.INACTIVE,
-        )
-
-        wallet = request.user.wallet
-        wallet_transaction = WalletTransaction.objects.create(
-            wallet=wallet,
-            transaction_type=WalletTransaction.TransactionType.CREDIT,
-            amount=plan.monthly_credits,
-            source="Mercado Pago - Assinatura",
-            external_reference=str(subscription.id),
-        )
-
-        sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
-        mp_service = MercadoPagoService(sdk)
-
-        success_url = request.build_absolute_uri(
-            reverse("payment_success")
-        ).replace("http://", "https://")
-
-        failure_url = request.build_absolute_uri(
-            reverse("payment_failure")
-        ).replace("http://", "https://")
-
-        pending_url = request.build_absolute_uri(
-            reverse("payment_pending")
-        ).replace("http://", "https://")
-
-        checkout_data = CheckoutPreferenceDTO(
-            title=f"Assinatura: {plan.name}",
-            price=plan.price,
-            quantity=1,
-            back_urls={
-                "success": success_url,
-                "failure": failure_url,
-                "pending": pending_url,
-            },
-            external_reference=str(subscription.id),
-            metadata={
-                "type": "subscription",
-                "subscription_id": subscription.id,
-                "transaction_id": wallet_transaction.id,
-            },
-        )
-
-        preference = mp_service.create_checkout_preference(checkout_data)
-
-        if preference.get("status") == 201 and \
-           preference.get("response", {}).get("init_point"):
-
-            init_point = preference["response"]["init_point"]
-            logger.info(
-                f"[CHECKOUT REDIRECT] User={request.user.id} RedirectTo={init_point}"
-            )
-            return redirect(init_point)
-
-        logger.error(f"[ERRO MERCADO PAGO] Preferência inválida: {preference}")
-        return HttpResponse("Erro ao criar preferência", status=400)
-
-
 class WalletPageView(View):
     template_name = "billing/wallet.html"
     paginate_by = 5
@@ -190,6 +124,9 @@ class WalletPageView(View):
         paginator = Paginator(transactions, self.paginate_by)
         transactions_page = paginator.get_page(request.GET.get("page"))
 
+        active_subscription = request.user.active_subscription
+        active_plan = active_subscription.plan if active_subscription else None
+
         logger.debug(
             f"Usuário {request.user.id} possui {wallet.balance} coins e {transactions.count()} transações."
         )
@@ -201,6 +138,8 @@ class WalletPageView(View):
                 "plans": plans,
                 "wallet": wallet,
                 "transactions": transactions_page,
+                "active_plan": active_plan,
+                "active_subscription": active_subscription,
             },
         )
 

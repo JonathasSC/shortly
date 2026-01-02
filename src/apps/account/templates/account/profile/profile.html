@@ -1,0 +1,130 @@
+{% extends 'common/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% load i18n %}
+
+{% block footer %}{% endblock %}
+
+{% block content %}
+<main class="w-full flex-col mt-16 flex items-center justify-center">
+  <div class="p-6 w-full max-w-[1440px] flex flex-col gap-6">
+    <section class="w-full max-w-[1440px]">
+      <form method="post" class="flex flex-col gap-4">
+        {% csrf_token %}
+
+        <h2 class="font-bold text-xl">
+          {% trans "Profile Information" %}
+        </h2>
+
+        <div class="grid grid-cols-1 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-600 mb-1">
+              {% trans "Email" %}
+            </label>
+            <input type="email"
+                  value="{{ request.user.email }}"
+                  readonly
+                  class="w-full bg-gray-100 border border-gray-200 rounded px-3 py-2 text-gray-600 cursor-not-allowed">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-600 mb-1">
+              {% trans "First Name" %}
+            </label>
+            {{ form.first_name|add_class:"w-full border rounded px-3 py-2 focus:ring-2 focus:ring-indigo-500" }}
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-600 mb-1">
+              {% trans "Last Name" %}
+            </label>
+            {{ form.last_name|add_class:"w-full border rounded px-3 py-2 focus:ring-2 focus:ring-indigo-500" }}
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-4">
+          <button type="submit"
+                  class="btn text-white bg-blue-500 rounded-md hover:bg-blue-600">
+            <span class="material-symbols-outlined text-xl">
+              save
+            </span>
+            {% trans "Save changes" %}
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <hr/>
+
+    <section class="w-full max-w-[1440px] flex flex-col gap-4">
+      <h2 class="font-bold text-xl">
+        {% trans "Security" %}
+      </h2>
+
+      <p class="text-sm text-gray-500">
+        {% trans "Update your password to keep your account secure." %}
+      </p>
+
+      <button
+        type="button"
+        data-open-modal="password-modal"
+        class="mt-2 w-fit flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-blue-100 text-blue-700 hover:bg-blue-500 hover:text-white rounded-md transition">
+        <span class="material-symbols-outlined text-xl">
+          encrypted
+        </span>
+        {% trans "Change password" %}
+      </button>
+    </section>
+
+    <hr/>
+      
+    <section class="flex flex-col gap-4">
+      <h2 class="font-bold text-xl">
+        {% trans "Danger Zone" %}
+      </h2>
+
+      <p class="text-sm text-red-600">
+        {% trans "Deleting your account is permanent and cannot be undone." %}
+      </p>
+
+      <button
+        type="button"
+        data-open-modal="delete-modal"
+        class="mt-2 w-fit flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-red-100 text-red-600 hover:bg-red-500 hover:text-white rounded-md transition">
+        <span class="material-symbols-outlined text-xl">
+          delete
+        </span>
+        {% trans "Delete my account" %}
+      </button>
+    </section>
+  </div>
+</main>
+
+{% include "account/includes/change_password_modal.html" %}
+{% include "account/includes/deactivate_account_modal.html" %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.querySelectorAll('[data-open-modal]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const modal = document.getElementById(btn.dataset.openModal);
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    });
+  });
+
+  document.querySelectorAll('[data-close-modal]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      btn.closest('.fixed').classList.add('hidden');
+    });
+  });
+
+  document.querySelectorAll('.fixed').forEach(modal => {
+    modal.addEventListener('click', e => {
+      if (e.target === modal) modal.classList.add('hidden');
+    });
+  });
+</script>
+{% endblock %}

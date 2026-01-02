@@ -5,76 +5,6 @@
 
 {% block content %}
 <main class="w-full flex-col mt-16 flex items-center justify-center">
-    <div class="p-6 w-full max-w-[1440px] space-y-6">
-        {% if user|feature_enabled:"market_closed" %}
-        <div class="flex justify-between items-center">
-            <div>
-                <h1 class="font-bold text-xl">{% trans "Subscriptions" %}</h1>
-                <p class="text-zinc-400">{% trans "Choose a plan to continue" %}</p>
-            </div>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {% for plan in plans %}
-            <form method="post" action="{% url 'subscribe_plan' plan.id %}" class="relative border rounded-md p-4 flex flex-col items-center gap-4 bg-gradient-to-b from-blue-50 to-white flex-col justify-between border">
-                {% csrf_token %}    
-                <div class="flex flex-col w-full gap-4">
-                    <div class="flex items-center justify-center gap-4 flex-col">
-                        <h2 class="text-lg font-bold flex items-center gap-2 flex-col">
-                            <div class="flex items-center justify-center w-14 h-14 bg-blue-500 text-white text-2xl font-extrabold rounded-full" >
-                                {% if plan.name == "Starter" %}
-                                    <span class="material-symbols-outlined text-white text-3xl">rocket</span>
-                                {% elif plan.name == "Turbo" %}
-                                    <span class="material-symbols-outlined text-white text-3xl">bolt</span>
-                                {% elif plan.name == "Power" %}
-                                    <span class="material-symbols-outlined text-white text-3xl">star</span>
-                                {% elif plan.name == "Master" %}
-                                    <span class="material-symbols-outlined text-white text-3xl">whatshot</span>
-                                {% else %}
-                                    <span class="material-symbols-outlined text-white text-3xl">circle</span>
-                                {% endif %}
-                            </div>
-
-                            {{ plan.name }}
-                        </h2>
-    
-                        <div class="flex flex-col">
-                            <p class="text-xl font-semibold text-gray-800">R$ {{ plan.price }} / {% trans "month" %}</p>
-            
-                            <p class="text-sm">
-                            {{ plan.monthly_credits }} {% trans "Monthly credits" %}
-                            </p>
-                        </div>
-                    </div>
-    
-                    <ul class="flex flex-col gap-1 text-sm w-full">
-                        <li class="border-b border-gray-200 p-2 {% if plan.longtime_expiration_date %}text-green-600 font-semibold{% else %}text-gray-300{% endif %}">
-                            {% trans "Extended expiration" %}
-                        </li>
-                        <li class="border-b border-gray-200 p-2 {% if plan.disable_interstitial_page %}text-green-600 font-semibold{% else %}text-gray-300{% endif %}">
-                            {% trans "No interstitial page" %}
-                        </li>
-                        <li class="border-b border-gray-200 p-2 {% if plan.advanced_stats %}text-green-600 font-semibold{% else %}text-gray-300{% endif %}">
-                            {% trans "Advanced statistics" %}
-                        </li>
-                        <li class="border-b border-gray-200 p-2 {% if plan.conditional_redirect %}text-green-600 font-semibold{% else %}text-gray-300{% endif %}">
-                            {% trans "Conditional redirect" %}
-                        </li>
-                        <li class="border-b border-gray-200 p-2 {% if plan.priority_support %}text-green-600 font-semibold{% else %}text-gray-300{% endif %}">
-                            {% trans "Priority support" %}
-                        </li>
-                    </ul>
-                </div>
-
-                <button type="submit" 
-                        class="mt-2 w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600 transition">
-                    {% trans "Subscribe" %}
-                </button>
-            </form>
-            {% endfor %}
-        </div>
-    </div>
-    {% endif %}
-
     {% if user|feature_enabled:"market_closed" %}
     <div class="p-6 w-full max-w-[1440px] space-y-6">
         <div class="flex justify-between items-center">
@@ -101,7 +31,7 @@
                 <p class="text-xl font-semibold text-gray-800">R$ {{ info.total_price }}</p>
 
                 <button type="submit"
-                    class="mt-2 w-full font-bold py-2 px-4 rounded-md transition
+                    class="btn bg-blue-500 justify-center w-full text-white hover:bg-blue-600 transition cursor-pointer
                         {% if disabled %}
                             cursor-not-allowed bg-gray-300 text-gray-600
                         {% else %}

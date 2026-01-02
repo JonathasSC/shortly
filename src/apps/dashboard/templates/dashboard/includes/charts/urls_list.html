@@ -73,8 +73,8 @@
                                 {% trans "Once you shorten a URL, it will appear here so you can track clicks and statistics." %}
                             </p>
 
-                            <a href="{% url 'user-url-list' %}"
-                               class="mt-2 flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 transition">
+                            <a href="{% url 'user_url_list' %}"
+                               class="btn text-white bg-blue-500 hover:bg-blue-600">
                                 <span class="material-symbols-outlined text-sm">add</span>
                                 {% trans "Create first link" %}
                             </a>
@@ -128,8 +128,8 @@
             </div>
         </table>
 
-        <a href="{% url 'user-url-list' %}"
-           class="mt-2 w-fit flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 transition">
+        <a href="{% url 'user_url_list' %}"
+           class="btn text-white bg-blue-500 hover:bg-blue-600">
             <span class="material-symbols-outlined text-sm">add</span>
             {% trans "View all" %}
         </a>

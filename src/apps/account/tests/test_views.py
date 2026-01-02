@@ -21,7 +21,7 @@ class RegisterViewTests(TestCase):
         response = self.client.post(reverse("register"), data)
 
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse("login"))
+        self.assertRedirects(response, reverse("account:login"))
 
         self.assertTrue(User.objects.filter(username="newuser").exists())
 
@@ -75,20 +75,21 @@ class UserLoginViewTests(TestCase):
             username="testuser", password="12345")
 
     def test_login_page_loads_successfully(self):
-        response = self.client.get(reverse("login"))
+        response = self.client.get(reverse("account:login"))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "account/login.html")
 
     def test_valid_login_redirects_to_home(self):
         response = self.client.post(
-            reverse("login"), {"username": "testuser", "password": "12345"}
+            reverse("account:login"), {
+                "username": "testuser", "password": "12345"}
         )
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("home"))
 
     def test_authenticated_user_is_redirected(self):
         self.client.force_login(self.user)
-        response = self.client.get(reverse("login"))
+        response = self.client.get(reverse("account:login"))
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("home"))
 
@@ -103,4 +104,4 @@ class LogoutViewTests(TestCase):
         self.client.force_login(self.user)
         response = self.client.post(reverse("logout"))
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse("login"))
+        self.assertRedirects(response, reverse("account:login"))

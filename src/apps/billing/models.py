@@ -1,11 +1,13 @@
-from django.contrib.auth import get_user_model
+from datetime import timedelta
+
+from django.conf import settings
 from django.db import models, transaction
 from django.utils import timezone
 
-User = get_user_model()
+from apps.common.models import BaseModelAbstract
 
 
-class Plan(models.Model):
+class Plan(BaseModelAbstract):
     name = models.CharField(max_length=50, unique=True)
     monthly_credits = models.PositiveIntegerField(default=0)
     price = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
@@ -19,14 +21,17 @@ class Plan(models.Model):
         return f"{self.name} - R$ {self.price}"
 
 
-class UserSubscription(models.Model):
+class UserSubscription(BaseModelAbstract):
+    def default_subscription_end():
+        return timezone.now() + timedelta(days=30)
+
     class Status(models.TextChoices):
         ACTIVE = "active", "Ativa"
         INACTIVE = "inactive", "Inativa"
         CANCELED = "canceled", "Cancelada"
 
     user = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="subscriptions"
     )
@@ -36,11 +41,12 @@ class UserSubscription(models.Model):
         null=True
     )
     start_date = models.DateTimeField(
-        default=timezone.now
+        default=default_subscription_end
     )
     end_date = models.DateTimeField(
         null=True,
         blank=True
+
     )
     status = models.CharField(
         max_length=20,
@@ -51,13 +57,43 @@ class UserSubscription(models.Model):
         default=True
     )
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "plan"],
+                name="unique_user_plan_subscription"
+            )
+        ]
+
+    def save(self, *args, **kwargs):
+        if self.status == self.Status.ACTIVE:
+            UserSubscription.objects.filter(
+                user=self.user
+            ).exclude(pk=self.pk).update(status=self.Status.INACTIVE)
+
+        if not self.pk:
+            existing = UserSubscription.objects.filter(
+                user=self.user,
+                plan=self.plan,
+            ).first()
+
+            if existing:
+                existing.status = self.status
+                existing.start_date = self.start_date
+                existing.end_date = self.end_date
+                existing.auto_renew = self.auto_renew
+                existing.save()
+                return
+
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"{self.user} - {self.plan} ({self.status})"
 
 
-class UserWallet(models.Model):
+class UserWallet(BaseModelAbstract):
     user = models.OneToOneField(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="wallet"
     )
@@ -65,14 +101,11 @@ class UserWallet(models.Model):
         default=0
     )
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="wallet")
-    balance = models.PositiveIntegerField(default=0)
-
     def __str__(self):
         return f"{self.user} - {self.balance} coins"
-    
 
-class WalletTransaction(models.Model):
+
+class WalletTransaction(BaseModelAbstract):
     class TransactionType(models.TextChoices):
         CREDIT = "credit", "Crédito"
         DEBIT = "debit", "Débito"
@@ -89,27 +122,18 @@ class WalletTransaction(models.Model):
         max_length=10, choices=TransactionType.choices)
     status = models.CharField(
         max_length=10, choices=Status.choices, default=Status.PENDING)
-    class Status(models.TextChoices):
-        PENDING = "pending", "Pendente"
-        SUCCESS = "success", "Concluída"
-        FAILED = "failed", "Falhou"
-        REFUNDED = "refunded", "Estornada"
 
-    wallet = models.ForeignKey(UserWallet, on_delete=models.CASCADE, related_name="transactions")
-    transaction_type = models.CharField(max_length=10, choices=TransactionType.choices)
-    status = models.CharField(max_length=10, choices=Status.choices, default=Status.PENDING)
     amount = models.PositiveIntegerField()
-    created_at = models.DateTimeField(auto_now_add=True)
     processed_at = models.DateTimeField(null=True, blank=True)
 
-    processed_at = models.DateTimeField(null=True, blank=True)
-    
     source = models.CharField(max_length=50, blank=True, null=True)
-    external_reference = models.CharField(max_length=128, blank=True, null=True)
+    external_reference = models.CharField(
+        max_length=128, blank=True, null=True)
 
     def _ensure_pending(self):
         if self.status != self.Status.PENDING:
-            raise ValueError("Transação já foi processada e não pode ser alterada.")
+            raise ValueError(
+                "Transação já foi processada e não pode ser alterada.")
 
     @transaction.atomic
     def process_success(self):
@@ -128,17 +152,16 @@ class WalletTransaction(models.Model):
         self.processed_at = timezone.now()
         self.save(update_fields=["status", "processed_at"])
 
-
     def process_failed(self):
         if self.status == self.Status.PENDING:
             self.status = self.Status.FAILED
             self.save(update_fields=["status"])
 
-
     @transaction.atomic
     def refund(self):
         if self.status != self.Status.SUCCESS:
-            raise ValueError("Apenas transações concluídas podem ser estornadas.")
+            raise ValueError(
+                "Apenas transações concluídas podem ser estornadas.")
 
         reverse_type = (
             self.TransactionType.DEBIT
@@ -167,20 +190,17 @@ class WalletTransaction(models.Model):
         self.status = self.Status.REFUNDED
         super(WalletTransaction, self).save(update_fields=["status"])
 
-
     def save(self, *args, **kwargs):
-        if self.pk:  
-            original = WalletTransaction.objects.get(pk=self.pk)
-            if original.status == self.Status.SUCCESS:
-                raise ValueError("Transações concluídas não podem ser alteradas.")
+        if self.pk:
+            try:
+                original = WalletTransaction.objects.get(pk=self.pk)
+                if original.status == self.Status.SUCCESS:
+                    raise ValueError(
+                        "Transações concluídas não podem ser alteradas.")
+            except WalletTransaction.DoesNotExist:
+                pass
 
-        if not self.pk and self.amount <= 0:
-            raise ValueError("Valor precisa ser maior que zero.")
-        
         super().save(*args, **kwargs)
-
-    def delete(self, *args, **kwargs):
-        raise ValueError("Transações não podem ser apagadas por auditoria.")
 
     def __str__(self):
         return f"{self.transaction_type} {self.amount} {self.status} ({self.wallet.user})"

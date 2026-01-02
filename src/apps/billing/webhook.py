@@ -2,10 +2,8 @@ import hashlib
 import hmac
 import json
 import logging
-from datetime import timezone
 
 import mercadopago
-from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import transaction
@@ -15,7 +13,7 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 
 from apps.billing.dto import PaymentDataDTO
-from apps.billing.models import Plan, UserSubscription, UserWallet, WalletTransaction
+from apps.billing.models import UserWallet, WalletTransaction
 from apps.billing.services import MercadoPagoService
 from apps.billing.tasks import process_payment_task
 
@@ -67,30 +65,6 @@ class MercadoPagoWebhookView(View):
 
         logger.info(f"[CREDITO] Sucesso | user={user_id} amount={amount}")
         return {"status": "wallet_updated"}
-
-    @transaction.atomic
-    def _activate_subscription(self, user_id, plan_id, payment_id):
-        plan = Plan.objects.get(id=plan_id)
-
-        subscription, created = UserSubscription.objects.select_for_update().get_or_create(
-            user_id=user_id,
-            plan=plan,
-            defaults={
-                "status": UserSubscription.Status.INACTIVE,
-            }
-        )
-
-        if subscription.status == UserSubscription.Status.ACTIVE:
-            return
-
-        wallet_transaction = WalletTransaction.objects.get(
-            external_reference=str(payment_id))
-        wallet_transaction.process_success()
-
-        subscription.status = UserSubscription.Status.ACTIVE
-        subscription.start_date = timezone.now()
-        subscription.end_date = timezone.now() + relativedelta(months=1)
-        subscription.save(update_fields=["status", "start_date", "end_date"])
 
     def _verify_signature(self, request):
         try:

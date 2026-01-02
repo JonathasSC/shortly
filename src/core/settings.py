@@ -208,9 +208,9 @@ ACCOUNT_FORMS = {
     "login": "apps.account.forms.CustomLoginForm",
 }
 
-LOGIN_URL = "apps.account:login"
-LOGIN_REDIRECT_URL = "/"
-LOGOUT_REDIRECT_URL = "/"
+LOGIN_URL = "account:login"
+LOGIN_REDIRECT_URL = "converter:home"
+LOGOUT_REDIRECT_URL = "account:login"
 
 # ================================================================
 # INTERNATIONALIZATION & TIMEZONE
@@ -268,7 +268,7 @@ CELERY_BEAT_SCHEDULE = {
     },
     'deposit-monthly-credits-daily': {
         'task': 'apps.billing.tasks.deposit_monthly_credits',
-        'schedule': crontab(hour=0, minute=0),
+        'schedule': crontab(hour=0, minute="*"),
     },
 }
 
@@ -319,8 +319,13 @@ CACHES = {
 # AXES
 # ================================================================
 AXES_CACHE = "default"
-AXES_LOCK_OUT_AT_FAILURE = False
 AXES_EXCLUDE_PATHS = [
     '/buy/mercado-pago/webhook',
     '/buy/mercado-pago/webhook/',
 ]
+
+AXES_FAILURE_LIMIT = 5
+AXES_COOLOFF_TIME = 1
+AXES_RESET_ON_SUCCESS = True
+AXES_HTTP_RESPONSE_CODE = 429
+AXES_LOCKOUT_TEMPLATE = "security/locked.html"

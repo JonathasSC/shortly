@@ -141,7 +141,7 @@ class UserUrlsList(LoginRequiredMixin, ListView):
             )
 
         min_clicks = self.request.GET.get('min_clicks')
+
         if min_clicks and min_clicks.isdigit():
             qs = qs.filter(clicks__gte=int(min_clicks))
-
         return qs.order_by('-created_at')

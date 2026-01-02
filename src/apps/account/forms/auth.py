@@ -1,5 +1,4 @@
 from django import forms
-from django.contrib.auth.forms import AuthenticationForm
 from django.utils.translation import gettext_lazy as _
 
 from apps.account.models import User
@@ -70,7 +69,7 @@ class CustomRegisterForm(forms.ModelForm):
         return user
 
 
-class CustomLoginForm(AuthenticationForm):
+class CustomLoginForm(forms.Form):
     username = forms.CharField(
         label=_("Username"),
         widget=forms.TextInput(attrs={
@@ -86,12 +85,3 @@ class CustomLoginForm(AuthenticationForm):
             'class': 'w-full text-sm sm:text-md p-2 border border-zinc-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500',
         })
     )
-
-class ProfileForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = ["first_name", "last_name"]
-        widgets = {
-            "first_name": forms.TextInput(attrs={"class": "form-control"}),
-            "last_name": forms.TextInput(attrs={"class": "form-control"}),
-        }

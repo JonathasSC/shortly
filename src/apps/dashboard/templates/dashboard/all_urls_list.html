@@ -31,7 +31,7 @@
             </button>
         </form>
 
-        <table class="hidden md:table min-w-full border border-zinc-200 rounded-lg table-auto overflow-hidden">
+        <table class="min-w-full border border-zinc-200 rounded-lg table-auto border-collapse">
             <thead class="bg-zinc-50 border-b border-zinc-200">
                 <tr>
                     <th class="px-3 py-2 text-left text-sm text-zinc-600">{% trans "Original URL" %}</th>
@@ -96,10 +96,28 @@
                         </div>
                     </td>
                 </tr>
+                
                 {% empty %}
                 <tr>
-                    <td colspan="5" class="text-center py-6 text-gray-500">
-                        {% trans "No links found." %}
+                    <td colspan="5" class="px-4 py-10 text-center">
+                        <div class="flex flex-col items-center justify-center gap-3 text-gray-500">
+
+                            <div class="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-full">
+                                <span class="material-symbols-outlined text-3xl text-gray-500">link_off</span>
+                            </div>
+
+                            <p class="text-sm font-medium">{% trans "You haven't created any links yet" %}</p>
+
+                            <p class="text-xs text-gray-400 max-w-xs">
+                                {% trans "Once you shorten a URL, it will appear here so you can track clicks and statistics." %}
+                            </p>
+
+                            <a href="{% url 'converter:home' %}"
+                               class="btn text-white bg-blue-500 hover:bg-blue-600">
+                                <span class="material-symbols-outlined text-sm">add</span>
+                                {% trans "Create first link" %}
+                            </a>
+                        </div>
                     </td>
                 </tr>
                 {% endfor %}

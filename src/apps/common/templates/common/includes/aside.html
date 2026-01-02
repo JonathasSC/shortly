@@ -7,7 +7,7 @@
     <div class="mb-6">
         <h3 class="text-gray-400 uppercase text-xs font-semibold mb-2">Principal</h3>
         <nav class="flex flex-col gap-2">
-            <a href="{% url 'home' %}" class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors shadow-sm hover:shadow-md">
+            <a href="{% url 'converter:home' %}" class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors shadow-sm hover:shadow-md">
                 <span class="material-icons">home</span>
                 <span>{% trans "Home" %}</span>
             </a>
@@ -29,7 +29,7 @@
     <div>
         <h3 class="text-gray-400 uppercase text-xs font-semibold mb-2">Conta</h3>
         <nav class="flex flex-col gap-2">
-            <a href="{% url 'logout' %}" class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors shadow-sm hover:shadow-md text-red-500 font-semibold">
+            <a href="{% url 'account:logout' %}" class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors shadow-sm hover:shadow-md text-red-500 font-semibold">
                 <span class="material-icons">logout</span>
                 <span>{% trans "Logout" %}</span>
             </a>

@@ -4,7 +4,7 @@
 
 <header id="main-header" class="fixed w-full z-50 border-zinc-100 bg-transparent transition-all duration-300 ease-in-out">
   <div class="border-box px-4 py-3 flex items-center justify-between">
-    <a href="{% url 'home' %}" class="text-2xl font-bold text-gray-800">
+    <a href="{% url 'converter:home' %}" class="text-2xl font-bold text-gray-800">
       <img class='w-36' src="{% static '/common/svg/logo/without_bg_with_text_blue.svg' %}" alt='logo do shortly'>
     </a>
 
@@ -43,13 +43,13 @@
         </div>
 
         {% if not user.is_authenticated %}
-          <a href="{% url 'login' %}" class="flex items-center gap-2 px-4 py-2 font-medium text-blue-700 
+          <a href="{% url 'account:login' %}" class="flex items-center gap-2 px-4 py-2 font-medium text-blue-700 
                                             bg-blue-100 rounded-md hover:bg-blue-200 transition duration-200 shadow-sm">
             <span class="material-symbols-outlined">login</span>
             <span class="hidden sm:block">{% trans "Login" %}</span>
           </a>
 
-          <a href="{% url 'register' %}" class="flex items-center gap-2 px-4 py-2 font-medium text-white 
+          <a href="{% url 'account:register' %}" class="flex items-center gap-2 px-4 py-2 font-medium text-white 
                                               bg-blue-500 rounded-md hover:bg-blue-600 transition duration-200 shadow-sm">
             <span class="material-symbols-outlined">person_add</span>
             <span class="hidden sm:block">{% trans "Create Account" %}</span>
@@ -64,21 +64,48 @@
           </a>
 
           <div class="relative group">
-            <div class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center 
-                        cursor-pointer select-none shadow-sm">
-              {{ user.first_name|default:user.username|first|upper }}
+            <div class="relative inline-flex items-center justify-center">
+              <div class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center 
+                          cursor-pointer select-none shadow-sm">
+                {{ user.first_name|default:user.username|first|upper }}
+              </div>
+
+              {% if user.has_active_subscription %}
+              {% with sub=user.active_subscription %}
+                {% if sub.plan %}
+                  {% with plan=sub.plan %}
+                    <span class="absolute -bottom-1 -right-1 flex items-center justify-center 
+                                w-5 h-5 rounded-full border-2 border-white shadow-md"
+                          title="{{ plan.name }}">
+
+                      {% if plan.name == "Starter" %}
+                        <span class="material-symbols-outlined text-[14px] text-white bg-blue-500 w-full h-full flex items-center justify-center rounded-full">rocket</span>
+                      {% elif plan.name == "Turbo" %}
+                        <span class="material-symbols-outlined text-[14px] text-white bg-indigo-500 w-full h-full flex items-center justify-center rounded-full">bolt</span>
+                      {% elif plan.name == "Power" %}
+                        <span class="material-symbols-outlined text-[14px] text-white bg-amber-500 w-full h-full flex items-center justify-center rounded-full">star</span>
+                      {% elif plan.name == "Master" %}
+                        <span class="material-symbols-outlined text-[14px] text-white bg-rose-600 w-full h-full flex items-center justify-center rounded-full">whatshot</span>
+                      {% else %}
+                        <span class="material-symbols-outlined text-[14px] text-white bg-gray-500 w-full h-full flex items-center justify-center rounded-full">circle</span>
+                      {% endif %}
+                    </span>
+                  {% endwith %}
+                {% endif %}
+              {% endwith %}
+            {% endif %}
             </div>
 
             <div class="absolute right-0 mt-2 w-48 bg-white shadow-lg border border-zinc-200 rounded-lg 
                         opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
 
-              <a href="{% url 'dashboard-home' %}" class="flex items-center gap-2 px-4 py-2 text-sm hover:bg-zinc-100">
+              <a href="{% url 'dashboard_home' %}" class="flex items-center gap-2 px-4 py-2 text-sm hover:bg-zinc-100">
                 <span class="material-symbols-outlined text-blue-500">dashboard</span>
                 {% trans "Dashboard" %}
               </a>
 
-              {% if user|feature_enabled:"profile_unavailable" %}
-                <a href="{% url 'dashboard-home' %}" class="flex items-center gap-2 px-4 py-2 text-sm hover:bg-zinc-100">
+              {% if user|feature_enabled:"profile_available" %}
+                <a href="{% url 'account:profile_edit' %}" class="flex items-center gap-2 px-4 py-2 text-sm hover:bg-zinc-100">
                   <span class="material-symbols-outlined text-blue-500">person</span>
                   {% trans "My Account" %}
                 </a>
@@ -86,7 +113,7 @@
 
               <div class="border-t border-zinc-200"></div>
 
-              <form action="{% url 'logout' %}" method="post">
+              <form action="{% url 'account:logout' %}" method="post">
                 {% csrf_token %}
                 <button type="submit" class="flex items-center gap-2 w-full text-left px-4 py-2 text-sm hover:bg-zinc-100 text-red-500">
                   <span class="material-symbols-outlined">logout</span>
@@ -134,19 +161,26 @@
           <div class="border-t border-zinc-200"></div>
 
           {% if not user.is_authenticated %}
-            <a href="{% url 'login' %}" class="block px-4 py-2 text-sm hover:bg-zinc-100">{% trans "Login" %}</a>
-            <a href="{% url 'register' %}" class="block px-4 py-2 text-sm hover:bg-zinc-100">{% trans "Create Account" %}</a>
+
+          <a href="{% url 'account:login' %}" class="block px-4 py-2 text-sm hover:bg-zinc-100">{% trans "Login" %}</a>
+          <a href="{% url 'account:register' %}" class="block px-4 py-2 text-sm hover:bg-zinc-100">{% trans "Create Account" %}</a>
+
           {% else %}
-            <a href="{% url 'dashboard-home' %}" class="block px-4 py-2 text-sm hover:bg-zinc-100">{% trans "Dashboard" %}</a>
-              {% if user|feature_enabled:"profile_unavailable" %}
-              <a href="{% url 'dashboard-home' %}" class="block px-4 py-2 text-sm hover:bg-zinc-100">{% trans "My Account" %}</a>
-            {% endif %}
-            <form action="{% url 'logout' %}" method="post">
-              {% csrf_token %}
-              <button type="submit" class="w-full text-left px-4 py-2 text-sm hover:bg-zinc-100 text-red-500">
-                {% trans "Logout" %}
-              </button>
-            </form>
+
+          <a href="{% url 'dashboard_home' %}" class="block px-4 py-2 text-sm hover:bg-zinc-100">{% trans "Dashboard" %}</a>
+
+          {% if user|feature_enabled:"profile_available" %}
+
+          <a href="{% url 'account:profile_edit' %}" class="block px-4 py-2 text-sm hover:bg-zinc-100">{% trans "My Account" %}</a>
+
+          {% endif %}
+          
+          <form action="{% url 'account:logout' %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="w-full text-left px-4 py-2 text-sm hover:bg-zinc-100 text-red-500">
+              {% trans "Logout" %}
+            </button>
+          </form>
           {% endif %}
         </div>
       </div>

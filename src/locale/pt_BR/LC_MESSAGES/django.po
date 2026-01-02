@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-07 12:28-0300\n"
+"POT-Creation-Date: 2025-12-28 16:30-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,47 +18,83 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: apps/account/forms.py:11 apps/account/forms.py:75
+#: apps/account/admin.py:13
+msgid "Informações Pessoais"
+msgstr ""
+
+#: apps/account/admin.py:14
+#, fuzzy
+#| msgid "Permissions"
+msgid "Permissões"
+msgstr "Permissões"
+
+#: apps/account/admin.py:23
+msgid "Datas Importantes"
+msgstr ""
+
+#: apps/account/admin.py:43
+msgid "Encerrar contas selecionadas"
+msgstr ""
+
+#: apps/account/admin.py:49
+#, python-brace-format
+msgid "{updated} conta(s) foram encerradas com sucesso."
+msgstr ""
+
+#: apps/account/admin.py:52
+msgid "Reativar contas selecionadas"
+msgstr ""
+
+#: apps/account/admin.py:58
+#, python-brace-format
+msgid "{updated} conta(s) foram reativadas com sucesso."
+msgstr ""
+
+#: apps/account/admin.py:67 apps/account/admin.py:74
+msgid "Você não tem permissão para excluir usuários."
+msgstr ""
+
+#: apps/account/forms/auth.py:11 apps/account/forms/auth.py:75
 msgid "Username"
 msgstr "Nome de usuário"
 
-#: apps/account/forms.py:13
+#: apps/account/forms/auth.py:13
 msgid "Your username"
 msgstr "Seu nome de usuário"
 
-#: apps/account/forms.py:19
+#: apps/account/forms/auth.py:19
 msgid "E-mail address"
 msgstr "Endereço de e-mail"
 
-#: apps/account/forms.py:21
+#: apps/account/forms/auth.py:21
 msgid "example@email.com"
 msgstr "exemplo@email.com"
 
-#: apps/account/forms.py:27 apps/account/forms.py:83
+#: apps/account/forms/auth.py:27 apps/account/forms/auth.py:83
 msgid "Password"
 msgstr "Senha"
 
-#: apps/account/forms.py:29
+#: apps/account/forms/auth.py:29
 msgid "Your secure password"
 msgstr "Sua senha segura"
 
-#: apps/account/forms.py:35
+#: apps/account/forms/auth.py:35
 msgid "Confirm password"
 msgstr "Confirmar senha"
 
-#: apps/account/forms.py:37
+#: apps/account/forms/auth.py:37
 msgid "Confirm your password"
 msgstr "Confirme sua senha"
 
-#: apps/account/forms.py:61
+#: apps/account/forms/auth.py:61
 msgid "Passwords do not match."
 msgstr "As senhas não coincidem."
 
-#: apps/account/forms.py:77
+#: apps/account/forms/auth.py:77
 msgid "Seu nome de usuário"
 msgstr "Seu nome de usuário"
 
-#: apps/account/forms.py:85
+#: apps/account/forms/auth.py:85
 msgid "Sua senha"
 msgstr "Sua senha"
 
@@ -66,66 +102,66 @@ msgstr "Sua senha"
 msgid "email address"
 msgstr "endereço de e-mail"
 
-#: apps/account/templates/account/login.html:25
+#: apps/account/templates/account/auth/login.html:25
 msgid "Welcome back!"
 msgstr "Bem-vindo de volta!"
 
-#: apps/account/templates/account/login.html:28
+#: apps/account/templates/account/auth/login.html:28
 msgid "Please log in to your account"
 msgstr "Faça login na sua conta"
 
-#: apps/account/templates/account/login.html:56
+#: apps/account/templates/account/auth/login.html:64
 msgid "Forgot your password?"
 msgstr "Esqueceu sua senha?"
 
-#: apps/account/templates/account/login.html:64
+#: apps/account/templates/account/auth/login.html:72
 msgid "Signin"
 msgstr "Entrar"
 
-#: apps/account/templates/account/password_reset.html:24
+#: apps/account/templates/account/auth/password_reset.html:24
 msgid "Recover your account"
 msgstr "Recuperar sua conta"
 
-#: apps/account/templates/account/password_reset.html:27
+#: apps/account/templates/account/auth/password_reset.html:27
 msgid "Enter your email to receive reset instructions"
 msgstr "Digite seu e-mail para receber instruções de redefinição"
 
-#: apps/account/templates/account/password_reset.html:53
+#: apps/account/templates/account/auth/password_reset.html:53
 msgid "Send instructions"
 msgstr "Enviar instruções"
 
-#: apps/account/templates/account/password_reset.html:58
-#: apps/account/templates/account/password_reset_done.html:29
+#: apps/account/templates/account/auth/password_reset.html:58
+#: apps/account/templates/account/auth/password_reset_done.html:29
 msgid "Back to login"
 msgstr "Voltar ao login"
 
-#: apps/account/templates/account/password_reset_complete.html:21
+#: apps/account/templates/account/auth/password_reset_complete.html:21
 msgid "Password changed successfully!"
 msgstr "Senha alterada com sucesso!"
 
-#: apps/account/templates/account/password_reset_complete.html:25
+#: apps/account/templates/account/auth/password_reset_complete.html:25
 msgid "You can now log in using your new password."
 msgstr "Agora você já pode entrar com sua nova senha."
 
-#: apps/account/templates/account/password_reset_complete.html:30
+#: apps/account/templates/account/auth/password_reset_complete.html:30
 msgid "Go to login"
 msgstr "Ir para o login"
 
-#: apps/account/templates/account/password_reset_confirm.html:21
+#: apps/account/templates/account/auth/password_reset_confirm.html:21
 #, fuzzy
 #| msgid "Set new password"
 msgid "Define a new password"
 msgstr "Definir nova senha"
 
-#: apps/account/templates/account/password_reset_confirm.html:41
+#: apps/account/templates/account/auth/password_reset_confirm.html:41
 msgid "Save new password"
 msgstr "Salvar nova senha"
 
-#: apps/account/templates/account/password_reset_done.html:20
+#: apps/account/templates/account/auth/password_reset_done.html:20
 msgid "Email sent!"
 msgstr "E-mail enviado!"
 
-#: apps/account/templates/account/password_reset_done.html:24
+#: apps/account/templates/account/auth/password_reset_done.html:24
 msgid ""
 "If the email you entered is registered, you will receive a link to reset "
 "your password."
@@ -133,179 +169,245 @@ msgstr ""
 "Se o e-mail informado estiver cadastrado, você receberá um link para "
 "redefinir sua senha."
 
-#: apps/account/templates/account/profile_edit.html:24
-msgid "My Profile"
-msgstr "Meu perfil"
-
-#: apps/account/templates/account/profile_edit.html:27
-msgid "View and edit your account information"
-msgstr "Veja e edite informações da sua conta"
-
-#: apps/account/templates/account/profile_edit.html:36
-msgid "Avatar"
-msgstr "Avatar"
-
-#: apps/account/templates/account/profile_edit.html:67
-#, fuzzy
-#| msgid "First Page"
-msgid "First name"
-msgstr "Primeira página"
-
-#: apps/account/templates/account/profile_edit.html:77
-#, fuzzy
-#| msgid "Last Page"
-msgid "Last name"
-msgstr "Última página"
-
-#: apps/account/templates/account/profile_edit.html:87
-msgid "Save changes"
-msgstr ""
-
-#: apps/account/templates/account/profile_edit.html:93
-#, fuzzy
-#| msgid "Create your account!"
-msgid "Delete my account"
-msgstr "Crie sua conta!"
-
-#: apps/account/templates/account/register.html:24
+#: apps/account/templates/account/auth/register.html:24
 msgid "Create your account!"
 msgstr "Crie sua conta!"
 
-#: apps/account/templates/account/register.html:27
+#: apps/account/templates/account/auth/register.html:27
 msgid "Join us! Create your account today"
 msgstr "Junte-se a nós! Crie sua conta hoje"
 
-#: apps/account/templates/account/register.html:48
+#: apps/account/templates/account/auth/register.html:48
 msgid "Register"
 msgstr "Registrar"
 
-#: apps/account/templates/account/register.html:52
+#: apps/account/templates/account/auth/register.html:52
 msgid "Already have an account?"
 msgstr "Já possui uma conta?"
 
-#: apps/account/templates/account/register.html:54
+#: apps/account/templates/account/auth/register.html:54
 msgid "Click here"
 msgstr "Clique aqui"
 
+#: apps/account/templates/account/includes/change_password_modal.html:8
+msgid "Change Password"
+msgstr "Alterar Senha"
+
+#: apps/account/templates/account/includes/change_password_modal.html:15
+msgid "Current Password"
+msgstr "Senha Atual"
+
+#: apps/account/templates/account/includes/change_password_modal.html:20
+msgid "New Password"
+msgstr "Nova Senha"
+
+#: apps/account/templates/account/includes/change_password_modal.html:25
+msgid "Confirm New Password"
+msgstr "Confirmar Nova Senha"
+
+#: apps/account/templates/account/includes/change_password_modal.html:32
+#: apps/account/templates/account/includes/deactivate_account_modal.html:20
+#: apps/converter/templates/converter/home.html:64
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: apps/account/templates/account/includes/change_password_modal.html:36
+msgid "Update"
+msgstr "Atualizar"
+
+#: apps/account/templates/account/includes/deactivate_account_modal.html:8
+#: apps/account/templates/account/profile/profile.html:97
+msgid "Delete my account"
+msgstr "Apagar minha conta"
+
+#: apps/account/templates/account/includes/deactivate_account_modal.html:12
+msgid "Your account will be deactivated and permanently deleted after 30 days."
+msgstr ""
+"Sua conta será desativada e excluida permanentemente depois de 30 dias."
+
+#: apps/account/templates/account/includes/deactivate_account_modal.html:24
+msgid "Deactivate"
+msgstr "Desativar"
+
+#: apps/account/templates/account/profile/profile.html:16
+msgid "Profile Information"
+msgstr "Informações do Perfil"
+
+#: apps/account/templates/account/profile/profile.html:22
+msgid "Email"
+msgstr "E-mail"
+
+#: apps/account/templates/account/profile/profile.html:32
+msgid "First Name"
+msgstr "Primeiro Nome"
+
+#: apps/account/templates/account/profile/profile.html:39
+msgid "Last Name"
+msgstr "Último Nome"
+
+#: apps/account/templates/account/profile/profile.html:51
+msgid "Save changes"
+msgstr "Salvar mudanças"
+
+#: apps/account/templates/account/profile/profile.html:61
+msgid "Security"
+msgstr "Segurança"
+
+#: apps/account/templates/account/profile/profile.html:65
+msgid "Update your password to keep your account secure."
+msgstr "Atualize sua senha para manter sua conta segura."
+
+#: apps/account/templates/account/profile/profile.html:75
+#, fuzzy
+#| msgid "Save new password"
+msgid "Change password"
+msgstr "Salvar nova senha"
+
+#: apps/account/templates/account/profile/profile.html:83
+msgid "Danger Zone"
+msgstr "Zona de Perigo"
+
+#: apps/account/templates/account/profile/profile.html:87
+msgid "Deleting your account is permanent and cannot be undone."
+msgstr "Deletando sua conta permanentemente não será possível reverter."
+
 #: apps/account/utils.py:53
-msgid "Password must be at least 8 characters long."
-msgstr "A senha deve ter pelo menos 8 caracteres."
+msgid "A senha deve ter pelo menos 8 caracteres."
+msgstr ""
 
 #: apps/account/utils.py:56
-msgid "Password must contain letters and numbers."
-msgstr "A senha deve conter letras e números."
+msgid "A senha deve conter letras e números."
+msgstr ""
 
-#: apps/account/utils.py:59
-msgid "Password must contain at least one special character."
-msgstr "A senha deve conter pelo menos um caractere especial."
+#: apps/account/utils.py:60
+msgid "A senha deve conter pelo menos um caractere especial."
+msgstr ""
 
-#: apps/billing/templates/billing/wallet.html:11
-#, fuzzy
-#| msgid "Actions"
+#: apps/account/views/auth.py:71
+msgid "Não foi possível entrar. Verifique seu usuário e senha."
+msgstr ""
+
+#: apps/account/views/auth.py:82
+msgid ""
+"Sua conta foi encerrada. Se acredita que isso é um engano, entre em contato "
+"com o suporte."
+msgstr ""
+
+#: apps/account/views/auth.py:101
+msgid "Usuário ou senha inválidos."
+msgstr ""
+
+#: apps/billing/templates/billing/wallet.html:12
 msgid "Subscriptions"
 msgstr "Inscrições"
 
-#: apps/billing/templates/billing/wallet.html:12
+#: apps/billing/templates/billing/wallet.html:13
 msgid "Choose a plan to continue"
 msgstr "Escolha um plano para continuar"
 
-#: apps/billing/templates/billing/wallet.html:39
+#: apps/billing/templates/billing/wallet.html:41
 msgid "month"
 msgstr "mês"
 
-#: apps/billing/templates/billing/wallet.html:42
+#: apps/billing/templates/billing/wallet.html:44
 msgid "Monthly credits"
 msgstr "Créditos mensais"
 
-#: apps/billing/templates/billing/wallet.html:49
+#: apps/billing/templates/billing/wallet.html:51
 msgid "Extended expiration"
 msgstr "Expiração extendida"
 
-#: apps/billing/templates/billing/wallet.html:52
+#: apps/billing/templates/billing/wallet.html:54
 msgid "No interstitial page"
-msgstr ""
+msgstr "Na página intermediária"
 
-#: apps/billing/templates/billing/wallet.html:55
+#: apps/billing/templates/billing/wallet.html:57
 msgid "Advanced statistics"
 msgstr "Estatísticas avançadas"
 
-#: apps/billing/templates/billing/wallet.html:58
+#: apps/billing/templates/billing/wallet.html:60
 msgid "Conditional redirect"
 msgstr "Redirecionamento Condicional"
 
-#: apps/billing/templates/billing/wallet.html:61
+#: apps/billing/templates/billing/wallet.html:63
 msgid "Priority support"
 msgstr "Suporte prioritário"
 
-#: apps/billing/templates/billing/wallet.html:68
+#: apps/billing/templates/billing/wallet.html:70
 msgid "Subscribe"
-msgstr "Inscrava-se"
+msgstr "Inscreva-se"
 
-#: apps/billing/templates/billing/wallet.html:78
+#: apps/billing/templates/billing/wallet.html:82
 msgid "Buy Credits"
 msgstr "Compre créditos"
 
-#: apps/billing/templates/billing/wallet.html:79
+#: apps/billing/templates/billing/wallet.html:83
 msgid "Select a package to continue"
-msgstr ""
+msgstr "Selecione um pacote para continuar"
 
-#: apps/billing/templates/billing/wallet.html:93
+#: apps/billing/templates/billing/wallet.html:98
 msgid "Credits"
 msgstr "Créditos"
 
-#: apps/billing/templates/billing/wallet.html:99
-msgid "Buy"
-msgstr "Compre"
+#: apps/billing/templates/billing/wallet.html:112
+msgid "Market temporarily closed"
+msgstr "Loja temporáriamente fechada"
 
-#: apps/billing/templates/billing/wallet.html:104
+#: apps/billing/templates/billing/wallet.html:114
+msgid "Buy"
+msgstr "Comprar"
+
+#: apps/billing/templates/billing/wallet.html:120
 msgid "Best value"
 msgstr "Melhor valor"
 
-#: apps/billing/templates/billing/wallet.html:128
+#: apps/billing/templates/billing/wallet.html:145
 #, fuzzy
 #| msgid "Your username"
 msgid "Your statement"
 msgstr "Seu nome de usuário"
 
-#: apps/billing/templates/billing/wallet.html:129
+#: apps/billing/templates/billing/wallet.html:146
 msgid "See your latest transactions"
 msgstr "Veja suas ultimas transações"
 
-#: apps/billing/templates/billing/wallet.html:169
+#: apps/billing/templates/billing/wallet.html:186
 msgid "Credit"
 msgstr "Crédito"
 
-#: apps/billing/templates/billing/wallet.html:180
+#: apps/billing/templates/billing/wallet.html:197
 msgid "You don't have any transactions yet"
 msgstr "Você ainda não tem nenhuma transação"
 
-#: apps/billing/templates/billing/wallet.html:184
+#: apps/billing/templates/billing/wallet.html:201
 msgid ""
 "Once you purchase credits or subscribe to a plan, your history will appear "
 "here."
-msgstr "Assim que você comprar créditos ou assinar um plano, seu histórico aparecerá aqui."
+msgstr ""
+"Assim que você comprar créditos ou assinar um plano, seu histórico aparecerá "
+"aqui."
 
-#: apps/billing/templates/billing/wallet.html:192
+#: apps/billing/templates/billing/wallet.html:209
 #: apps/dashboard/templates/dashboard/all_urls_list.html:151
 msgid "First Page"
 msgstr "Primeira página"
 
-#: apps/billing/templates/billing/wallet.html:197
+#: apps/billing/templates/billing/wallet.html:214
 #: apps/dashboard/templates/dashboard/all_urls_list.html:158
 msgid "Previous Page"
 msgstr "Página anterior"
 
-#: apps/billing/templates/billing/wallet.html:216
+#: apps/billing/templates/billing/wallet.html:233
 #: apps/dashboard/templates/dashboard/all_urls_list.html:177
 msgid "of"
 msgstr "de"
 
-#: apps/billing/templates/billing/wallet.html:221
+#: apps/billing/templates/billing/wallet.html:238
 #: apps/dashboard/templates/dashboard/all_urls_list.html:182
 msgid "Next Page"
 msgstr "Próxima página"
 
-#: apps/billing/templates/billing/wallet.html:226
+#: apps/billing/templates/billing/wallet.html:243
 #: apps/dashboard/templates/dashboard/all_urls_list.html:189
 msgid "Last Page"
 msgstr "Última página"
@@ -342,7 +444,8 @@ msgid "Contact"
 msgstr "Contato"
 
 #: apps/common/templates/common/includes/aside.html:34
-#: apps/common/templates/common/includes/header.html:107
+#: apps/common/templates/common/includes/header.html:93
+#: apps/common/templates/common/includes/header.html:154
 msgid "Logout"
 msgstr "Sair"
 
@@ -375,23 +478,27 @@ msgstr "Desenvolvido por"
 msgid "All rights reserved."
 msgstr "Todos os direitos reservados."
 
-#: apps/common/templates/common/includes/header.html:56
+#: apps/common/templates/common/includes/header.html:49
+#: apps/common/templates/common/includes/header.html:138
 msgid "Login"
 msgstr "Entrar"
 
-#: apps/common/templates/common/includes/header.html:64
+#: apps/common/templates/common/includes/header.html:55
+#: apps/common/templates/common/includes/header.html:139
 msgid "Create Account"
 msgstr "Criar Conta"
 
-#: apps/common/templates/common/includes/header.html:91
+#: apps/common/templates/common/includes/header.html:77
+#: apps/common/templates/common/includes/header.html:143
 msgid "Dashboard"
 msgstr "Painel"
 
-#: apps/common/templates/common/includes/header.html:97
+#: apps/common/templates/common/includes/header.html:83
+#: apps/common/templates/common/includes/header.html:147
 #, fuzzy
 #| msgid "Create Account"
 msgid "My Account"
-msgstr "Criar Conta"
+msgstr "Minha Conta"
 
 #: apps/converter/forms.py:14
 #: apps/dashboard/templates/dashboard/all_urls_list.html:37
@@ -426,10 +533,6 @@ msgid ""
 msgstr ""
 "Esta URL já foi encurtada e ainda está ativa. Deseja criar um novo link "
 "encurtado para o mesmo destino?"
-
-#: apps/converter/templates/converter/home.html:64
-msgid "Cancel"
-msgstr "Cancelar"
 
 #: apps/converter/templates/converter/home.html:71
 msgid "Create New"
@@ -489,7 +592,7 @@ msgstr "Nenhum link encontrado."
 
 #: apps/dashboard/templates/dashboard/home.html:16
 msgid "Administrative Panel"
-msgstr ""
+msgstr "Painel Adminsitrativo"
 
 #: apps/dashboard/templates/dashboard/home.html:19
 msgid "View and manage all your shortened links"
@@ -507,7 +610,7 @@ msgstr "Você não criou nenhum link ainda"
 msgid ""
 "Once you shorten a URL, it will appear here so you can track clicks and "
 "statistics."
-msgstr ""
+msgstr "Ao encurtar uma URL, ela vai aparecer aqui e você poderá ver os cliques e estatísticas."
 
 #: apps/dashboard/templates/dashboard/includes/charts/urls_list.html:79
 msgid "Create first link"
@@ -518,6 +621,12 @@ msgstr "Crie o primeiro link"
 #| msgid "Short Link"
 msgid "Short link"
 msgstr "Link curto"
+
+#: apps/dashboard/templates/dashboard/includes/charts/urls_list.html:118
+#, fuzzy
+#| msgid "Clicks"
+msgid "Clicks:"
+msgstr "Cliques"
 
 #: apps/dashboard/templates/dashboard/includes/charts/urls_list.html:134
 msgid "View all"
@@ -679,6 +788,40 @@ msgstr ""
 "Podemos usar cookies e tecnologias de rastreamento semelhantes para melhorar "
 "o desempenho do site, fornecer conteúdo personalizado e aprimorar sua "
 "experiência geral na Shortly."
+
+#~ msgid "Deactivate Account"
+#~ msgstr "Desativar Conta"
+
+#~ msgid "Important Data"
+#~ msgstr "Dados importantes"
+
+#~ msgid "Personal Informations"
+#~ msgstr "Informações Pessoais"
+
+#~ msgid "My Profile"
+#~ msgstr "Meu perfil"
+
+#~ msgid ""
+#~ "Your profile is a record of your personal information that defines who "
+#~ "you are."
+#~ msgstr ""
+#~ "Seu perfil é um registro das suas informações pessoais que define quem "
+#~ "você é."
+
+#~ msgid "View and edit your account information"
+#~ msgstr "Veja e edite informações da sua conta"
+
+#~ msgid "Avatar"
+#~ msgstr "Avatar"
+
+#~ msgid "Password must be at least 8 characters long."
+#~ msgstr "A senha deve ter pelo menos 8 caracteres."
+
+#~ msgid "Password must contain letters and numbers."
+#~ msgstr "A senha deve conter letras e números."
+
+#~ msgid "Password must contain at least one special character."
+#~ msgstr "A senha deve conter pelo menos um caractere especial."
 
 #~ msgid "The password must be at least 8 characters long."
 #~ msgstr "A senha deve ter pelo menos 8 caracteres."

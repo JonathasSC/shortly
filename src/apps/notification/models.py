@@ -1,8 +1,10 @@
 from django.db import models
 from django.utils import timezone
 
+from apps.common.models import BaseModelAbstract
 
-class Announcement(models.Model):
+
+class Announcement(BaseModelAbstract):
     title = models.CharField(max_length=150, verbose_name="Título")
 
     message = models.TextField(verbose_name="Mensagem")
@@ -13,15 +15,13 @@ class Announcement(models.Model):
         default=False, verbose_name="Exibir apenas uma vez por usuário"
     )
 
-    start_at = models.DateTimeField(default=timezone.now, verbose_name="Início da exibição")
+    start_at = models.DateTimeField(
+        default=timezone.now, verbose_name="Início da exibição")
+    end_at = models.DateTimeField(
+        null=True, blank=True, verbose_name="Fim da exibição (opcional)")
 
-    end_at = models.DateTimeField(null=True, blank=True, verbose_name="Fim da exibição (opcional)")
-
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Criado em")
-
-    updated_at = models.DateTimeField(auto_now=True, verbose_name="Atualizado em")
-
-    display_order = models.PositiveIntegerField(default=0, unique=True, verbose_name="Ordem de exibição")
+    display_order = models.PositiveIntegerField(
+        default=0, unique=True, verbose_name="Ordem de exibição")
 
     class Meta:
         ordering = ["display_order", "-start_at"]

@@ -7,7 +7,7 @@
 {% block header %}
 <header class="fixed w-full bg-white z-50 ">
   <div class="border-box px-4 py-3 flex items-center justify-start">
-    <a href="{% url 'home' %}" class="text-2xl font-bold text-gray-800">
+    <a href="{% url 'converter:home' %}" class="text-2xl font-bold text-gray-800">
       <img class='w-36' src="{% static '/common/svg/logo/without_bg_with_text_blue.svg' %}" alt='logo do shortly'>
     </a>  
   </div>
@@ -50,7 +50,7 @@
             
             <p class="text-center mt-2 text-sm sm:text-base">
                 {% trans "Already have an account?" %}
-                <a href="{% url 'login' %}" class="text-blue-500">
+                <a href="{% url 'account:login' %}" class="text-blue-500">
                     {% trans "Click here" %}
                 </a>
             </p>
