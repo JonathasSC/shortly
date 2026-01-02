@@ -29,7 +29,7 @@ class User(BaseModelAbstract, AbstractUser):
         ).exists()
 
 
-class UserDeletionSchedule(models.Model):
+class UserDeletionSchedule(BaseModelAbstract):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     requested_at = models.DateTimeField(auto_now_add=True)
     scheduled_for = models.DateTimeField()

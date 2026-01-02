@@ -22,7 +22,6 @@ class RegisterViewTests(TestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("account:login"))
-
         self.assertTrue(User.objects.filter(username="newuser").exists())
 
     def test_register_fails_with_mismatched_passwords(self):
