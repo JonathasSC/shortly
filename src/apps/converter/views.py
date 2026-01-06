@@ -9,6 +9,7 @@ from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
+from django.utils.translation import gettext_lazy as translate
 from django.views import View
 
 from apps.billing.models import UserWallet
@@ -100,7 +101,7 @@ class HomeView(View):
         WalletService.debit(
             wallet=wallet,
             amount=cost,
-            source=_("URL shortening"),
+            source=translate("URL shortening"),
         )
 
         return True
