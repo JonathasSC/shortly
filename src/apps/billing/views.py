@@ -13,7 +13,8 @@ from django.views.generic import TemplateView
 from apps.billing.domain import Pricing
 from apps.billing.dto import CheckoutPreferenceDTO
 from apps.billing.models import Plan, UserWallet, WalletTransaction
-from apps.billing.services import MercadoPagoService
+from apps.billing.services.mp_service import MercadoPagoService
+
 
 logger = logging.getLogger(__name__)
 

@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils.html import format_html
 
 from apps.billing.models import Plan, UserSubscription, UserWallet, WalletTransaction
 
@@ -46,8 +47,9 @@ class WalletTransactionAdmin(admin.ModelAdmin):
     list_filter = ("transaction_type", "created_at")
     search_fields = ("wallet__user__username", "external_reference")
 
-    def has_change_permission(self, request, obj=None):
-        return False
+    def safe_user(self, obj):
+        if obj.wallet and obj.wallet.user:
+            return obj.wallet.user
+        return format_html("<i>Usuário removido</i>")
 
-    def has_delete_permission(self, request, obj=None):
-        return False
+    safe_user.short_description = "Usuário"

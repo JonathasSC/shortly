@@ -2,13 +2,14 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models.signals import post_save
+from django.core.exceptions import ValidationError
 from django.test import TransactionTestCase
 
 from apps.billing.models import UserWallet, WalletTransaction
-from apps.billing.signals import add_new_user_coins
+from apps.billing.signals import bootstrap_user_wallet
 from apps.common.models import BaseModelAbstract
 from apps.common.utils import CommonUtils
-from apps.notification.signals import send_welcome_on_signup
+from apps.notification.signals import enqueue_welcome_email
 
 User = get_user_model()
 
@@ -26,13 +27,13 @@ class WalletTransactionTestCase(TransactionTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        post_save.disconnect(add_new_user_coins, sender=User)
-        post_save.disconnect(send_welcome_on_signup, sender=User)
+        post_save.disconnect(bootstrap_user_wallet, sender=User)
+        post_save.disconnect(enqueue_welcome_email, sender=User)
 
     @classmethod
     def tearDownClass(cls):
-        post_save.connect(add_new_user_coins, sender=User)
-        post_save.connect(send_welcome_on_signup, sender=User)
+        post_save.connect(bootstrap_user_wallet, sender=User)
+        post_save.connect(enqueue_welcome_email, sender=User)
         super().tearDownClass()
 
     def setUp(self):
@@ -55,8 +56,9 @@ class WalletTransactionTestCase(TransactionTestCase):
             status=WalletTransaction.Status.PENDING,
             source="Test",
         )
-        self.assertEqual(wallet_transaction.status, WalletTransaction.Status.PENDING)
-        self.assertEqual(self.wallet.balance, 0)  # saldo não aplicado ainda
+        self.assertEqual(wallet_transaction.status,
+                         WalletTransaction.Status.PENDING)
+        self.assertEqual(self.wallet.balance, 0)
 
     def test_process_success_adds_balance(self):
         wallet_transaction = WalletTransaction.objects.create(
@@ -68,7 +70,8 @@ class WalletTransactionTestCase(TransactionTestCase):
         )
         wallet_transaction.process_success()
         self.wallet.refresh_from_db()
-        self.assertEqual(wallet_transaction.status, WalletTransaction.Status.SUCCESS)
+        self.assertEqual(wallet_transaction.status,
+                         WalletTransaction.Status.SUCCESS)
         self.assertEqual(self.wallet.balance, 50)
 
     def test_process_failed_does_not_change_balance(self):
@@ -81,7 +84,8 @@ class WalletTransactionTestCase(TransactionTestCase):
         )
         wallet_transaction.process_failed()
         self.wallet.refresh_from_db()
-        self.assertEqual(wallet_transaction.status, WalletTransaction.Status.FAILED)
+        self.assertEqual(wallet_transaction.status,
+                         WalletTransaction.Status.FAILED)
         self.assertEqual(self.wallet.balance, 0)
 
     def test_refund_transaction(self):
@@ -98,7 +102,8 @@ class WalletTransactionTestCase(TransactionTestCase):
         wallet_transaction.refund()
 
         self.wallet.refresh_from_db()
-        self.assertEqual(wallet_transaction.status, WalletTransaction.Status.REFUNDED)
+        self.assertEqual(wallet_transaction.status,
+                         WalletTransaction.Status.REFUNDED)
         self.assertEqual(self.wallet.balance, 0)
 
     def test_debit_transaction(self):
@@ -119,7 +124,7 @@ class WalletTransactionTestCase(TransactionTestCase):
         self.assertEqual(self.wallet.balance, 60)
 
     def test_debit_transaction_insufficient_balance_raises(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(ValidationError):
             WalletTransaction.objects.create(
                 wallet=self.wallet,
                 amount=10,

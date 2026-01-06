@@ -1,6 +1,9 @@
 from datetime import timedelta
 
-from axes.decorators import axes_dispatch
+from apps.account.dtos.create_user_dto import CreateUserDTO
+from apps.account.dtos.login_user_dto import LoginUserDTO
+from apps.account.services.create_user_service import CreateUserService
+from apps.account.services.login_user_service import LoginUserService
 from django.contrib import messages
 from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -14,10 +17,8 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.utils import timezone
-from django.utils.decorators import method_decorator
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as translate
 from django.views import View
-from django.views.generic.edit import CreateView
 
 from apps.account.forms.auth import CustomLoginForm, CustomRegisterForm
 from apps.account.models import UserDeletionSchedule
@@ -25,11 +26,22 @@ from apps.account.models import UserDeletionSchedule
 User = get_user_model()
 
 
-@method_decorator(axes_dispatch, name="dispatch")
-class UserRegisterView(CreateView):
-    form_class = CustomRegisterForm
+class UserRegisterView(View):
     template_name = "account/auth/register.html"
-    success_url = reverse_lazy("account:login")
+
+    def get(self, request):
+        return render(request, self.template_name, {'form': CustomRegisterForm()})
+
+    def post(self, request):
+        form = CustomRegisterForm(request.POST)
+
+        if not form.is_valid():
+            return render(request, self.template_name, {'form': form})
+
+        dto = CreateUserDTO(**form.cleaned_data)
+        CreateUserService.execute(dto)
+
+        return redirect("account:login")
 
 
 class UserLoginView(View):
@@ -45,63 +57,25 @@ class UserLoginView(View):
         form = self.form_class(request.POST)
 
         if not form.is_valid():
-            return render(
-                request,
-                self.template_name,
-                {"form": form},
-                status=400,
-            )
+            return render(request, self.template_name, {"form": form})
 
-        username = form.cleaned_data["username"]
-        password = form.cleaned_data["password"]
+        dto = LoginUserDTO(**form.cleaned_data)
+        result = LoginUserService.execute(request, dto)
 
-        try:
-            user_obj = User.objects.get(username=username)
-        except User.DoesNotExist:
-            messages.error(request, _(
-                "Não foi possível entrar. Verifique seu usuário e senha."))
-            return render(
-                request,
-                self.template_name,
-                {"form": self.form_class()},
-                status=400,
-            )
+        if not result.success:
+            self._handle_error(request, result.error_code)
+            return render(request, self.template_name, {"form": form}, status=400)
 
-        if not user_obj.is_active:
-            messages.error(
-                request,
-                _("Sua conta foi encerrada. "
-                  "Se acredita que isso é um engano, entre em contato com o suporte.")
-            )
-            return render(
-                request,
-                self.template_name,
-                {"form": self.form_class()},
-                status=403,
-            )
-
-        user = authenticate(
-            request=request,
-            username=username,
-            password=password,
-        )
-
-        if user is None:
-            messages.error(
-                request,
-                _("Usuário ou senha inválidos.")
-            )
-
-            return render(
-                request,
-                self.template_name,
-                {"form": self.form_class()},
-                status=400,
-            )
-
-        login(request, user)
-
+        login(request, result.user)
         return redirect("converter:home")
+
+    def _handle_error(self, request, error_code):
+        errors = {
+            "invalid_credentials": translate("Usuário ou senha inválidos."),
+            "inactive_user": translate("Sua conta foi encerrada."),
+        }
+        messages.error(request, errors.get(
+            error_code, translate("Erro inesperado.")))
 
 
 class UserLogoutView(View):

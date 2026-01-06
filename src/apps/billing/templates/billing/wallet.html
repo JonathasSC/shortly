@@ -5,7 +5,6 @@
 
 {% block content %}
 <main class="w-full flex-col mt-16 flex items-center justify-center">
-    {% if user|feature_enabled:"market_closed" %}
     <div class="p-6 w-full max-w-[1440px] space-y-6">
         <div class="flex justify-between items-center">
             <div>
@@ -66,8 +65,6 @@
         </div>
         {% endif %}
     </div>
-    {% endif %}
-
 
     <div class="p-6 w-full max-w-[1440px] space-y-6">
         <div class="flex justify-between items-center">

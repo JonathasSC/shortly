@@ -2,7 +2,7 @@
 from django.contrib.auth import get_user_model
 from django.db.models.signals import post_save
 
-from apps.notification.signals import send_welcome_on_signup
+from apps.notification.signals import enqueue_welcome_email
 
 User = get_user_model()
 
@@ -12,4 +12,4 @@ class CommonUtils:
         pass
 
     def disable_welcome_signal(self):
-        post_save.disconnect(send_welcome_on_signup, sender=User)
+        post_save.disconnect(enqueue_welcome_email, sender=User)

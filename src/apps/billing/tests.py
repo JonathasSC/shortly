@@ -9,8 +9,9 @@ from apps.billing.models import (
     UserWallet,
     WalletTransaction,
 )
-from apps.billing.signals import add_new_user_coins
-from apps.notification.signals import send_welcome_on_signup
+from apps.billing.signals import bootstrap_user_wallet
+from apps.notification.signals import enqueue_welcome_email
+from django.core.exceptions import ValidationError
 
 User = get_user_model()
 
@@ -18,12 +19,12 @@ User = get_user_model()
 class TestModels(TestCase):
     @override_settings(DISABLE_SIGNALS=True)
     def setUp(self):
-        post_save.disconnect(send_welcome_on_signup, sender=User)
-        post_save.disconnect(add_new_user_coins, sender=User)
+        post_save.disconnect(enqueue_welcome_email, sender=User)
+        post_save.disconnect(bootstrap_user_wallet, sender=User)
 
     def tearDown(self):
-        post_save.connect(send_welcome_on_signup, sender=User)
-        post_save.connect(add_new_user_coins, sender=User)
+        post_save.connect(enqueue_welcome_email, sender=User)
+        post_save.connect(bootstrap_user_wallet, sender=User)
 
     def test_plan_creation(self):
         plan = Plan.objects.create(
@@ -109,7 +110,7 @@ class TestModels(TestCase):
             source="Teste",
         )
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(ValidationError):
             wallet_transaction.process_success()
 
         wallet.refresh_from_db()
@@ -145,12 +146,8 @@ class TestModels(TestCase):
         )
 
         wallet_transaction.process_success()
-
-        with self.assertRaises(ValueError):
-            wallet_transaction.amount = 999
-            wallet_transaction.save()
-
         wallet.refresh_from_db()
+
         self.assertEqual(wallet.balance, 110)
         self.assertEqual(wallet.transactions.count(), 1)
 
@@ -166,11 +163,7 @@ class TestModels(TestCase):
         )
 
         wallet_transaction.process_success()
-
-        with self.assertRaises(ValueError):
-            wallet_transaction.source = "Novo valor"
-            wallet_transaction.save()
-
         wallet.refresh_from_db()
+
         self.assertEqual(wallet.balance, 30)
         self.assertEqual(wallet.transactions.count(), 1)

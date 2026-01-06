@@ -6,6 +6,7 @@ from django.db import transaction
 
 from apps.billing.dto import PaymentDataDTO
 from apps.billing.models import UserWallet, WalletTransaction
+from apps.billing.services.wallet_service import WalletService
 
 logger = logging.getLogger(__name__)
 
@@ -40,18 +41,12 @@ def process_payment_task(self, data: PaymentDataDTO):
 
         try:
             with transaction.atomic():
-                wallet_transaction = WalletTransaction.objects.create(
+                wallet_transaction = WalletService.credit(
                     wallet=wallet,
                     amount=data.amount,
-                    transaction_type=WalletTransaction.TransactionType.CREDIT,
-                    status=WalletTransaction.Status.PENDING,
                     source=f"CRED {data.amount} via Mercado Pago",
                     external_reference=str(data.payment_id),
                 )
-                logger.info(
-                    f"[TASK] Transação criada | wallet_transaction_id={wallet_transaction.id} status=PENDING")
-
-                wallet_transaction.process_success()
                 logger.info(
                     f"[TASK] Transação marcada como SUCCESS | wallet_transaction_id={wallet_transaction.id}")
 

@@ -1,5 +1,5 @@
 from django import forms
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as translate
 
 from apps.account.models import User
 from apps.account.utils import AuthenticationUtils
@@ -7,33 +7,33 @@ from apps.account.utils import AuthenticationUtils
 
 class CustomRegisterForm(forms.ModelForm):
     username = forms.CharField(
-        label=_("Username"),
+        label=translate("Username"),
         widget=forms.TextInput(attrs={
-            'placeholder': _("Your username"),
+            'placeholder': translate("Your username"),
             'class': 'w-full text-sm sm:text-md p-2 border border-zinc-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500',
         })
     )
 
     email = forms.CharField(
-        label=_("E-mail address"),
+        label=translate("E-mail address"),
         widget=forms.EmailInput(attrs={
-            'placeholder': _("example@email.com"),
+            'placeholder': translate("example@email.com"),
             'class': 'w-full text-sm sm:text-md p-2 border border-zinc-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500',
         })
     )
 
     password = forms.CharField(
-        label=_("Password"),
+        label=translate("Password"),
         widget=forms.PasswordInput(attrs={
-            'placeholder': _("Your secure password"),
+            'placeholder': translate("Your secure password"),
             'class': 'w-full text-sm sm:text-md p-2 border border-zinc-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500',
         })
     )
 
     confirm_password = forms.CharField(
-        label=_("Confirm password"),
+        label=translate("Confirm password"),
         widget=forms.PasswordInput(attrs={
-            'placeholder': _("Confirm your password"),
+            'placeholder': translate("Confirm your password"),
             'class': 'w-full text-sm sm:text-md p-2 border border-zinc-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500',
         })
     )
@@ -57,7 +57,7 @@ class CustomRegisterForm(forms.ModelForm):
         confirm_password = cleaned_data.get('confirm_password')
 
         if password and confirm_password and password != confirm_password:
-            raise forms.ValidationError(_("Passwords do not match."))
+            raise forms.ValidationError(translate("Passwords do not match."))
 
         return cleaned_data
 
@@ -71,17 +71,17 @@ class CustomRegisterForm(forms.ModelForm):
 
 class CustomLoginForm(forms.Form):
     username = forms.CharField(
-        label=_("Username"),
+        label=translate("Username"),
         widget=forms.TextInput(attrs={
-            'placeholder': _("Seu nome de usuário"),
+            'placeholder': translate("Seu nome de usuário"),
             'class': 'w-full text-sm sm:text-md p-2 border border-zinc-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500',
         })
     )
 
     password = forms.CharField(
-        label=_("Password"),
+        label=translate("Password"),
         widget=forms.PasswordInput(attrs={
-            'placeholder': _("Sua senha"),
+            'placeholder': translate("Sua senha"),
             'class': 'w-full text-sm sm:text-md p-2 border border-zinc-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500',
         })
     )

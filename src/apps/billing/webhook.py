@@ -3,6 +3,7 @@ import hmac
 import json
 import logging
 
+from apps.billing.services.wallet_service import WalletService
 import mercadopago
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -14,7 +15,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from apps.billing.dto import PaymentDataDTO
 from apps.billing.models import UserWallet, WalletTransaction
-from apps.billing.services import MercadoPagoService
+from apps.billing.services.mp_service import MercadoPagoService
 from apps.billing.tasks import process_payment_task
 
 logger = logging.getLogger(__name__)
@@ -54,14 +55,12 @@ class MercadoPagoWebhookView(View):
         wallet, _ = UserWallet.objects.get_or_create(user_id=user_id)
 
         with transaction.atomic():
-            wallet_transaction = WalletTransaction.objects.create(
+            WalletService.credit(
                 wallet=wallet,
                 amount=amount,
-                transaction_type=WalletTransaction.TransactionType.CREDIT,
                 source=f"Crédito via Mercado Pago: {amount}",
                 external_reference=str(payment_id),
             )
-            wallet_transaction.process_success()
 
         logger.info(f"[CREDITO] Sucesso | user={user_id} amount={amount}")
         return {"status": "wallet_updated"}

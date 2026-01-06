@@ -1,42 +1,25 @@
 import time
 
 from celery import shared_task
-from django.conf import settings
-from django.core.mail import EmailMultiAlternatives
-from django.template.loader import render_to_string
-from django.utils import timezone
-
-from apps.account.models import User
+from apps.notification.models import EmailOutbox
+from apps.notification.mailers import send_welcome_email
 
 
-@shared_task(bind=True, max_retries=5, default_retry_delay=3)
-def send_welcome_email_task(self, user_id: int):
-    try:
-        for attempt in range(5):
-            try:
-                user = User.objects.get(id=user_id)
-                break
-            except User.DoesNotExist:
-                if attempt == 4:
-                    raise
-                time.sleep(0.5)
+@shared_task(bind=True, autoretry_for=(Exception,), retry_kwargs={"max_retries": 5, "countdown": 10})
+def process_email_outbox_task(self):
+    for outbox in EmailOutbox.objects.select_for_update(skip_locked=True).filter(status="pending")[:20]:
+        try:
+            if outbox.template == "welcome":
+                send_welcome_email(outbox.user)
 
-        subject = "Bem-vindo à nossa plataforma!"
-        from_email = settings.DEFAULT_FROM_EMAIL
-        to = [user.email]
+            outbox.status = EmailOutbox.Status.SENT
+            outbox.save(update_fields=["status"])
 
-        context = {"user": user, "current_year": timezone.now().year}
+        except Exception as exc:
+            outbox.attempts += 1
+            outbox.last_error = str(exc)
 
-        html_content = render_to_string(
-            "notification/email/welcome.html", context)
-        text_content = f"Olá {user.username}, bem-vindo à nossa plataforma!"
+            if outbox.attempts >= 5:
+                outbox.status = EmailOutbox.Status.FAILED
 
-        msg = EmailMultiAlternatives(subject, text_content, from_email, to)
-        msg.attach_alternative(html_content, "text/html")
-        msg.send()
-
-    except User.DoesNotExist as exc:
-        raise self.retry(exc=exc, countdown=3)
-
-    except Exception as exc:
-        raise self.retry(exc=exc, countdown=5)
+            outbox.save(update_fields=["attempts", "status", "last_error"])

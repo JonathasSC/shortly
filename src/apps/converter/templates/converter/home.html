@@ -18,21 +18,47 @@
         </div>
 
         <div>
-            <form method="post" class="border rounded-xl flex flex-col gap-2 p-4 border-zinc-200">
+            <form method="post" class="border rounded-xl flex flex-col gap-3 p-4 border-zinc-200">
                 {% csrf_token %}
 
-                {% for field in form %}
-                <div>
-                    <label for="{{ field.id_for_label }}" class="block font-extrabold text-sm sm:text-md font-medium mb-1">
-                        {% trans field.label %}
-                    </label>
-                    {{ field }}
-                    {% if field.errors %}
-                        <p class="text-red-500 text-sm mt-1">{{ field.errors }}</p>
+                <div class="flex gap-4">
+                    <div class="flex flex-col flex-1 h-fit gap-4">
+                        <label for="{{ form.original_url.id_for_label }}" class="block font-extrabold text-sm sm:text-md">
+                            {% trans "Original URL" %}
+                        </label>
+                        {{ form.original_url }}
+    
+                        {% if form.original_url.errors %}
+                            <p class="text-red-500 text-sm mt-1">{{ form.original_url.errors }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    {% if request.user.is_authenticated %}
+                    <div id="is_direct_container" class="flex w-32 flex-col items-center justify-center gap-5">  
+                            <label class="block font-bold text-sm sm:text-md">
+                                {% trans "Direct Link" %}
+                            </label>
+    
+                            <label for="{{ form.is_direct.id_for_label }}" class="relative inline-flex items-center cursor-pointer">
+                                {{ form.is_direct }}
+                                <div class="w-11 h-6 bg-zinc-200 peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full
+                                            peer peer-checked:bg-blue-600 transition-colors"></div>
+                                <div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform
+                                            peer-checked:translate-x-5"></div>
+                            </label>
+    
+                            {% if form.is_direct.errors %}
+                                <p class="text-red-500 text-sm mt-1">{{ form.is_direct.errors }}</p>
+                            {% endif %}
+                        </div>
                     {% endif %}
                 </div>
-                {% endfor %}
-
+                
+                <div id="direct-cost-warning"
+                    class="hidden text-sm text-center text-blue-500">
+                    {% trans "Direct links cost 2 coins." %}
+                </div>
+                                
                 <button type="submit" class="btn w-full justify-center bg-blue-500 text-white hover:bg-blue-600 transition">
                     {% trans "Shorten" %}
                 </button>
@@ -73,6 +99,7 @@
             </form>
         </div>
     </div>
+
 </div>
 
 {% include 'notification/includes/news_modal.html' %}
@@ -82,4 +109,22 @@
 {% block scripts %}
 <script src="{% static 'converter/js/utilities.js' %}"></script>
 <script src="{% static 'converter/js/announcements.js' %}"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const checkbox = document.getElementById("id_is_direct")
+    const warning = document.getElementById("direct-cost-warning")
+    console.log(checkbox)
+    console.log(warning)
+
+    if (!checkbox || !warning) return
+
+    function sync() {
+        warning.classList.toggle("hidden", !checkbox.checked)
+    }
+
+    checkbox.addEventListener("change", sync)
+    sync()
+})
+</script>
 {% endblock %}

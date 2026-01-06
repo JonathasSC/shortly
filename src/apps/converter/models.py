@@ -34,6 +34,8 @@ class Url(BaseModelAbstract):
         help_text="IP do usuário anônimo que criou a URL"
     )
 
+    is_direct = models.BooleanField(default=False)
+
     def save(self, *args, **kwargs):
         if not self.short_code:
             self.short_code = short_code_generator.generate_unique(

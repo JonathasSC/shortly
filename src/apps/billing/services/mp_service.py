@@ -48,11 +48,3 @@ class MercadoPagoService(PaymentAbstract):
                 "status": 500,
                 "response": {"error": str(e)},
             }
-
-
-class SubscriptionService:
-    @staticmethod
-    def activate(user_id, plan_id):
-        UserSubscription.objects.update_or_create(
-            user_id=user_id, defaults={"plan_id": plan_id, "is_active": True}
-        )

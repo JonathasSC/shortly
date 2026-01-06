@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 
 from apps.common.models import BaseModelAbstract
+from django.conf import settings
 
 
 class Announcement(BaseModelAbstract):
@@ -40,3 +41,19 @@ class Announcement(BaseModelAbstract):
         if self.end_at and now > self.end_at:
             return False
         return True
+
+
+class EmailOutbox(BaseModelAbstract):
+    class Status(models.TextChoices):
+        PENDING = "pending"
+        SENT = "sent"
+        FAILED = "failed"
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE)
+    template = models.CharField(max_length=50)
+    status = models.CharField(
+        max_length=10, choices=Status.choices, default=Status.PENDING)
+    attempts = models.PositiveSmallIntegerField(default=0)
+    last_error = models.TextField(blank=True, null=True)
+
