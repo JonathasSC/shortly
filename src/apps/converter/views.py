@@ -9,10 +9,9 @@ from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
-from django.utils.translation import gettext as _
 from django.views import View
 
-from apps.billing.models import UserWallet, WalletTransaction
+from apps.billing.models import UserWallet
 from apps.billing.services.wallet_service import WalletService
 from apps.converter.forms import UrlForm
 from apps.converter.models import AccessEvent, Url

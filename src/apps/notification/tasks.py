@@ -1,8 +1,8 @@
-import time
 
 from celery import shared_task
-from apps.notification.models import EmailOutbox
+
 from apps.notification.mailers import send_welcome_email
+from apps.notification.models import EmailOutbox
 
 
 @shared_task(bind=True, autoretry_for=(Exception,), retry_kwargs={"max_retries": 5, "countdown": 10})

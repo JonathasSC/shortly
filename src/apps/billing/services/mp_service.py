@@ -2,7 +2,6 @@ import logging
 
 from apps.billing.abstracts import PaymentAbstract
 from apps.billing.dto import CheckoutPreferenceDTO
-from apps.billing.models import UserSubscription
 
 logger = logging.getLogger(__name__)
 

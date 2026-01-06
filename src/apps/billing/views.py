@@ -15,7 +15,6 @@ from apps.billing.dto import CheckoutPreferenceDTO
 from apps.billing.models import Plan, UserWallet, WalletTransaction
 from apps.billing.services.mp_service import MercadoPagoService
 
-
 logger = logging.getLogger(__name__)
 
 

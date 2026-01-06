@@ -1,11 +1,7 @@
 from datetime import timedelta
 
-from apps.account.dtos.create_user_dto import CreateUserDTO
-from apps.account.dtos.login_user_dto import LoginUserDTO
-from apps.account.services.create_user_service import CreateUserService
-from apps.account.services.login_user_service import LoginUserService
 from django.contrib import messages
-from django.contrib.auth import authenticate, get_user_model, login, logout
+from django.contrib.auth import get_user_model, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import (
     PasswordResetCompleteView,
@@ -20,8 +16,12 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as translate
 from django.views import View
 
+from apps.account.dtos.create_user_dto import CreateUserDTO
+from apps.account.dtos.login_user_dto import LoginUserDTO
 from apps.account.forms.auth import CustomLoginForm, CustomRegisterForm
 from apps.account.models import UserDeletionSchedule
+from apps.account.services.create_user_service import CreateUserService
+from apps.account.services.login_user_service import LoginUserService
 
 User = get_user_model()
 

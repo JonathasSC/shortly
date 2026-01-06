@@ -2,12 +2,10 @@ from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
-from apps.billing.models import UserWallet, WalletTransaction
 from django.utils.translation import gettext_lazy as translate
 
+from apps.billing.models import UserWallet
 from apps.billing.services.wallet_service import WalletService
-
 
 User = get_user_model()
 

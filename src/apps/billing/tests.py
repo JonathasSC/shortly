@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.db.models.signals import post_save
 from django.test import TestCase, override_settings
 from django.utils import timezone
@@ -11,7 +12,6 @@ from apps.billing.models import (
 )
 from apps.billing.signals import bootstrap_user_wallet
 from apps.notification.signals import enqueue_welcome_email
-from django.core.exceptions import ValidationError
 
 User = get_user_model()
 

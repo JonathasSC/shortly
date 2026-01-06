@@ -3,7 +3,6 @@ import hmac
 import json
 import logging
 
-from apps.billing.services.wallet_service import WalletService
 import mercadopago
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -16,6 +15,7 @@ from django.views.decorators.csrf import csrf_exempt
 from apps.billing.dto import PaymentDataDTO
 from apps.billing.models import UserWallet, WalletTransaction
 from apps.billing.services.mp_service import MercadoPagoService
+from apps.billing.services.wallet_service import WalletService
 from apps.billing.tasks import process_payment_task
 
 logger = logging.getLogger(__name__)
