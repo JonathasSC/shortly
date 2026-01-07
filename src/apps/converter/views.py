@@ -1,5 +1,4 @@
 import secrets
-from datetime import timedelta
 
 from django.contrib import messages
 from django.db import models
@@ -12,12 +11,12 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as translate
 from django.views import View
 
-from apps.billing.models import UserWallet
-from apps.billing.services.wallet_service import WalletService
 from apps.converter.forms import UrlForm
 from apps.converter.models import AccessEvent, Url
+from apps.converter.services.url_shortening_service import UrlShorteningService, ShortenResult
 from apps.converter.utils import UserRequestUtil
 from apps.notification.models import Announcement
+from django.core.exceptions import ValidationError
 
 user_request_util = UserRequestUtil()
 
@@ -91,28 +90,6 @@ class HomeView(View):
                 original_url=url_object.original_url, created_by=None, created_by_ip=client_ip
             ).first()
 
-    def __debit_user_wallet(self, user, cost):
-        wallet, _ = UserWallet.objects.get_or_create(user=user)
-
-        if wallet.balance < cost:
-            print(wallet.balance)
-            return False
-
-        WalletService.debit(
-            wallet=wallet,
-            amount=cost,
-            source=translate("URL shortening"),
-        )
-
-        return True
-
-    def __create_short_url(self, url_object, user=None, client_ip=None):
-        url_object.created_by = user
-        url_object.created_by_ip = client_ip
-        url_object.save()
-
-        return url_object
-
     def get(self, request):
         form = UrlForm()
         announcements = []
@@ -149,65 +126,36 @@ class HomeView(View):
     def post(self, request):
         form = UrlForm(request.POST)
         client_ip = user_request_util.get_client_ip(request)
-        create_new = request.POST.get("create_new", "false") == "true"
-        user = request.user
 
         if not form.is_valid():
-            messages.error(
-                request, "Erro ao criar o link. Verifique o formulário.")
+            messages.error(request, translate("Invalid form"))
             return redirect("converter:home")
 
-        url_object = form.save(commit=False)
-        is_direct = form.cleaned_data.get("is_direct", False)
-        cost = 2 if is_direct else 1
-
-        if not user.is_authenticated:
-            today_start = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
-            today_end = today_start + timedelta(days=1)
-
-            if Url.objects.filter(
-                created_by_ip=client_ip,
-                created_at__range=(today_start, today_end)
-            ).count() >= 5:
-                messages.error(request, mark_safe("""
-                    <p class="text-center bg-yellow-100 px-4 py-2 w-full rounded text-yellow-600">
-                        Você atingiu o limite de 5 links por dia. Tente novamente amanhã ou faça login para continuar.
-                    </p>
-                """))
-                return redirect("converter:home")
-
-        if user.is_authenticated:
-            if not self.__debit_user_wallet(user, cost):
-                messages.error(request, mark_safe("""
-                    <p class="text-center text-sm bg-red-100 w-full px-4 py-2 rounded text-red-600">
-                        Saldo insuficiente! Adicione mais coins para encurtar mais URL's
-                    </p>
-                """))
-                return redirect("converter:home")
-
-        existing_url = self.__get_existing_url(url_object, user, client_ip)
-
-        if existing_url and not create_new:
-            messages.info(request, mark_safe(f'''
-                <span class="existing-url-trigger hidden"
-                    data-original-url="{existing_url.original_url}"></span>
-            '''))
+        try:
+            url, result = UrlShorteningService.shorten(
+                user=request.user,
+                client_ip=client_ip,
+                url_object=form.save(commit=False),
+                is_direct=form.cleaned_data["is_direct"],
+                create_new=request.POST.get("create_new") == "true"
+            )
+        except ValidationError:
+            messages.success(request, mark_safe(
+                render_to_string(
+                    "converter/messages/insufficient_balance.html")
+            ))
             return redirect("converter:home")
 
-        created_url = self.__create_short_url(
-            url_object,
-            user=user if user.is_authenticated else None,
-            client_ip=client_ip
-        )
+        if result == ShortenResult.EXISTS:
+            messages.info(request, mark_safe(
+                f'<span class="existing-url-trigger" data-original-url="{url.original_url}"></span>'
+            ))
+            return redirect("converter:home")
 
-        created_url.is_direct = is_direct
-        created_url.save(update_fields=["is_direct"])
-
-        short_url = request.build_absolute_uri(f"/{created_url.short_code}/")
+        short_url = request.build_absolute_uri(f"/{url.short_code}/")
 
         messages.success(request, mark_safe(
             render_to_string(
-                "converter/includes/success_message.html", {"short_url": short_url})
+                "converter/success_message.html", {"short_url": short_url})
         ))
-
         return redirect("converter:home")

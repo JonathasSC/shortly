@@ -35,7 +35,7 @@ class RegisterViewTests(TestCase):
         form = response.context["form"]
         self.assertEqual(response.status_code, 200)
         self.assertTrue(form.errors)
-        self.assertIn('As senhas não coincidem.', form.errors['__all__'])
+        self.assertIn('Passwords do not match.', form.errors['__all__'])
         self.assertFalse(User.objects.filter(username="user2").exists())
 
     def test_register_fails_with_invalid_password_size(self):

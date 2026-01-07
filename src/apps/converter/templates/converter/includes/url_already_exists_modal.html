@@ -1,0 +1,23 @@
+{% load i18n %}
+
+<div id="existing-url-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg w-11/12 max-w-md p-6 flex flex-col gap-4">
+        <h2 class="text-lg font-bold text-gray-800">{% trans "URL already shortened" %}</h2>
+        <p class="text-gray-600 text-sm">
+            {% trans "This URL has already been shortened and is still active. Do you want to create a new shortened URL for the same destination?" %}
+        </p>
+        <div class="flex justify-end gap-2">
+            <button id="cancel-modal" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 transition">
+                {% trans "Cancel" %}
+            </button>
+            <form method="post" id="create-new-url-form">
+                {% csrf_token %}
+                <input type="hidden" name="original_url" id="modal-original-url" value="">
+                <input type="hidden" name="create_new" value="true">
+                <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
+                    {% trans "Create New" %}
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

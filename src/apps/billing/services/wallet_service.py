@@ -18,7 +18,7 @@ class WalletService:
         if amount <= 0:
             raise ValidationError("O valor do crédito deve ser positivo.")
 
-        tx = WalletTransaction.objects.create(
+        transaction = WalletTransaction.objects.create(
             wallet=wallet,
             transaction_type=WalletTransaction.TransactionType.CREDIT,
             amount=amount,
@@ -29,42 +29,30 @@ class WalletService:
         wallet.balance += amount
         wallet.save(update_fields=["balance"])
 
-        tx.status = WalletTransaction.Status.SUCCESS
-        tx.processed_at = timezone.now()
-        tx.save(update_fields=["status", "processed_at"])
+        transaction.status = WalletTransaction.Status.SUCCESS
+        transaction.processed_at = timezone.now()
+        transaction.save(update_fields=["status", "processed_at"])
 
-        return tx
+        return transaction
 
     @staticmethod
     @transaction.atomic
-    def debit(
-        wallet: UserWallet,
-        amount: int,
-        source: str = None,
-        external_reference: str = None
-    ) -> WalletTransaction:
+    def debit(wallet, amount, source=None, external_reference=None):
         if amount <= 0:
             raise ValidationError("O valor do débito deve ser positivo.")
 
         if wallet.balance < amount:
             raise ValidationError("Saldo insuficiente.")
 
-        tx = WalletTransaction.objects.create(
+        transaction = WalletTransaction.objects.create(
             wallet=wallet,
             transaction_type=WalletTransaction.TransactionType.DEBIT,
             amount=amount,
             source=source,
             external_reference=external_reference,
+            status=WalletTransaction.Status.SUCCESS,
         )
-
-        wallet.balance -= amount
-        wallet.save(update_fields=["balance"])
-
-        tx.status = WalletTransaction.Status.SUCCESS
-        tx.processed_at = timezone.now()
-        tx.save(update_fields=["status", "processed_at"])
-
-        return tx
+        return transaction
 
     @staticmethod
     @transaction.atomic
@@ -93,7 +81,7 @@ class WalletService:
 
         wallet.save(update_fields=["balance"])
 
-        refund_tx = WalletTransaction.objects.create(
+        refund_transaction = WalletTransaction.objects.create(
             wallet=wallet,
             transaction_type=reverse_type,
             amount=transaction.amount,
@@ -106,4 +94,4 @@ class WalletService:
         transaction.status = WalletTransaction.Status.REFUNDED
         transaction.save(update_fields=["status"])
 
-        return refund_tx
+        return refund_transaction
