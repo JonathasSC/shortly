@@ -24,8 +24,6 @@ user_request_util = UserRequestUtil()
 class MiddleView(View):
     def get(self, request, short_code) -> HttpResponse:
         url = get_object_or_404(Url, short_code=short_code)
-        token = secrets.token_urlsafe(16)
-        timestamp = timezone.now().timestamp()
         ip_address = user_request_util.get_client_ip(request)
 
         AccessEvent.objects.create(url=url, ip_address=ip_address)
@@ -33,63 +31,34 @@ class MiddleView(View):
         if url.is_direct:
             return redirect(url.original_url)
 
+        token = secrets.token_urlsafe(16)
         request.session[f"token_{token}"] = {
-            "timestamp": timestamp,
+            "timestamp": timezone.now().timestamp(),
             "target_url": url.original_url,
         }
 
-        return render(
-            request,
-            "converter/middle.html",
-            {
-                "redirect_url": reverse("confirm_redirect") + f"?token={token}",
-            },
-        )
+        return render(request, "converter/middle.html", {
+            "redirect_url": reverse("converter:confirm-redirect") + f"?token={token}",
+        })
 
 
 class ConfirmRedirectView(View):
     def get(self, request):
         token = request.GET.get("token")
-        if not token:
+        data = request.session.get(f"token_{token}")
+
+        if not data:
             return HttpResponseForbidden("Token inválido")
 
-        data = request.session.get(f"token_{token}")
-        if not data:
-            return HttpResponseForbidden("Token não encontrado")
-
-        timestamp = data.get("timestamp")
-        target_url = data.get("target_url")
-
-        if not target_url or timestamp is None:
-            return HttpResponseForbidden("Dados incompletos")
-
         now = timezone.now().timestamp()
-        if now - timestamp < 5:
-            remaining = int(5 - (now - timestamp))
-            return render(
-                request,
-                "converter/middle.html",
-                {
-                    "redirect_url": reverse("confirm_redirect") + f"?token={token}",
-                    "remaining": remaining,
-                },
-            )
+        if now - data["timestamp"] < 5:
+            return HttpResponseForbidden("Aguarde 5 segundos")
 
         del request.session[f"token_{token}"]
-        return redirect(target_url)
+        return redirect(data["target_url"])
 
 
 class HomeView(View):
-    def __get_existing_url(self, url_object, user, client_ip):
-        if user.is_authenticated:
-            return Url.objects.filter(
-                original_url=url_object.original_url, created_by=user
-            ).first()
-        else:
-            return Url.objects.filter(
-                original_url=url_object.original_url, created_by=None, created_by_ip=client_ip
-            ).first()
-
     def get(self, request):
         form = UrlForm()
         announcements = []
