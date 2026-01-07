@@ -1,7 +1,6 @@
 import secrets
 
 from django.contrib import messages
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
@@ -14,9 +13,10 @@ from django.views import View
 
 from apps.converter.forms import UrlForm
 from apps.converter.models import AccessEvent, Url
-from apps.converter.services.url_shortening_service import ShortenResult, UrlShorteningService
+from apps.converter.services.url_shortening_service import UrlShorteningService, ShortenResult
 from apps.converter.utils import UserRequestUtil
 from apps.notification.models import Announcement
+from django.core.exceptions import ValidationError
 
 user_request_util = UserRequestUtil()
 
@@ -142,7 +142,7 @@ class HomeView(View):
         except ValidationError:
             messages.success(request, mark_safe(
                 render_to_string(
-                    "converter/messages/insufficient_balance.html")
+                    "converter/includes/insufficient_balance.html")
             ))
             return redirect("converter:home")
 
@@ -156,6 +156,6 @@ class HomeView(View):
 
         messages.success(request, mark_safe(
             render_to_string(
-                "converter/success_message.html", {"short_url": short_url})
+                "converter/includes/success_message.html", {"short_url": short_url})
         ))
         return redirect("converter:home")
