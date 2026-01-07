@@ -14,6 +14,7 @@
                 {% csrf_token %}
                 <input type="hidden" name="original_url" id="modal-original-url" value="">
                 <input type="hidden" name="create_new" value="true">
+                <input type="hidden" name="is_direct" id="modal-is-direct">
                 <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
                     {% trans "Create New" %}
                 </button>
