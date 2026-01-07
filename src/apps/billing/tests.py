@@ -10,7 +10,7 @@ from apps.billing.models import (
     UserWallet,
     WalletTransaction,
 )
-from apps.billing.signals import bootstrap_user_wallet
+from apps.billing.signals import create_user_wallet
 from apps.notification.signals import enqueue_welcome_email
 
 User = get_user_model()
@@ -20,11 +20,11 @@ class TestModels(TestCase):
     @override_settings(DISABLE_SIGNALS=True)
     def setUp(self):
         post_save.disconnect(enqueue_welcome_email, sender=User)
-        post_save.disconnect(bootstrap_user_wallet, sender=User)
+        post_save.disconnect(create_user_wallet, sender=User)
 
     def tearDown(self):
         post_save.connect(enqueue_welcome_email, sender=User)
-        post_save.connect(bootstrap_user_wallet, sender=User)
+        post_save.connect(create_user_wallet, sender=User)
 
     def test_plan_creation(self):
         plan = Plan.objects.create(

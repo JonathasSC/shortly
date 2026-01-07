@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import datetime
 
 from django.contrib import messages
 from django.contrib.auth import get_user_model, login, logout
@@ -38,11 +38,14 @@ class UserRegisterView(View):
         if not form.is_valid():
             return render(request, self.template_name, {'form': form})
 
-        dto = CreateUserDTO(**form.cleaned_data)
-        CreateUserService.execute(dto)
+        try:
+            dto = CreateUserDTO(**form.cleaned_data)
+            CreateUserService.execute(dto)
+            print("REGISTER POST HIT:", datetime.now(), request.META.get("REMOTE_ADDR"))
+            return redirect("account:login")
 
-        return redirect("account:login")
-
+        except Exception as error:
+            raise error
 
 class UserLoginView(View):
     template_name = "account/auth/login.html"

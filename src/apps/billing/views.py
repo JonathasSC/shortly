@@ -117,7 +117,8 @@ class WalletPageView(View):
         prices_info = self.get_prices_with_value()
         plans = Plan.objects.all().order_by("price")
 
-        wallet, _ = UserWallet.objects.get_or_create(user=request.user)
+        wallet = UserWallet.objects.get(user=request.user)
+
         transactions = WalletTransaction.objects.filter(
             wallet=wallet).order_by("-created_at")
 

@@ -6,7 +6,7 @@ from django.db.models.signals import post_save
 from django.test import TransactionTestCase
 
 from apps.billing.models import UserWallet, WalletTransaction
-from apps.billing.signals import bootstrap_user_wallet
+from apps.billing.signals import create_user_wallet
 from apps.common.models import BaseModelAbstract
 from apps.common.utils import CommonUtils
 from apps.notification.signals import enqueue_welcome_email
@@ -27,12 +27,12 @@ class WalletTransactionTestCase(TransactionTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        post_save.disconnect(bootstrap_user_wallet, sender=User)
+        post_save.disconnect(create_user_wallet, sender=User)
         post_save.disconnect(enqueue_welcome_email, sender=User)
 
     @classmethod
     def tearDownClass(cls):
-        post_save.connect(bootstrap_user_wallet, sender=User)
+        post_save.connect(create_user_wallet, sender=User)
         post_save.connect(enqueue_welcome_email, sender=User)
         super().tearDownClass()
 
