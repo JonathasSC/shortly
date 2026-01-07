@@ -1,6 +1,7 @@
 import secrets
 
 from django.contrib import messages
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
@@ -13,10 +14,9 @@ from django.views import View
 
 from apps.converter.forms import UrlForm
 from apps.converter.models import AccessEvent, Url
-from apps.converter.services.url_shortening_service import UrlShorteningService, ShortenResult
+from apps.converter.services.url_shortening_service import ShortenResult, UrlShorteningService
 from apps.converter.utils import UserRequestUtil
 from apps.notification.models import Announcement
-from django.core.exceptions import ValidationError
 
 user_request_util = UserRequestUtil()
 
