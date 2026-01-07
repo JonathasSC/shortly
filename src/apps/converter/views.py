@@ -156,6 +156,6 @@ class HomeView(View):
 
         messages.success(request, mark_safe(
             render_to_string(
-                "converter/includes/success_message.html", {"short_url": short_url})
+                "converter/includes/url_created.html", {"short_url": short_url})
         ))
         return redirect("converter:home")
