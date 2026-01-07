@@ -112,20 +112,26 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!trigger) return;
 
   const modal = document.getElementById("existing-url-modal");
-  const originalInput = document.getElementById("modal-original-url");
-  const directInput = document.getElementById("modal-is-direct");
-  const cancel = document.getElementById("cancel-modal");
+  const inputUrl = document.getElementById("modal-original-url");
+  const inputDirect = document.getElementById("modal-is-direct");
 
-  const originalField = document.getElementById("id_original_url");
-  const directCheckbox = document.getElementById("id_is_direct");
+  const mainCheckbox = document.getElementById("id_is_direct");
 
-  originalInput.value = originalField.value;
-  directInput.value = directCheckbox && directCheckbox.checked ? "on" : "";
+  inputUrl.value = trigger.dataset.originalUrl;
+
+  const isDirect = trigger.dataset.isDirect === "true";
+
+  if (mainCheckbox) {
+      mainCheckbox.checked = isDirect;
+      mainCheckbox.dispatchEvent(new Event("change"));
+  }
+
+  inputDirect.value = isDirect ? "true" : "false";
 
   modal.classList.remove("hidden");
   modal.classList.add("flex");
 
-  cancel.onclick = () => modal.classList.add("hidden");
+  document.getElementById("cancel-modal").onclick = () => modal.classList.add("hidden");
 });
 </script>
 {% endblock %}

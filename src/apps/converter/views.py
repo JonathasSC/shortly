@@ -117,11 +117,18 @@ class HomeView(View):
 
         if result == ShortenResult.EXISTS:
             messages.info(request, mark_safe(
-                f'<span class="existing-url-trigger" data-original-url="{url.original_url}"></span>'
+                render_to_string(
+                    "converter/includes/existing_url_trigger.html",
+                    {
+                        "original_url": url.original_url,
+                        "is_direct": form.cleaned_data["is_direct"],
+                    }
+                )
             ))
             return redirect("converter:home")
 
-        short_url = request.build_absolute_uri(f"/{url.short_code}/")
+        short_url = request.build_absolute_uri(
+            f"/{url.short_code}/").replace("http", "https")
 
         messages.success(request, mark_safe(
             render_to_string(
