@@ -1,4 +1,4 @@
-{% extends 'common/base.html'%}
+{% extends 'common/base.html' %}
 
 {% load widget_tweaks %}
 {% load static %}
@@ -8,21 +8,39 @@
 {% block footer %}{% endblock %}
 
 {% block content %}
-<div class="alert alert-warning text-center">
-    <h4>🚫 Acesso temporariamente bloqueado</h4>
+<main class="min-h-screen p-4 flex flex-col items-center justify-center">
+    <img
+        class="w-full max-w-[1080px] max-h-full absolute blur-sm -z-10 opacity-5"
+        src="{% static '/common/svg/logo/without_bg_icon_blue.svg' %}"
+        alt="shortly logo"
+    >
 
-    <p>
-        Detectamos várias tentativas de login sem sucesso.
-        Por segurança, seu acesso foi <strong>temporariamente bloqueado</strong>.
-    </p>
+    <div class="flex items-start md:items-center gap-3 sm:gap-4 justify-center flex-col text-center max-w-md sm:max-w-xl">
+        <h4 class="flex gap-3 text-start md:text-center items-center px-3 py-2 text-blue-500 font-bold text-lg sm:text-2xl">
+            <span class="material-symbols-outlined font-bold rounded-full text-blue-500 text-xl sm:text-2xl">
+                block
+            </span>
+            {% trans "Access temporarily blocked" %}
+        </h4>
 
-    <p>
-        Aguarde alguns minutos e tente novamente.
-        Caso tenha esquecido sua senha, utilize a recuperação de senha.
-    </p>
+        <p class="text-sm text-start md:text-center sm:text-base leading-snug sm:leading-relaxed text-gray-700">
+            {% trans "We detected multiple unsuccessful login attempts." %}
+            <br>
+            {% trans "For security reasons, your access has been temporarily blocked." %}
+        </p>
 
-    <p class="text-muted">
-        Se você acredita que isso é um engano, entre em contato com o suporte.
-    </p>
-</div>
+        <p class="text-sm text-start md:text-center sm:text-base leading-snug sm:leading-relaxed text-gray-700">
+            {% trans "Please wait a few minutes and try again." %}
+            <br>
+            {% trans "If you forgot your password, use the " %}
+            <a href="{% url 'account:recovery' %}" class="outlined text-blue-500 cursor-pointer">
+                {% trans "password recovery" %}
+            </a>
+        </p>
+
+        <small class="text-xs text-start md:text-center sm:text-sm text-gray-400 leading-snug sm:leading-normal">
+            {% trans "If you believe this is a mistake, please contact support." %}
+        </small>
+    </div>
+</main>
 {% endblock %}
