@@ -1,11 +1,5 @@
 name: Continuous Integration
 
-env:
-  DB_ENGINE: sqlite3
-  DB_NAME: ':memory:'
-  DJANGO_DEBUG: 'True'
-  DJANGO_SECRET_KEY: 'insecure-default-key'
-
 on:
   push:
     branches: [ main ]
@@ -62,8 +56,9 @@ jobs:
         working-directory: ./src
         run: |
           uv run manage.py migrate
+          uv run manage.py check
           uv run manage.py runserver 0.0.0.0:8000 &
-          sleep 5
+          sleep 10
 
       - name: Run Cypress tests
         working-directory: ./infra/cypress

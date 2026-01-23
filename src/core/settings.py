@@ -25,7 +25,7 @@ loadenv(dotenv_path=BASE_DIR / ".env")
 # ================================================================
 # SECURITY
 # ================================================================
-SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "")
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", 'insecure-default-key')
 DEBUG = True if os.environ.get("DJANGO_DEBUG", "FALSE") == "TRUE" else False
 ALLOWED_HOSTS = [
     host
