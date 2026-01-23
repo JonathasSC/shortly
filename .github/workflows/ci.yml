@@ -56,16 +56,30 @@ jobs:
         working-directory: ./infra/cypress
         run: npm install
 
-      - name: Run Django server (background)
+      - name: Run Migrations
         working-directory: ./src
         run: |
           uv run manage.py migrate
+
+      - name: Check Django Project
+        working-directory: ./src
+        run: |
           uv run manage.py check
-          uv run manage.py collectstatic --noinput
-          # Run Django in background
+
+      - name: Run Django Server (background)
+        working-directory: ./src
+        run: |
           uv run manage.py runserver 0.0.0.0:8000 &
-          # Espera o server subir
-          sleep 10
+
+      - name: Wait for Django Server
+        working-directory: ./src
+        run: |
+          echo "Waiting for Django server to be ready..."
+          until curl -s http://127.0.0.1:8000/ > /dev/null; do
+            echo "Still waiting..."
+            sleep 2
+          done
+          echo "Django server is ready!"          
 
       - name: Run Cypress tests
         working-directory: ./infra/cypress
