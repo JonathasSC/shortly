@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -33,6 +34,9 @@ class UserRegisterView(View):
         return render(request, self.template_name, {'form': CustomRegisterForm()})
 
     def post(self, request):
+        if settings.DEBUG and request.headers.get("X-CYPRESS") == "true":
+            User.objects.filter(email="cypress@test.com").delete()
+
         form = CustomRegisterForm(request.POST)
 
         if not form.is_valid():
@@ -46,6 +50,7 @@ class UserRegisterView(View):
 
         except Exception as error:
             raise error
+
 
 class UserLoginView(View):
     template_name = "account/auth/login.html"

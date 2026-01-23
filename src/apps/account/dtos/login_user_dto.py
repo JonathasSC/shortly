@@ -5,3 +5,4 @@ class LoginUserDTO(BaseModel):
     username: str
     password: str
 
+

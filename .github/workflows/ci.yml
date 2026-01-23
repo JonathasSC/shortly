@@ -8,9 +8,9 @@ env:
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main ]
 
 defaults:
   run:
@@ -23,6 +23,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      # ---------- Python / Django ----------
       - name: Update packages
         run: |
           sudo apt-get update
@@ -45,4 +46,25 @@ jobs:
         run: uv run ruff check .
 
       - name: Run Django tests
-        run: uv run python manage.py test
+        run: uv run python manage.py test 
+        
+        # ---------- Front / Cypress ---------- 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Cypress dependencies
+        working-directory: ./infra/cypress
+        run: npm install
+
+      - name: Run Django server (background)
+        working-directory: ./src
+        run: |
+          uv run manage.py migrate
+          uv run manage.py runserver 0.0.0.0:8000 &
+          sleep 5
+
+      - name: Run Cypress tests
+        working-directory: ./infra/cypress
+        run: npm run cy:run

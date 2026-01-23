@@ -11,7 +11,7 @@ from apps.billing.models import UserWallet, WalletTransaction
 class CreateUserService:
     @staticmethod
     @transaction.atomic
-    def execute(dto: CreateUserDTO) -> User:        
+    def execute(dto: CreateUserDTO) -> User:
         try:
             user = User.objects.create_user(
                 username=dto.username,
@@ -33,7 +33,8 @@ class CreateUserService:
                 wallet=wallet,
                 amount=5,
                 transaction_type=WalletTransaction.TransactionType.CREDIT,
-                source=translate("%(amount)s free coins for signing up") % {"amount": 5}
+                source=translate("%(amount)s free coins for signing up") % {
+                    "amount": 5}
             )
-    
+
         return user

@@ -121,6 +121,7 @@ INSTALLED_APPS = [
     "apps.billing",
     "apps.notification",
     "apps.toggler",
+    "apps.security",
 ]
 
 # ================================================================
