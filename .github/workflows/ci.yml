@@ -81,6 +81,14 @@ jobs:
           done
           echo "Django server is ready!"          
 
+      - name: Debug Django Home Page
+        working-directory: ./src
+        run: |
+          echo "Fetching home page HTML..."
+          curl -v http://127.0.0.1:8000/ -o debug_home.html
+          echo "HTML saved to debug_home.html"
+          head -n 50 debug_home.html
+
       - name: Run Cypress tests
         working-directory: ./infra/cypress
         run: npx cypress run
