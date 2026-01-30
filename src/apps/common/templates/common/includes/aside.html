@@ -1,27 +1,28 @@
-
 {% load i18n %}
 
 <aside class="w-64 bg-gray-900 text-white flex flex-col p-4 min-h-screen shadow-lg">
-    <h2 class="text-3xl font-bold mb-8 text-center">Sh0rtly</h2>
+    <a href="{% url 'converter:home' %}" class="text-2xl font-bold">
+        <h2 class="text-3xl font-bold mb-8 text-center">Sh0rtly</h2>
+    </a>
 
     <div class="mb-6">
         <h3 class="text-gray-400 uppercase text-xs font-semibold mb-2">Principal</h3>
         <nav class="flex flex-col gap-2">
-            <a href="{% url 'converter:home' %}" class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors shadow-sm hover:shadow-md">
-                <span class="material-icons">home</span>
-                <span>{% trans "Home" %}</span>
+            <a href="{% url 'converter:home' %}" class="flex items-center gap-3 p-3 rounded hover:bg-gray-800 transition-colors shadow-sm hover:shadow-md">
+                <span class="material-symbols-outlined text-sm">home</span>
+                <span class="text-sm">{% trans "Home" %}</span>
             </a>
-            <a href="#" class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors shadow-sm hover:shadow-md">
-                <span class="material-icons">info</span>
-                <span>{% trans "About" %}</span>
+            <a href="#" class="flex items-center gap-3 p-3 rounded hover:bg-gray-800 transition-colors shadow-sm hover:shadow-md">
+                <span class="material-symbols-outlined text-sm">info</span>
+                <span class="text-sm">{% trans "About" %}</span>
             </a>
-            <a href="#" class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors shadow-sm hover:shadow-md">
-                <span class="material-icons">local_hospital</span>
-                <span>{% trans "Services" %}</span>
+            <a href="#" class="flex items-center gap-3 p-3 rounded hover:bg-gray-800 transition-colors shadow-sm hover:shadow-md">
+                <span class="material-symbols-outlined text-sm">medical_services</span>
+                <span class="text-sm">{% trans "Services" %}</span>
             </a>
-            <a href="#" class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors shadow-sm hover:shadow-md">
-                <span class="material-icons">phone</span>
-                <span>{% trans "Contact" %}</span>
+            <a href="#" class="flex items-center gap-3 p-3 rounded hover:bg-gray-800 transition-colors shadow-sm hover:shadow-md">
+                <span class="material-symbols-outlined text-sm">call</span>
+                <span class="text-sm">{% trans "Contact" %}</span>
             </a>
         </nav>
     </div>
@@ -29,9 +30,9 @@
     <div>
         <h3 class="text-gray-400 uppercase text-xs font-semibold mb-2">Conta</h3>
         <nav class="flex flex-col gap-2">
-            <a href="{% url 'account:logout' %}" class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors shadow-sm hover:shadow-md text-red-500 font-semibold">
-                <span class="material-icons">logout</span>
-                <span>{% trans "Logout" %}</span>
+            <a href="{% url 'account:logout' %}" class="flex items-center gap-3 p-3 rounded hover:bg-gray-800 transition-colors shadow-sm hover:shadow-md text-red-500 font-semibold">
+                <span class="material-symbols-outlined text-sm">logout</span>
+                <span class="text-sm">{% trans "Logout" %}</span>
             </a>
         </nav>
     </div>

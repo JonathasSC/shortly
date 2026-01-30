@@ -8,11 +8,12 @@ urlpatterns = [
     path("i18n/", include("django.conf.urls.i18n")),
     path("info/", include("apps.institutional.urls")),
     path("account/", include("apps.account.urls")),
-    path("dashboard/", include("apps.dashboard.urls")),
+    path("dashboard/", include("apps.monitor.urls")),
     path("buy/", include("apps.billing.urls")),
+    path("manager/", include("apps.manager.urls")),
     path("", include("apps.converter.urls")),
     path("", include("apps.common.urls")),
-]
 
+]
 
 handler404 = NotFoundView.as_view()

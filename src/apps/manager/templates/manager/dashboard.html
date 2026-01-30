@@ -1,0 +1,264 @@
+{% extends 'manager/base_aside.html'%}
+
+{% load static %}
+{% load i18n %}
+
+{% block header %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<main class="flex flex-col gap-4 p-4">
+    <h1 class="text-2xl font-bold">
+        {% trans "Dashboard" %}
+    </h1>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="bg-white border border-slate-200 rounded p-6">
+            <p class="text-gray-500 text-sm">{% trans "Total Users" %}</p>
+            <h2 class="text-3xl font-bold mt-2">
+                {{ users.count_all_users }}
+            </h2>
+        </div>
+
+        <div class="bg-white border border-slate-200 rounded p-6">
+            <p class="text-gray-500 text-sm">{% trans "Active Users" %}</p>
+            <h2 class="text-3xl font-bold mt-2 text-green-600">
+                {{ users.count_active_users }}
+            </h2>
+        </div>
+
+        <div class="bg-white border border-slate-200 rounded p-6">
+            <p class="text-gray-500 text-sm">{% trans "URLs created today" %}</p>
+            <h2 class="text-3xl font-bold mt-2 text-blue-600">
+                {{ urls.count_created_urls_today }}
+            </h2>
+        </div>
+
+        <div class="bg-white border border-slate-200 rounded p-6">
+            <p class="text-gray-500 text-sm">{% trans "Clicks Today" %}</p>
+            <h2 class="text-3xl font-bold mt-2 text-indigo-600">
+                {{ urls.count_clicks_today }}
+            </h2>
+        </div>
+
+        <div class="bg-white border border-slate-200 rounded p-6">
+            <p class="text-gray-500 text-sm">{% trans "New Users Today" %}</p>
+            <h2 class="text-3xl font-bold mt-2 text-amber-600">
+                {{ users.count_users_today }}
+            </h2>
+        </div>
+
+        <div class="bg-white border border-slate-200 rounded p-6">
+            <p class="text-gray-500 text-sm">{% trans "Growth vs Yesterday" %}</p>
+            <h2 class="text-3xl font-bold mt-2
+                {% if users_growth > 0 %} text-green-600
+                {% elif users_growth < 0 %} text-red-600
+                {% else %} text-gray-600 {% endif %}">
+                {{ users_growth }}%
+            </h2>
+        </div>
+    </div>
+    
+    <h1 class="text-lg font-bold">
+        {% trans "System Health" %}
+    </h1>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div class="bg-white border border-slate-200 rounded p-5">
+            <p class="text-gray-500 text-sm mb-3">{% trans "Database Status" %}</p>
+
+            <table class="min-w-full text-sm text-left border border-gray-200">
+                <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
+                    <tr>
+                        <th class="px-4 py-2 border">{% trans "Metric" %}</th>
+                        <th class="px-4 py-2 border">{% trans "Value" %}</th>
+                        <th class="px-4 py-2 border">{% trans "Status" %}</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-700">
+
+                    <tr>
+                        <td class="px-4 py-2 border">Online</td>
+                        <td class="px-4 py-2 border">
+                            {% if system.database.online %}True{% else %}False{% endif %}
+                        </td>
+                        <td class="px-4 py-2 border">
+                            {% if system.database.online %}
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
+                                ● Online
+                            </span>
+                            {% else %}
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-100 text-rose-700">
+                                ● Offline
+                            </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="px-4 py-2 border">Latency</td>
+                        <td class="px-4 py-2 border">
+                            {{ system.database.latency_ms }} ms
+                        </td>
+                        <td class="px-4 py-2 border">
+                            {% if system.database.latency_ms < 10 %}
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
+                                ● Excellent
+                            </span>
+                            {% elif system.database.latency_ms < 50 %}
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
+                                ● Acceptable
+                            </span>
+                            {% else %}
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-100 text-rose-700">
+                                ● High
+                            </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="px-4 py-2 border">Database Size</td>
+                        <td class="px-4 py-2 border">
+                            {{ system.database.db_size_mb }} MB
+                        </td>
+                        <td class="px-4 py-2 border">
+                            {% if system.database.db_size_mb < 500 %}
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
+                                    ● Healthy
+                                </span>
+                            {% elif system.database.db_size_mb < 2000 %}
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
+                                    ● Warning
+                                </span>
+                            {% else %}
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-100 text-rose-700">
+                                    ● High
+                                </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="px-4 py-2 border">Active Transactions</td>
+                        <td class="px-4 py-2 border">
+                            {{ system.database.active_transactions }}
+                        </td>
+                        <td class="px-4 py-2 border">
+                            {% if system.database.active_transactions > 10 %}
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-100 text-rose-700">
+                                ● High
+                            </span>
+                            {% else %}
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
+                                ● Normal
+                            </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="bg-white border border-slate-200 rounded p-5">
+            <p class="text-gray-500 text-sm mb-3">{% trans "Server Status" %}</p>
+
+            <table class="min-w-full text-sm text-left border border-gray-200">
+                <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
+                    <tr>
+                        <th class="px-4 py-2 border">{% trans "Resource" %}</th>
+                        <th class="px-4 py-2 border">{% trans "Value" %}</th>
+                        <th class="px-4 py-2 border">{% trans "Status" %}</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-700">
+                    <tr>
+                        <td class="px-4 py-2 border">Free Disk Space</td>
+                        <td class="px-4 py-2 border">
+                            {{ system.disk_free_percent|floatformat:1 }}%
+                        </td>
+                        <td class="px-4 py-2 border">
+                            {% if system.disk_free_percent > 30 %}
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
+                                ● Healthy
+                            </span>
+                            {% elif system.disk_free_percent > 15 %}
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
+                                ● Warning
+                            </span>
+                            {% else %}
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-100 text-rose-700">
+                                ● Critical
+                            </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="px-4 py-2 border">Memory Usage</td>
+                        <td class="px-4 py-2 border">
+                            {{ system.memory_percent|floatformat:1 }}%
+                        </td>
+                        <td class="px-4 py-2 border">
+                            {% if system.memory_percent < 70 %}
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
+                                ● Normal
+                            </span>
+                            {% elif system.memory_percent < 85 %}
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
+                                ● High
+                            </span>
+                            {% else %}
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-100 text-rose-700">
+                                ● Critical
+                            </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="px-4 py-2 border">Uptime</td>
+                        <td class="px-4 py-2 border">
+                            {{ system.uptime_hours }} h
+                        </td>
+                        <td class="px-4 py-2 border">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
+                                ● Running
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <h1 class="text-lg font-bold">
+        {% trans "Logs" %}
+    </h1>
+
+    <div id="logs-container" class="bg-gray-900 text-green-400 font-mono p-4 rounded h-64 overflow-y-auto border border-gray-700">
+    </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    (function() {
+        const logsContainer = document.getElementById('logs-container');
+        const ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";
+        const logsSocket = new WebSocket(ws_scheme + '://' + window.location.host + '/ws/logs/');
+
+        logsSocket.onmessage = function(e) {
+            const message = e.data;
+            const line = document.createElement('div');
+            line.textContent = message;
+            logsContainer.appendChild(line);
+            logsContainer.scrollTop = logsContainer.scrollHeight; 
+        };
+
+        logsSocket.onclose = function(e) {
+            console.warn('Logs WebSocket fechado.');
+        };
+    })();
+</script>
+{% endblock %}

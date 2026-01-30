@@ -19,7 +19,7 @@ PROTOCOL = os.environ.get("DJANGO_PROTOCOL", "")
 # ================================================================
 # ENVIRONMENT VARIABLES
 # ================================================================
-loadenv(dotenv_path=BASE_DIR / ".env")
+loadenv(dotenv_path=BASE_DIR / ".env.dev")
 
 
 # ================================================================
@@ -48,6 +48,9 @@ LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO").upper()
 LOG_DIR = os.environ.get("LOG_DIR", "logs")
 os.makedirs(LOG_DIR, exist_ok=True)
 
+APP_LOG_FILE_PATH = os.path.join(LOG_DIR, "app.log")
+ERROR_LOG_FILE_PATH = os.path.join(LOG_DIR, "error.log")
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -68,12 +71,12 @@ LOGGING = {
         },
         "file": {
             "class": "logging.FileHandler",
-            "filename": os.path.join(LOG_DIR, "app.log"),
+            "filename": APP_LOG_FILE_PATH,
             "formatter": "verbose",
         },
         "error_file": {
             "class": "logging.FileHandler",
-            "filename": os.path.join(LOG_DIR, "error.log"),
+            "filename": ERROR_LOG_FILE_PATH,
             "level": "ERROR",
             "formatter": "verbose",
         },
@@ -112,16 +115,18 @@ INSTALLED_APPS = [
     "widget_tweaks",
     "django_celery_beat",
     "axes",
+    "channels",
     # Local apps
     "apps.common",
     "apps.converter",
-    "apps.dashboard",
+    "apps.monitor",
     "apps.account",
     "apps.institutional",
     "apps.billing",
     "apps.notification",
     "apps.toggler",
     "apps.security",
+    "apps.manager",
 ]
 
 # ================================================================
@@ -197,6 +202,7 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
+
 
 AUTHENTICATION_BACKENDS = [
     "axes.backends.AxesStandaloneBackend",
@@ -330,3 +336,16 @@ AXES_COOLOFF_TIME = 1
 AXES_RESET_ON_SUCCESS = True
 AXES_HTTP_RESPONSE_CODE = 429
 AXES_LOCKOUT_TEMPLATE = "security/locked.html"
+
+
+# ================================================================
+# CHANNELS
+# ================================================================
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("redis", 6379)],
+        },
+    },
+}

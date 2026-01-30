@@ -1,0 +1,35 @@
+{% load static %}
+{% load i18n %}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <title>{% block title %}Sh0rtly{% endblock %}</title>
+    {% include "common/includes/builtin.html" %}
+    {% block extrahead %}{% endblock %}
+</head>
+
+<body class="bg-gray-100 min-h-screen flex font-[Inter]">
+
+    {% block sidebar %}
+        {% include "common/includes/aside.html" %}
+    {% endblock %}
+
+    <div class="flex flex-col flex-1 min-h-screen">
+
+        {% block header %}
+        {% endblock %}
+
+        {% block content %}{% endblock %}
+        
+        {% block footer %}
+        {% endblock %}
+    </div>
+
+    {% block scripts %}{% endblock %}
+
+    <script src="{% static 'common/js/utilities.js'%}"></script>
+    <script src="{% static 'common/js/gradient-header.js' %}"></script>
+    <script src="{% static 'dashboard/js/url_actions.js' %}"></script>
+</body>
+</html>

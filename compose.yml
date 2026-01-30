@@ -22,6 +22,21 @@ services:
       retries: 5
       start_period: 15s
 
+  shortly_asgi:
+    container_name: shortly-asgi
+    build:
+      context: ./src
+      dockerfile: Dockerfile
+    command: daphne -b 0.0.0.0 -p 8001 core.asgi:application
+    env_file:
+      - ${ENV_FILE}
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - shortly_net
+    restart: always
+
   nginx:
     container_name: nginx
     build: 
@@ -120,17 +135,6 @@ services:
       timeout: 3s
       retries: 10
       start_period: 5s
-
-  dozzle:
-    image: amir20/dozzle:latest
-    container_name: dozzle
-    restart: always
-    ports:
-      - "9999:8080"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    networks:
-      - shortly_net
       
 networks:
   shortly_net:

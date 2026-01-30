@@ -1,6 +1,6 @@
 from django.urls import path
 
-from apps.dashboard.views import DashboardHomeView, UrlDelete, UrlUpdate, UserUrlsList
+from apps.monitor.views import DashboardHomeView, UrlDelete, UrlUpdate, UserUrlsList
 
 urlpatterns = [
     path('', DashboardHomeView.as_view(), name='dashboard_home'),
