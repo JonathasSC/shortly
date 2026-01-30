@@ -41,6 +41,7 @@ SECURE_CROSS_ORIGIN_OPENER_POLICY = os.environ.get(
 SECURE_SSL_REDIRECT = True if os.environ.get(
     "DJANGO_SECURE_SSL_REDIRECT") == "TRUE" else False
 
+
 # ================================================================
 # LOGGING
 # ================================================================
