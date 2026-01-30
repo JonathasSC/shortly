@@ -1,6 +1,7 @@
 from django.urls import path, re_path
 
 from apps.manager.consumers import LogsConsumer
+
 from .views import DashboardView
 
 urlpatterns = [
