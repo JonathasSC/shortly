@@ -46,7 +46,7 @@ SECURE_SSL_REDIRECT = True if os.environ.get(
 # LOGGING
 # ================================================================
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO").upper()
-LOG_DIR = os.environ.get("LOG_DIR", "/usr/src/logs")
+LOG_DIR = os.environ.get("LOG_DIR", "logs")
 os.makedirs(LOG_DIR, exist_ok=True)
 
 APP_LOG_FILE_PATH = os.path.join(LOG_DIR, "app.log")
