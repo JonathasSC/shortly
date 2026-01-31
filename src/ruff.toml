@@ -13,6 +13,7 @@ exclude = [
   "site-packages",
   "venv",
   "core/settings",
+  "core/asgi.py",
    "**/apps.py",
 ]
 line-length = 99
