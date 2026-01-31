@@ -30,6 +30,8 @@ services:
     command: daphne -b 0.0.0.0 -p 8001 core.asgi:application
     env_file:
       - ${ENV_FILE}
+    volumes:
+      - ./src/logs:/usr/src/log
     depends_on:
       redis:
         condition: service_healthy
