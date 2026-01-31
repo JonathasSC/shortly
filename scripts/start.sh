@@ -101,16 +101,16 @@ collect_staticfiles() {
     log_success "Arquivos estaticos coletados"
 }
 
-make_migrations() {
-    log "Aplicando migracoes no Django..."
-    nohup $DOCKER_COMPOSE exec $SERVICE_NAME python3 manage.py makemigrations
-    log_success "Migracoes feitas com sucesso"
-}
-
 apply_migrations() {
-    log "Aplicando migracoes no Django..."
-    $DOCKER_COMPOSE exec $SERVICE_NAME python3 manage.py migrate
-    log_success "Migracoes aplicadas com sucesso"
+    log "Verificando se existem migrações pendentes..."
+
+    if $DOCKER_COMPOSE exec $SERVICE_NAME python3 manage.py migrate --check >/dev/null 2>&1; then
+        log_success "Nenhuma migração pendente. Pulando migrate ✅"
+    else
+        log_warn "Migrações pendentes encontradas. Aplicando..."
+        $DOCKER_COMPOSE exec $SERVICE_NAME python3 manage.py migrate --noinput
+        log_success "Migrações aplicadas com sucesso"
+    fi
 }
 
 create_superuser_if_not_exists() {
@@ -136,7 +136,6 @@ run_start() {
     build_app_containers
     up_all_containers
 
-    make_migrations
     apply_migrations
     create_superuser_if_not_exists
     collect_staticfiles
