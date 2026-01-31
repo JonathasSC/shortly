@@ -85,7 +85,7 @@ stop_oldest_containers() {
 
 build_app_containers() {
     log "Iniciando build dos containers da aplicação (Django + Celery + Flower)..."
-    $DOCKER_COMPOSE build shortly celery_worker celery_beat flower
+    $DOCKER_COMPOSE build shortly shortly_asgi celery_worker celery_beat flower
     log_success "Build concluído com sucesso"
 }
 
