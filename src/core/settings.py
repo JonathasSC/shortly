@@ -350,3 +350,7 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+ALLOWED_WS_ORIGINS = [
+    origin for origin in os.environ.get("ALLOWED_WS_ORIGINS", "").split(",") if origin
+]

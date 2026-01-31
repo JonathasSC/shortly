@@ -1,7 +1,7 @@
-from django.urls import re_path
+from django.urls import path
 
 from apps.manager.consumers import LogsConsumer
 
 websocket_urlpatterns = [
-    re_path(r"logs/", LogsConsumer.as_asgi()),
+    path("ws/admin/system/logs/", LogsConsumer.as_asgi()),
 ]

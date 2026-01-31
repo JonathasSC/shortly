@@ -1,6 +1,7 @@
+
 from django.http import JsonResponse
 
-from apps.security.services import ExponentialBanService
+from apps.security.services import ExponentialBanService, WebSocketOriginService
 
 
 class ExponentialBanMiddleware:
@@ -21,3 +22,28 @@ class ExponentialBanMiddleware:
                     )
 
         return self.get_response(request)
+
+
+class WsAllowedOriginValidator:
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] != "websocket":
+            return await self.app(scope, receive, send)
+
+        headers = {
+            key.decode().lower(): value.decode()
+            for key, value in scope.get("headers", [])
+        }
+
+        origin = headers.get("origin")
+
+        if not WebSocketOriginService.is_allowed(origin):
+            await send({
+                "type": "websocket.close",
+                "code": 4003,
+            })
+            return
+
+        return await self.app(scope, receive, send)

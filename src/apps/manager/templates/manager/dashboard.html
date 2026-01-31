@@ -236,29 +236,74 @@
         {% trans "Logs" %}
     </h1>
 
-    <div id="logs-container" class="bg-gray-900 text-green-400 font-mono p-4 rounded h-64 overflow-y-auto border border-gray-700">
+    <div class="bg-[#0d1117] border border-gray-800 rounded-lg shadow-inner overflow-hidden">
+        <div class="flex items-center justify-between px-3 py-2 bg-[#161b22] border-b border-gray-800">
+            <span class="text-xs text-gray-400 font-mono">app.log</span>
+            <span id="log-status" class="text-xs text-green-400 font-mono">● LIVE</span>
+        </div>
+
+        <div id="logs-container"
+            class="font-mono text-xs leading-5 p-3 h-72 overflow-y-auto space-y-1
+                    text-gray-300 scroll-smooth">
+        </div>
     </div>
 </main>
 {% endblock %}
 
 {% block scripts %}
 <script>
-    (function() {
-        const logsContainer = document.getElementById('logs-container');
-        const ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";
-        const logsSocket = new WebSocket(ws_scheme + '://' + window.location.host + '/ws/logs/');
+(function () {
+    const logsContainer = document.getElementById("logs-container");
+    const statusIndicator = document.getElementById("log-status");
 
-        logsSocket.onmessage = function(e) {
-            const message = e.data;
-            const line = document.createElement('div');
-            line.textContent = message;
-            logsContainer.appendChild(line);
-            logsContainer.scrollTop = logsContainer.scrollHeight; 
-        };
+    const ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";
 
-        logsSocket.onclose = function(e) {
-            console.warn('Logs WebSocket fechado.');
-        };
-    })();
+    const logsSocket = new WebSocket(
+        ws_scheme + "://" + window.location.host + "/ws/admin/system/logs/"
+    );
+
+    const MAX_LINES = 500;
+
+    function getLevelClass(message) {
+        if (message.includes("ERROR")) return "text-red-400";
+        if (message.includes("WARNING")) return "text-yellow-400";
+        if (message.includes("INFO")) return "text-blue-400";
+        if (message.includes("DEBUG")) return "text-purple-400";
+        return "text-gray-300";
+    }
+
+    function shouldAutoScroll() {
+        return logsContainer.scrollTop + logsContainer.clientHeight >= logsContainer.scrollHeight - 20;
+    }
+
+    logsSocket.onmessage = function (e) {
+        const autoScroll = shouldAutoScroll();
+
+        const line = document.createElement("div");
+        line.className = "whitespace-pre-wrap break-words " + getLevelClass(e.data);
+        line.textContent = e.data;
+
+        logsContainer.appendChild(line);
+
+        if (logsContainer.children.length > MAX_LINES) {
+            logsContainer.removeChild(logsContainer.firstChild);
+        }
+
+        if (autoScroll) {
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+        }
+    };
+
+    logsSocket.onopen = function () {
+        statusIndicator.textContent = "● LIVE";
+        statusIndicator.className = "text-xs text-green-400 font-mono";
+    };
+
+    logsSocket.onclose = function () {
+        statusIndicator.textContent = "● DISCONNECTED";
+        statusIndicator.className = "text-xs text-red-400 font-mono";
+        console.warn("Logs WebSocket fechado.");
+    };
+})();
 </script>
 {% endblock %}
