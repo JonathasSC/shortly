@@ -1,10 +1,10 @@
 import asyncio
-import os
 
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.conf import settings
 
-from apps.security.services import LogSanitizerService
+from apps.manager.services.monitoring.log_sanitizer_service import LogSanitizerService
+from apps.manager.services.monitoring.log_streamer_service import LogStreamerService
 
 
 class LogsConsumer(AsyncWebsocketConsumer):
@@ -19,6 +19,7 @@ class LogsConsumer(AsyncWebsocketConsumer):
         await self.accept()
         self.log_path = settings.APP_LOG_FILE_PATH
         self.sanitizer = LogSanitizerService()
+        self.log_streamer = LogStreamerService()
         self.task = asyncio.create_task(self.stream_logs())
 
     async def disconnect(self, close_code):
@@ -26,27 +27,6 @@ class LogsConsumer(AsyncWebsocketConsumer):
             self.task.cancel()
 
     async def stream_logs(self):
-        last_inode = None
-
-        while True:
-            try:
-                stat = os.stat(self.log_path)
-                if stat.st_ino != last_inode:
-                    last_inode = stat.st_ino
-                    with open(self.log_path, "r") as f:
-                        f.seek(0, os.SEEK_END)
-
-                line = f.readline()
-
-                if not line:
-                    await asyncio.sleep(0.3)
-                    continue
-
-                line = self.sanitizer.sanitize(line)
-
-                await self.send(text_data=line)
-
-            except FileNotFoundError:
-                await asyncio.sleep(1)
-            except Exception:
-                await asyncio.sleep(1)
+        async for line in self.log_streamer.stream():
+            sanitized_line = self.sanitizer.sanitize(line)
+            await self.send(text_data=sanitized_line)
