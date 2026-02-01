@@ -1,6 +1,4 @@
-import re
 import time
-from typing import Iterable
 from urllib.parse import urlparse
 
 import redis
