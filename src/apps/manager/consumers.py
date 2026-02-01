@@ -19,7 +19,7 @@ class LogsConsumer(AsyncWebsocketConsumer):
         await self.accept()
         self.log_path = settings.APP_LOG_FILE_PATH
         self.sanitizer = LogSanitizerService()
-        self.log_streamer = LogStreamerService()
+        self.log_streamer = LogStreamerService(self.log_path)
         self.task = asyncio.create_task(self.stream_logs())
 
     async def disconnect(self, close_code):
