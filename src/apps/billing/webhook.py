@@ -215,12 +215,12 @@ class MercadoPagoWebhookView(View):
             logger.info(
                 f"[WEBHOOK] Aprovado (créditos), enviando para fila | payment={payment_id}")
 
-            payment_data = PaymentDataDTO({
-                "user_id": user_id,
-                "payment_type": payment_type,
-                "amount": metadata.get("amount"),
-                "payment_id": payment_id
-            })
+            payment_data = PaymentDataDTO(
+                payment_id=payment_id,
+                user_id=user_id,
+                payment_type=payment_type,
+                amount=metadata.get("amount"),
+            )
 
             process_payment_task.delay(payment_data)
             return JsonResponse({"status": "queued"}, status=202)
