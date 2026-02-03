@@ -11,6 +11,7 @@ from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
+from dataclasses import asdict
 
 from apps.billing.dto import PaymentDataDTO
 from apps.billing.models import UserWallet, WalletTransaction
@@ -222,7 +223,7 @@ class MercadoPagoWebhookView(View):
                 amount=metadata.get("amount"),
             )
 
-            process_payment_task.delay(payment_data)
+            process_payment_task.delay(asdict(payment_data))
             return JsonResponse({"status": "queued"}, status=202)
 
         if payment_type == "plan":

@@ -131,16 +131,35 @@ class WalletTransaction(BaseModelAbstract):
         REFUNDED = "refunded", "Estornada"
 
     wallet = models.ForeignKey(
-        UserWallet, on_delete=models.CASCADE, related_name="transactions")
+        UserWallet,
+        on_delete=models.CASCADE,
+        related_name="transactions"
+    )
     transaction_type = models.CharField(
-        max_length=10, choices=TransactionType.choices)
+        max_length=10,
+        choices=TransactionType.choices
+    )
     status = models.CharField(
-        max_length=10, choices=Status.choices, default=Status.PENDING)
+        max_length=10,
+        choices=Status.choices,
+        default=Status.PENDING
+    )
     amount = models.PositiveIntegerField()
-    processed_at = models.DateTimeField(null=True, blank=True)
-    source = models.CharField(max_length=50, blank=True, null=True)
+    processed_at = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+    source = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True
+    )
     external_reference = models.CharField(
-        max_length=128, blank=True, null=True)
+        max_length=128,
+        blank=True,
+        null=True,
+        unique=True
+    )
 
     # --------------------------------------
 

@@ -12,53 +12,60 @@ logger = logging.getLogger(__name__)
 
 
 @shared_task(bind=True, max_retries=5)
-def process_payment_task(self, data: PaymentDataDTO):
+def process_payment_task(self, data: dict):
+    payment = PaymentDataDTO(**data)
+
     logger.info(
-        f"[TASK][START] Processando pagamento | payment={data.data.payment_id} user={data.user_id} tipo={data.payment_type}")
+        f"[TASK][START] Processando pagamento | "
+        f"payment={payment.payment_id} user={payment.user_id} tipo={payment.payment_type}"
+    )
 
     User = get_user_model()
 
     try:
-        user = User.objects.get(id=data.user_id)
+        user = User.objects.get(id=payment.user_id)
     except User.DoesNotExist:
-        logger.error(f"[TASK] Usuário não encontrado | user={data.user_id}")
+        logger.error(f"[TASK] Usuário não encontrado | user={payment.user_id}")
         return {"status": "user_not_found"}
 
-    if WalletTransaction.objects.filter(external_reference=str(data.payment_id)).exists():
+    if WalletTransaction.objects.filter(
+        external_reference=str(payment.payment_id)
+    ).exists():
         logger.warning(
-            f"[TASK][Idempotência] Já processado | payment={data.payment_id}")
+            f"[TASK][Idempotência] Já processado | payment={payment.payment_id}"
+        )
         return {"status": "already_processed"}
 
-    if data.payment_type == "credits":
+    if payment.payment_type == "credits":
         logger.debug(
-            f"[TASK] Iniciando aplicação de créditos | valor={data.amount}")
+            f"[TASK] Iniciando aplicação de créditos | valor={payment.amount}")
 
         wallet, created = UserWallet.objects.get_or_create(user=user)
 
         if created:
-            logger.info(
-                f"[TASK] Carteira criada para o usuário | user={data.user_id}")
+            logger.info(f"[TASK] Carteira criada | user={payment.user_id}")
 
         try:
             with transaction.atomic():
                 wallet_transaction = WalletService.credit(
                     wallet=wallet,
-                    amount=data.amount,
-                    source=f"CRED {data.amount} via Mercado Pago",
-                    external_reference=str(data.payment_id),
+                    amount=payment.amount,
+                    source=f"CRED {payment.amount} via Mercado Pago",
+                    external_reference=str(payment.payment_id),
                 )
-                logger.info(
-                    f"[TASK] Transação marcada como SUCCESS | wallet_transaction_id={wallet_transaction.id}")
 
         except Exception as e:
             logger.error(
-                f"[TASK][ERRO] Falha ao processar créditos | payment={data.payment_id} error={str(e)}")
-            self.retry(exc=e, countdown=10)
+                f"[TASK][ERRO] Falha ao processar | payment={payment.payment_id} error={str(e)}"
+            )
+            raise self.retry(exc=e, countdown=10)
+
+        wallet.refresh_from_db()
 
         logger.info(
-            f"[TASK][DONE] Créditos aplicados com sucesso | user={data.user_id} new_balance={wallet.balance}")
+            f"[TASK][DONE] Créditos aplicados | user={payment.user_id} balance={wallet.balance}"
+        )
         return {"status": "wallet_updated", "wallet_transaction_id": wallet_transaction.id}
 
-    logger.warning(
-        f"[TASK] Tipo de pagamento não reconhecido | tipo={data.payment_type}")
+    logger.warning(f"[TASK] Tipo inválido | tipo={payment.payment_type}")
     return {"status": "invalid_type"}
