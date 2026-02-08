@@ -93,5 +93,5 @@ jobs:
         working-directory: ./infra/cypress
         run: npx cypress run
 
-      - name: Force prune UV cache
-        run: /opt/hostedtoolcache/uv/0.9.28/x86_64/uv cache prune --ci --force
+      - name: Force prune uv cache
+        run: uv cache prune --ci --force
