@@ -3,6 +3,8 @@ from django.core.exceptions import ValidationError
 from django.db.models.signals import post_save
 from django.test import TestCase, override_settings
 from django.utils import timezone
+from uuid import uuid4
+
 
 from apps.billing.models import (
     Plan,
@@ -60,7 +62,7 @@ class TestModels(TestCase):
             transaction_type=WalletTransaction.TransactionType.CREDIT,
             amount=amount,
             source=f"Crédito de {amount} coins para teste",
-            external_reference='',
+            external_reference=str(uuid4()),
         )
         wallet_transaction.process_success()
         wallet.refresh_from_db()
@@ -73,7 +75,7 @@ class TestModels(TestCase):
             transaction_type=WalletTransaction.TransactionType.CREDIT,
             amount=amount,
             source=f"Crédito de {amount} coins para teste",
-            external_reference='',
+            external_reference=str(uuid4()),
         )
         wallet_transaction.process_success()
 
@@ -90,7 +92,7 @@ class TestModels(TestCase):
             transaction_type=WalletTransaction.TransactionType.DEBIT,
             amount=amount,
             source=f"Débito de {amount} coins para teste",
-            external_reference='',
+            external_reference=str(uuid4()),
         )
 
         wallet_transaction.process_success()
