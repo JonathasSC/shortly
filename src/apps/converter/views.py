@@ -82,7 +82,7 @@ class HomeView(View):
         seen = request.session.get("announcement_seen", [])
 
         for announcement in queryset:
-            if announcement.show_only_once and announcement.id in seen:
+            if announcement.show_only_once and str(announcement.id) in seen:
                 continue
 
             announcements.append(announcement)
@@ -91,8 +91,9 @@ class HomeView(View):
             updated_seen = seen[:]
 
             for ann in announcements:
-                if ann.show_only_once and ann.id not in updated_seen:
-                    updated_seen.append(ann.id)
+                ann_id_str = str(ann.id)
+                if ann.show_only_once and ann_id_str not in updated_seen:
+                    updated_seen.append(ann_id_str)
 
             request.session["announcement_seen"] = updated_seen
 
@@ -102,10 +103,10 @@ class HomeView(View):
             {
                 "form": form,
                 "announcements": announcements,
-                "pricing": json.dumps(pricing),
+                "pricing": json.dumps(pricing), 
             },
         )
-
+        
     def post(self, request):
         form = UrlForm(request.POST)
         client_ip = user_request_util.get_client_ip(request)
