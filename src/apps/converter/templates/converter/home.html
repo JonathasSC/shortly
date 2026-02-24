@@ -12,18 +12,30 @@
     <div class="flex flex-col w-full max-w-md justify-center gap-4">
         <div class="flex flex-col justify-center text-center">
             <h1 class="text-xl sm:text-2xl font-bold mb-2 text-center">{% trans "Link Shortener" %}</h1>
-            <p class="text-sm md:text-base text-center">
+            <p class="text-sm md:text-base text-zinc-500 text-center">
                 {% trans "Turn long links into short, shareable URLs" %}
             </p>
         </div>
 
         <div>
-            <form method="post" class="border rounded-xl flex flex-col gap-3 p-4 border-zinc-200">
+            <form method="post" class="border bg-white rounded-xl flex flex-col gap-3 p-4 border-zinc-200">
+                {% if messages %}
+                <div class="flex justify-center w-full">
+                    <div class="w-full max-w-md">
+                        {% for message in messages %}
+                            <div class="rounded w-full">
+                                {{ message|safe }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
                 {% csrf_token %}
 
-                <div class="flex gap-4">
+                <div class="flex flex-col gap-4">
                     <div class="flex flex-col flex-1 h-fit gap-4">
-                        <label for="{{ form.original_url.id_for_label }}" class="block font-extrabold text-sm sm:text-md">
+                        <label for="{{ form.original_url.id_for_label }}" class="block font-bold text-sm sm:text-md">
                             {% trans "Original URL" %}
                         </label>
                         {{ form.original_url }}
@@ -34,29 +46,37 @@
                     </div>
                     
                     {% if request.user.is_authenticated %}
-                    <div id="is_direct_container" class="flex w-32 flex-col items-center justify-center gap-5">  
-                            <label class="block font-bold text-sm sm:text-md">
-                                {% trans "Direct Link" %}
-                            </label>
-    
-                            <label for="{{ form.is_direct.id_for_label }}" class="relative inline-flex items-center cursor-pointer">
-                                {{ form.is_direct }}
-                                <div class="w-11 h-6 bg-zinc-200 peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full
-                                            peer peer-checked:bg-blue-600 transition-colors"></div>
-                                <div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform
-                                            peer-checked:translate-x-5"></div>
-                            </label>
-    
-                            {% if form.is_direct.errors %}
-                                <p class="text-red-500 text-sm mt-1">{{ form.is_direct.errors }}</p>
-                            {% endif %}
+                    <div class="bg-zinc-100/60 rounded p-2 border border-zinc-200 flex gap-4">
+                        
+                        <div class="flex w-full justify-between items-center gap-3 p-4">
+                            <span class="text-xs font-bold uppercase tracking-wider text-zinc-500">{% trans "Direct Link" %}</span>
+                            <div class="flex w-fit h-fit">
+                                <label class="relative inline-flex items-center cursor-pointer group">
+                                    {{ form.is_direct }}
+                                    <div class="w-11 h-6 bg-zinc-300 rounded-full peer peer-checked:bg-blue-600 transition-all duration-300"></div>
+                                    <div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-all duration-300 peer-checked:translate-x-5 shadow-sm"></div>
+                                </label>
+                            </div>
                         </div>
+
+                        <div class="w-[1.5px] bg-zinc-200 h-100"></div>
+
+                        <div class="flex w-full justify-between items-center gap-3 p-4">
+                            <span class="text-xs font-bold uppercase tracking-wider text-zinc-500">{% trans "Permanent" %}</span>
+                            <div class="flex w-fit h-fit">
+                                <label class="relative inline-flex items-center cursor-pointer group">
+                                    {{ form.is_permanent }}
+                                    <div class="w-11 h-6 bg-zinc-300 rounded-full peer peer-checked:bg-blue-600 transition-all duration-300"></div>
+                                    <div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-all duration-300 peer-checked:translate-x-5 shadow-sm"></div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
                     {% endif %}
                 </div>
                 
-                <div id="direct-cost-warning"
+                <div id="cost-warning"
                     class="hidden text-sm text-center text-blue-500">
-                    {% trans "Direct links cost 2 coins." %}
                 </div>
                                 
                 <button type="submit" id="shorten_btn" class="btn w-full justify-center bg-blue-500 text-white hover:bg-blue-600 transition">
@@ -64,18 +84,6 @@
                 </button>
             </form>
         </div>
-
-        {% if messages %}
-        <div class="flex justify-center w-full">
-            <div class="w-full max-w-md">
-                {% for message in messages %}
-                    <div class="rounded w-full">
-                        {{ message|safe }}
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-        {% endif %}
     </div>
 </main>
 
@@ -87,21 +95,46 @@
 {% block scripts %}
 <script src="{% static 'converter/js/utilities.js' %}"></script>
 <script src="{% static 'converter/js/announcements.js' %}"></script>
+<script id="pricing-data" type="application/json">
+    {{ pricing|safe }}
+</script>
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    const checkbox = document.getElementById("id_is_direct")
-    const warning = document.getElementById("direct-cost-warning")
-    console.log(checkbox)
-    console.log(warning)
+    const pricing = JSON.parse(
+        document.getElementById("pricing-data").textContent
+    )
 
-    if (!checkbox || !warning) return
+    const direct = document.getElementById("id_is_direct")
+    const permanent = document.getElementById("id_is_permanent")
+    const warning = document.getElementById("cost-warning")
 
     function sync() {
-        warning.classList.toggle("hidden", !checkbox.checked)
+        let cost = pricing.base
+        let labels = []
+
+        if (direct?.checked) {
+            cost += pricing.direct
+            labels.push("{% trans 'direct' %}")
+        }
+
+        if (permanent?.checked) {
+            cost += pricing.permanent
+            labels.push("{% trans 'permanent' %}")
+        }
+
+        if (cost > pricing.base) {
+            warning.innerText =
+                `{% trans "This link will cost" %} ${cost} ` +
+                `{% trans "coins" %} (${labels.join(" + ")})`
+            warning.classList.remove("hidden")
+        } else {
+            warning.classList.add("hidden")
+        }
     }
 
-    checkbox.addEventListener("change", sync)
+    direct?.addEventListener("change", sync)
+    permanent?.addEventListener("change", sync)
     sync()
 })
 </script>

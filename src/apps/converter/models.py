@@ -34,8 +34,6 @@ class Url(BaseModelAbstract):
         help_text="IP do usuário anônimo que criou a URL"
     )
 
-    is_direct = models.BooleanField(default=False)
-
     def save(self, *args, **kwargs):
         if not self.short_code:
             self.short_code = short_code_generator.generate_unique(
@@ -55,3 +53,13 @@ class AccessEvent(BaseModelAbstract):
     url = models.ForeignKey(Url, on_delete=models.CASCADE)
     ip_address = models.TextField(max_length=15)
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class UrlMetadata(BaseModelAbstract):
+    url = models.OneToOneField(
+        Url,
+        on_delete=models.CASCADE,
+        related_name="metadata",
+    )
+    is_direct = models.BooleanField(default=False)
+    is_permanent = models.BooleanField(default=False)
