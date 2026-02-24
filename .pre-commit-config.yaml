@@ -1,16 +1,16 @@
 repos:
   - repo: local
     hooks:
-      - id: ruff-format
-        name: Ruff Format via uv
-        entry: uv run ruff format
+      - id: ruff-fix-and-format
+        name: Ruff Fix + Format
+        entry: uv run ruff check --fix
         language: system
         types: [python]
         pass_filenames: true
 
-      - id: ruff-fix
-        name: Ruff Check + Fix via uv
-        entry: uv run ruff check --fix
+      - id: ruff-check
+        name: Ruff Check (no fix)
+        entry: uv run ruff check
         language: system
         types: [python]
         pass_filenames: true
