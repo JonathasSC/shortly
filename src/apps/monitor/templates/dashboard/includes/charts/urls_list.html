@@ -12,6 +12,7 @@
                     <th class="px-3 py-2 text-left text-sm text-zinc-600">{% trans "Short Link" %}</th>
                     <th class="px-2 py-1 text-center text-sm text-zinc-600">{% trans "Clicks" %}</th>
                     <th class="px-2 py-1 text-center text-sm text-zinc-600">{% trans "Created at" %}</th>
+                    <th class="px-2 py-1 text-center text-sm text-zinc-600">{% trans "Expires at" %}</th>
                 </tr>
             </thead>
 
@@ -55,6 +56,10 @@
 
                     <td class="px-3 py-2 text-center text-zinc-400">
                         {{ link.created_at|date:"d/m/Y" }}
+                    </td>
+
+                    <td class="px-3 py-2 text-center text-zinc-400">
+                        {{ link.expires_at|date:"d/m/Y" }}
                     </td>
                 </tr>
 
