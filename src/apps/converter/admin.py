@@ -1,7 +1,9 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
-from .models import Url, UrlMetadata, AccessEvent, UrlSequence
+
+from .models import AccessEvent, Url, UrlMetadata, UrlSequence
+
 
 class UrlMetadataInline(admin.StackedInline):
     model = UrlMetadata
