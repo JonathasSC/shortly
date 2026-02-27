@@ -26,7 +26,7 @@ loadenv(dotenv_path=BASE_DIR / ".env.dev")
 # SECURITY
 # ================================================================
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", '')
-SHORT_CODE_MIN_LENGTH = os.environ.get("DJANGO_SHORT_CODE_MIN_LENGTH", '')
+SHORT_CODE_MIN_LENGTH = int(os.getenv("SHORT_CODE_MIN_LENGTH", 6) or 6)
 SHORT_CODE_SALT = os.environ.get("DJANGO_SHORT_CODE_SALT", '')
 
 DEBUG = True if os.environ.get("DJANGO_DEBUG", "FALSE") == "TRUE" else False
