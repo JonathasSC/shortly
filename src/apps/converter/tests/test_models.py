@@ -24,7 +24,6 @@ class UrlModelTestCase(TestCase):
         url = Url.objects.get(original_url='https://sh0rtly.com')
         self.assertEqual(url.original_url, 'https://sh0rtly.com')
         self.assertIsNotNone(url.short_code)
-        self.assertIsNotNone(url.expires_at)
         self.assertFalse(url.is_expired())
 
 

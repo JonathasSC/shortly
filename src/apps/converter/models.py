@@ -10,6 +10,12 @@ from apps.converter.utils import ShortCodeGenerator
 short_code_generator: ShortCodeGenerator = ShortCodeGenerator(length=8)
 
 
+class UrlSequence(models.Model):
+    value = models.BigIntegerField(default=0)
+
+    class Meta:
+        db_table = "url_sequence"
+
 class Url(BaseModelAbstract):
     original_url = models.URLField(
         max_length=4096,
@@ -22,28 +28,23 @@ class Url(BaseModelAbstract):
         editable=False
     )
 
-    expires_at = models.DateTimeField(
-        null=True,
-        blank=True,
-        help_text="Data/hora em que o link expira"
-    )
-
     created_by_ip = models.GenericIPAddressField(
         null=True,
-        blank=True,
-        help_text="IP do usuário anônimo que criou a URL"
+        blank=True
     )
 
     def save(self, *args, **kwargs):
-        if not self.short_code:
-            self.short_code = short_code_generator.generate_unique(
-                Url, 'short_code')
-        if not self.expires_at:
-            self.expires_at = timezone.now() + timedelta(days=7)
+        is_new = self._state.adding
+        from apps.converter.services.shortening_service import ShortCodeService, UrlSequenceService
+
+        if is_new and not self.short_code:
+            sequence = UrlSequenceService.next()
+            self.short_code = ShortCodeService.encode(sequence)
+
         super().save(*args, **kwargs)
 
     def is_expired(self) -> bool:
-        return self.expires_at and timezone.now() > self.expires_at
+        return timezone.now() > self.created_at + timedelta(days=7)
 
     def __str__(self):
         return f"{self.short_code} -> {self.original_url}"
@@ -52,7 +53,6 @@ class Url(BaseModelAbstract):
 class AccessEvent(BaseModelAbstract):
     url = models.ForeignKey(Url, on_delete=models.CASCADE)
     ip_address = models.TextField(max_length=15)
-    created_at = models.DateTimeField(auto_now_add=True)
 
 
 class UrlMetadata(BaseModelAbstract):

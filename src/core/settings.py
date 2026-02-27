@@ -13,8 +13,8 @@ PROJECT_ROOT = os.path.dirname(__file__)
 sys.path.insert(0, os.path.join(PROJECT_ROOT, "apps"))
 SITE_ID = 1
 
-DOMAIN = os.environ.get("DJANGO_DOMAIN", "")
-PROTOCOL = os.environ.get("DJANGO_PROTOCOL", "")
+DOMAIN = os.environ.get("DJANGO_DOMAIN", '')
+PROTOCOL = os.environ.get("DJANGO_PROTOCOL", '')
 
 # ================================================================
 # ENVIRONMENT VARIABLES
@@ -25,7 +25,10 @@ loadenv(dotenv_path=BASE_DIR / ".env.dev")
 # ================================================================
 # SECURITY
 # ================================================================
-SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", 'insecure-default-key')
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", '')
+SHORT_CODE_MIN_LENGTH = os.environ.get("DJANGO_SHORT_CODE_MIN_LENGTH", '')
+SHORT_CODE_SALT = os.environ.get("DJANGO_SHORT_CODE_SALT", '')
+
 DEBUG = True if os.environ.get("DJANGO_DEBUG", "FALSE") == "TRUE" else False
 ALLOWED_HOSTS = [
     host
@@ -33,7 +36,7 @@ ALLOWED_HOSTS = [
     if host
 ]
 CSRF_TRUSTED_ORIGINS = [
-    origin for origin in os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",") if origin
+    origin for origin in os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS", '').split(",") if origin
 ]
 
 SECURE_CROSS_ORIGIN_OPENER_POLICY = os.environ.get(
@@ -51,7 +54,6 @@ os.makedirs(LOG_DIR, exist_ok=True)
 
 APP_LOG_FILE_PATH = os.path.join(LOG_DIR, "app.log")
 ERROR_LOG_FILE_PATH = os.path.join(LOG_DIR, "error.log")
-
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -179,10 +181,10 @@ DATABASES = {
     "default": {
         "ENGINE": f"django.db.backends.{os.getenv('DB_ENGINE', 'sqlite3')}",
         "NAME": os.getenv("DB_NAME", "db.sqlite3"),
-        "USER": os.getenv("DB_USER", ""),
-        "PASSWORD": os.getenv("DB_PASSWORD", ""),
-        "HOST": os.getenv("DB_HOST", ""),
-        "PORT": os.getenv("DB_PORT", ""),
+        "USER": os.getenv("DB_USER", ''),
+        "PASSWORD": os.getenv("DB_PASSWORD", ''),
+        "HOST": os.getenv("DB_HOST", ''),
+        "PORT": os.getenv("DB_PORT", ''),
     }
 }
 
@@ -280,9 +282,9 @@ CELERY_BEAT_SCHEDULE = {
     },
 }
 
-MERCADO_PAGO_ACCESS_TOKEN = os.environ.get("MERCADO_PAGO_ACCESS_TOKEN", "")
-MERCADO_PAGO_PUBLIC_KEY = os.environ.get("MERCADO_PAGO_PUBLIC_KEY", "")
-MERCADO_PAGO_WEBHOOK_SECRET = os.environ.get("MERCADO_PAGO_WEBHOOK_SECRET", "")
+MERCADO_PAGO_ACCESS_TOKEN = os.environ.get("MERCADO_PAGO_ACCESS_TOKEN", '')
+MERCADO_PAGO_PUBLIC_KEY = os.environ.get("MERCADO_PAGO_PUBLIC_KEY", '')
+MERCADO_PAGO_WEBHOOK_SECRET = os.environ.get("MERCADO_PAGO_WEBHOOK_SECRET", '')
 
 # ================================================================
 # EMAIL CONFIGURATION
@@ -292,9 +294,9 @@ EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 try:
     EMAIL_HOST = os.environ.get("DJANGO_EMAIL_HOST")
     EMAIL_PORT = int(os.environ.get("DJANGO_EMAIL_PORT", 465))
-    EMAIL_USE_SSL = os.environ.get("DJANGO_EMAIL_USE_SSL", "").lower() in [
+    EMAIL_USE_SSL = os.environ.get("DJANGO_EMAIL_USE_SSL", '').lower() in [
         "true", "1", "yes"]
-    EMAIL_USE_TLS = os.environ.get("DJANGO_EMAIL_USE_TLS", "").lower() in [
+    EMAIL_USE_TLS = os.environ.get("DJANGO_EMAIL_USE_TLS", '').lower() in [
         "true", "1", "yes"]
     EMAIL_HOST_USER = os.environ.get("DJANGO_EMAIL_HOST_USER")
     EMAIL_HOST_PASSWORD = os.environ.get("DJANGO_EMAIL_HOST_PASSWORD")
@@ -352,5 +354,5 @@ CHANNEL_LAYERS = {
 }
 
 ALLOWED_WS_ORIGINS = [
-    origin for origin in os.environ.get("ALLOWED_WS_ORIGINS", "").split(",") if origin
+    origin for origin in os.environ.get("ALLOWED_WS_ORIGINS", '').split(",") if origin
 ]
