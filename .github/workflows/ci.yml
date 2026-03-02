@@ -14,6 +14,9 @@ jobs:
   test:
     runs-on: ubuntu-latest
     env:
+      DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+      SHORT_CODE_MIN_LENGTH: ${{ secrets.SHORT_CODE_MIN_LENGTH }}
+      SHORT_CODE_SALT: ${{ secrets.SHORT_CODE_SALT }}
       DJANGO_ALLOWED_HOSTS: "localhost,127.0.0.1,0.0.0.0"
       DJANGO_CSRF_TRUSTED_ORIGINS: "http://localhost,http://127.0.0.1"
 

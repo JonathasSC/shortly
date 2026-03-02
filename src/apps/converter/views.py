@@ -119,7 +119,7 @@ class HomeView(View):
             url, result = UrlShorteningService.shorten(
                 user=request.user,
                 client_ip=client_ip,
-                url_object=form.save(commit=False),
+                url_object=form.save(commit=True),
                 is_direct=form.cleaned_data["is_direct"],
                 is_permanent=form.cleaned_data["is_permanent"],
                 create_new=request.POST.get("create_new") == "true"
@@ -148,7 +148,7 @@ class HomeView(View):
             return redirect("converter:home")
 
         short_url = request.build_absolute_uri(
-            f"/{url.short_code}/").replace("http", "https")
+            f"/{url.short_code}").replace("http", "https")
         
         metadata = UrlMetadata.objects.filter(url=url).first()
 
