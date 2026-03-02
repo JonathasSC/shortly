@@ -18,9 +18,11 @@ class ShortCodeGenerator:
 
 class UserRequestUtil:
     def get_client_ip(self, request):
-        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-        if x_forwarded_for:
-            ip = x_forwarded_for.split(',')[0].strip()
-        else:
-            ip = request.META.get('REMOTE_ADDR')
-        return ip
+        return (
+            request.META.get("HTTP_CF_CONNECTING_IP")
+            or request.META.get("HTTP_X_FORWARDED_FOR")
+            or request.META.get("REMOTE_ADDR")
+        )
+
+    def get_country(self, request):
+        return request.META.get("HTTP_CF_IPCOUNTRY")

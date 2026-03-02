@@ -24,5 +24,13 @@ def check_flag(user, feature_name: str) -> bool:
 
 
 @register.filter(name="feature_enabled")
-def feature_enabled_filter(user, feature_name: str):
-    return check_flag(user, feature_name)
+def feature_enabled(user, feature_name: str) -> bool:
+    if not user or not hasattr(user, "is_authenticated"):
+        return False
+
+    try:
+        flag = FeatureFlag.objects.get(name=feature_name)
+    except FeatureFlag.DoesNotExist:
+        return False
+
+    return flag.is_active_for(user)

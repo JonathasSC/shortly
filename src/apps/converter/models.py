@@ -52,8 +52,29 @@ class Url(BaseModelAbstract):
 
 class AccessEvent(BaseModelAbstract):
     url = models.ForeignKey(Url, on_delete=models.CASCADE)
-    ip_address = models.TextField(max_length=15)
 
+    # Request info
+    ip_address = models.GenericIPAddressField()
+    user_agent = models.TextField(blank=True, null=True)
+    referer = models.TextField(blank=True, null=True)
+
+    # Browser info
+    browser = models.CharField(max_length=100, blank=True, null=True)
+    browser_version = models.CharField(max_length=50, blank=True, null=True)
+    os = models.CharField(max_length=100, blank=True, null=True)
+    device_type = models.CharField(max_length=50, blank=True, null=True)
+
+    # Geolocalization
+    country = models.CharField(max_length=100, blank=True, null=True)
+    region = models.CharField(max_length=100, blank=True, null=True)
+    city = models.CharField(max_length=100, blank=True, null=True)
+    latitude = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
+
+    # Extra
+    is_bot = models.BooleanField(default=False)
+    
+    
 
 class UrlMetadata(BaseModelAbstract):
     url = models.OneToOneField(

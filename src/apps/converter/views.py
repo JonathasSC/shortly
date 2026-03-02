@@ -15,7 +15,8 @@ from django.views import View
 
 from apps.converter.enums import PricingRule
 from apps.converter.forms import UrlForm
-from apps.converter.models import AccessEvent, Url, UrlMetadata
+from apps.converter.models import Url, UrlMetadata
+from apps.converter.services.access_event_service import AccessEventService
 from apps.converter.services.pricing_service import PricingService
 from apps.converter.services.shortening_service import ShortenResult, UrlShorteningService
 from apps.converter.utils import UserRequestUtil
@@ -23,15 +24,13 @@ from apps.notification.models import Announcement
 
 user_request_util = UserRequestUtil()
 
-
 class MiddleView(View):
     def get(self, request, short_code) -> HttpResponse:
         url = get_object_or_404(Url, short_code=short_code)
         metadata = get_object_or_404(UrlMetadata, url=url)
-        
-        ip_address = user_request_util.get_client_ip(request)
 
-        AccessEvent.objects.create(url=url, ip_address=ip_address)
+        # Tracking completo
+        AccessEventService.track(request, url)
 
         if metadata.is_direct:
             return redirect(url.original_url)
@@ -42,10 +41,13 @@ class MiddleView(View):
             "target_url": url.original_url,
         }
 
-        return render(request, "converter/middle.html", {
-            "redirect_url": reverse("converter:confirm-redirect") + f"?token={token}",
-        })
-
+        return render(
+            request,
+            "converter/middle.html",
+            {
+                "redirect_url": reverse("converter:confirm-redirect") + f"?token={token}",
+            },
+        )
 
 class ConfirmRedirectView(View):
     def get(self, request):
@@ -124,6 +126,7 @@ class HomeView(View):
                 is_permanent=form.cleaned_data["is_permanent"],
                 create_new=request.POST.get("create_new") == "true"
             )
+            
         except ValidationError:
             messages.success(request, mark_safe(
                 render_to_string(
