@@ -1,11 +1,12 @@
-from django.views import View
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
-from django.contrib import messages
+from django.views import View
 
 from apps.account.models import UserProfile
 from apps.account.services.image_processor_service import ImageProcessor
 from apps.account.services.image_validator_service import ImageValidator
+
 
 class UploadAvatarView(LoginRequiredMixin, View):
 
@@ -17,7 +18,7 @@ class UploadAvatarView(LoginRequiredMixin, View):
 
         if not image:
             messages.error(request, "Image is required.")
-            return redirect("account:profile")
+            return redirect("account:profile_edit")
 
         try:
 
@@ -44,4 +45,4 @@ class UploadAvatarView(LoginRequiredMixin, View):
 
             messages.error(request, str(error))
 
-        return redirect("account:profile")
+        return redirect("account:profile_edit")

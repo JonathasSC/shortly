@@ -6,97 +6,170 @@
 {% block footer %}{% endblock %}
 
 {% block content %}
-<main class="w-full flex-col mt-16 flex items-center justify-center">
-  <div class="p-6 w-full max-w-[1440px] flex flex-col gap-6">
-    <section class="w-full max-w-[1440px]">
-      <form method="post" class="flex flex-col gap-4">
-        {% csrf_token %}
+<main class="w-full mt-24 mb-12 flex flex-col items-center justify-center font-[Inter]">
+  <div class="px-4 w-full max-w-4xl flex flex-col gap-8">
+    
+    <!-- Header Section -->
+    <div class="flex flex-col gap-1">
+      <h1 class="text-2xl font-bold text-zinc-900">{% trans "Meu Perfil" %}</h1>
+      <p class="text-zinc-500 text-sm">{% trans "Gerencie suas informações pessoais e configurações de conta" %}</p>
+    </div>
 
-        <h2 class="font-bold text-xl">
-          {% trans "Profile Information" %}
-        </h2>
-
-        <div class="grid grid-cols-1 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-600 mb-1">
-              {% trans "Email" %}
-            </label>
-            <input type="email"
-                  value="{{ request.user.email }}"
-                  readonly
-                  class="w-full bg-gray-100 border border-gray-200 rounded px-3 py-2 text-gray-600 cursor-not-allowed">
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-600 mb-1">
-              {% trans "First Name" %}
-            </label>
-            {{ form.first_name|add_class:"w-full border rounded px-3 py-2 focus:ring-2 focus:ring-indigo-500" }}
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-600 mb-1">
-              {% trans "Last Name" %}
-            </label>
-            {{ form.last_name|add_class:"w-full border rounded px-3 py-2 focus:ring-2 focus:ring-indigo-500" }}
-          </div>
-        </div>
-
-        <div class="flex justify-end gap-4">
-          <button type="submit"
-                  class="btn text-white bg-blue-500 rounded-md hover:bg-blue-600">
-            <span class="material-symbols-outlined text-xl">
-              save
-            </span>
-            {% trans "Save changes" %}
-          </button>
-        </div>
-      </form>
-    </section>
-
-    <hr/>
-
-    <section class="w-full max-w-[1440px] flex flex-col gap-4">
-      <h2 class="font-bold text-xl">
-        {% trans "Security" %}
-      </h2>
-
-      <p class="text-sm text-gray-500">
-        {% trans "Update your password to keep your account secure." %}
-      </p>
-
-      <button
-        type="button"
-        data-open-modal="password-modal"
-        class="mt-2 w-fit flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-blue-100 text-blue-700 hover:bg-blue-500 hover:text-white rounded-md transition">
-        <span class="material-symbols-outlined text-xl">
-          encrypted
+    {% if messages %}
+    <div class="flex flex-col gap-2">
+      {% for message in messages %}
+      <div class="px-4 py-3 rounded-lg text-sm flex items-center gap-3 {% if message.tags == 'success' %}bg-emerald-50 text-emerald-700{% elif message.tags == 'error' %}bg-rose-50 text-rose-700{% else %}bg-blue-50 text-blue-700{% endif %}">
+        <span class="material-symbols-outlined text-lg">
+          {% if message.tags == 'success' %}check_circle{% elif message.tags == 'error' %}error{% else %}info{% endif %}
         </span>
-        {% trans "Change password" %}
-      </button>
-    </section>
+        {{ message }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
 
-    <hr/>
+    <form id="profile-form" method="post" enctype="multipart/form-data" class="flex flex-col gap-10">
+      {% csrf_token %}
       
-    <section class="flex flex-col gap-4">
-      <h2 class="font-bold text-xl">
-        {% trans "Danger Zone" %}
-      </h2>
+      <!-- Avatar Section -->
+      <div class="flex flex-col sm:flex-row items-center gap-6">
+            <div class="relative">
+                <div id="avatar-preview-container" class="w-24 h-24 rounded-full bg-zinc-100 flex items-center justify-center overflow-hidden border border-zinc-200">
+                    {% if object.avatar %}
+                    <img id="avatar-image" src="{{ object.avatar.url }}" alt="avatar" class="w-full h-full object-cover">
+                    {% else %}
+                    <span id="avatar-placeholder" class="text-3xl font-bold text-zinc-400">
+                        {{ request.user.first_name|default:request.user.username|first|upper }}
+                    </span>
+                    {% endif %}
+                </div>
+            
+                <label 
+                    for="{{ form.avatar.id_for_label }}" 
+                    class="absolute -bottom-1 -right-1 bg-blue-500 text-white w-9 h-9 rounded-full cursor-pointer hover:bg-blue-600 transition flex items-center justify-center shadow-md ring-2 ring-white"
+                    >
+                    <span class="material-symbols-outlined text-[18px]">edit</span>
+                    <input type="file" name="avatar" accept="image/*" class="hidden" id="{{ form.avatar.id_for_label }}">
+                </label>
 
-      <p class="text-sm text-red-600">
-        {% trans "Deleting your account is permanent and cannot be undone." %}
-      </p>
+                <button type="button" id="remove-avatar-preview" class="absolute -top-1 -right-1 bg-zinc-800 text-white p-1 rounded-full opacity-0 scale-0 transition-all flex items-center justify-center">
+                    <span class="material-symbols-outlined text-xs">close</span>
+                </button>
+            </div>
 
-      <button
-        type="button"
-        data-open-modal="delete-modal"
-        class="mt-2 w-fit flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-red-100 text-red-600 hover:bg-red-500 hover:text-white rounded-md transition">
-        <span class="material-symbols-outlined text-xl">
-          delete
-        </span>
-        {% trans "Delete my account" %}
-      </button>
-    </section>
+            <div class="flex flex-col gap-1 text-center sm:text-left">
+                <p class="font-semibold text-zinc-900">{{ request.user.get_full_name|default:request.user.username }}</p>
+                <p class="text-sm text-zinc-500">{{ request.user.email }}</p>
+                <div id="upload-status" class="hidden mt-2 text-[10px] font-bold uppercase tracking-wider text-amber-600 bg-amber-50 px-2 py-0.5 rounded w-fit mx-auto sm:mx-0">
+                    {% trans "Alterações pendentes" %}
+                </div>
+            </div>
+      </div>
+
+      <!-- Hidden real avatar input if needed by Django (already in labels but good practice) -->
+      <div class="hidden">{{ form.avatar }}</div>
+
+      <!-- Form Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+        
+        <!-- Basic Info -->
+        <div class="flex flex-col gap-6">
+          <div class="flex items-center gap-2 text-zinc-900 mb-2">
+            <span class="material-symbols-outlined text-xl">person</span>
+            <h2 class="text-md font-semibold">{% trans "Informações Básicas" %}</h2>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-bold text-zinc-700">{% trans "Nome" %}</label>
+              {{ form.first_name|add_class:"w-full p-2 border text-sm sm:text-md border-zinc-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+              {% if form.first_name.errors %}<p class="text-[10px] text-rose-500 mt-1">{{ form.first_name.errors.0 }}</p>{% endif %}
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-bold text-zinc-700">{% trans "Sobrenome" %}</label>
+              {{ form.last_name|add_class:"w-full p-2 border text-sm sm:text-md border-zinc-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+              {% if form.last_name.errors %}<p class="text-[10px] text-rose-500 mt-1">{{ form.last_name.errors.0 }}</p>{% endif %}
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-zinc-700">{% trans "Data de Nascimento" %}</label>
+            {{ form.birth_date|add_class:"w-full p-2 border text-sm sm:text-md border-zinc-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+            {% if form.birth_date.errors %}<p class="text-[10px] text-rose-500 mt-1">{{ form.birth_date.errors.0 }}</p>{% endif %}
+          </div>
+        </div>
+
+        <!-- Professional/Other Info -->
+        <div class="flex flex-col gap-6">
+          <div class="flex items-center gap-2 text-zinc-900 mb-2">
+            <span class="material-symbols-outlined text-xl">description</span>
+            <h2 class="text-md font-semibold">{% trans "Sobre Você" %}</h2>
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-zinc-700">{% trans "Bio" %}</label>
+            {{ form.bio|add_class:"w-full p-2 border text-sm sm:text-md border-zinc-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+            {% if form.bio.errors %}<p class="text-[10px] text-rose-500 mt-1">{{ form.bio.errors.0 }}</p>{% endif %}
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-6 md:col-span-2">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-bold text-zinc-700">{% trans "Website / Link" %}</label>
+              {{ form.website|add_class:"w-full p-2 border text-sm sm:text-md border-zinc-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+              {% if form.website.errors %}<p class="text-[10px] text-rose-500 mt-1">{{ form.website.errors.0 }}</p>{% endif %}
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-bold text-zinc-700">{% trans "Localização" %}</label>
+              {{ form.location|add_class:"w-full p-2 border text-sm sm:text-md border-zinc-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+              {% if form.location.errors %}<p class="text-[10px] text-rose-500 mt-1">{{ form.location.errors.0 }}</p>{% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center justify-end gap-3 mt-4 border-t border-zinc-100 pt-8">
+        <a href="{% url 'converter:home' %}" class="px-6 py-2.5 text-sm font-semibold text-zinc-500 hover:text-zinc-900 transition-colors">
+          {% trans "Voltar" %}
+        </a>
+        <button type="submit" id="save-profile-btn" class="btn justify-center bg-blue-500 text-white hover:bg-blue-600 transition">
+          <span class="material-symbols-outlined text-lg">save</span>
+          {% trans "Salvar Alterações" %}
+        </button>
+      </div>
+    </form>
+
+    <!-- Danger/Security Section -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4">
+      <div class="bg-zinc-100/60 rounded p-4 border border-zinc-200 flex flex-col gap-4">
+        <div class="flex items-center gap-2 text-zinc-900">
+          <span class="material-symbols-outlined text-xl">lock</span>
+          <h2 class="text-md font-semibold">{% trans "Segurança" %}</h2>
+        </div>
+        <p class="text-xs text-zinc-500 leading-relaxed">{% trans "Mantenha sua conta protegida alterando sua senha periodicamente." %}</p>
+        <button type="button" data-open-modal="password-modal" class="btn w-full justify-center bg-blue-100 text-blue-500 hover:bg-blue-300 hover:text-blue-600 transition">
+          <span class="material-symbols-outlined text-lg">key</span>
+          {% trans "Alterar Senha" %}
+        </button>
+      </div>
+
+      <div class="bg-rose-50/50 rounded p-4 border border-rose-200 flex flex-col gap-4">
+        <div class="flex items-center gap-2 text-rose-900">
+          <span class="material-symbols-outlined text-xl text-rose-400">delete_forever</span>
+          <h2 class="text-md font-semibold text-rose-300">{% trans "Zona de Perigo" %}</h2>
+        </div>
+        <p class="text-xs text-rose-400 leading-relaxed">{% trans "A exclusão da conta é permanente e não pode ser desfeita." %}</p>
+        <button type="button" data-open-modal="delete-modal" class="btn w-full justify-center bg-rose-100 text-rose-500 hover:bg-rose-300 hover:text-rose-600 transition">
+          <span class="material-symbols-outlined text-lg">person_remove</span>
+          {% trans "Excluir minha conta" %}
+        </button>
+      </div>
+    </div>
+
   </div>
 </main>
 
@@ -107,11 +180,22 @@
 
 {% block scripts %}
 <script>
+  // UI Selectors
+  const avatarInput = document.getElementById('{{ form.avatar.id_for_label }}');
+  const avatarPreviewContainer = document.getElementById('avatar-preview-container');
+  const removePreviewBtn = document.getElementById('remove-avatar-preview');
+  const uploadStatus = document.getElementById('upload-status');
+  const saveBtn = document.getElementById('save-profile-btn');
+  const initialAvatarHtml = avatarPreviewContainer.innerHTML;
+
+  // Generic Modal Logic
   document.querySelectorAll('[data-open-modal]').forEach(btn => {
     btn.addEventListener('click', () => {
       const modal = document.getElementById(btn.dataset.openModal);
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
     });
   });
 
@@ -121,6 +205,41 @@
     });
   });
 
+  // Avatar Interaction
+  if (avatarInput) {
+      avatarInput.addEventListener('change', function() {
+          if (this.files && this.files[0]) {
+              const reader = new FileReader();
+              reader.onload = function(e) {
+                  avatarPreviewContainer.innerHTML = `<img id="avatar-image" src="${e.target.result}" alt="preview" class="w-full h-full object-cover">`;
+                  removePreviewBtn.classList.remove('opacity-0', 'scale-0');
+                  removePreviewBtn.classList.add('opacity-100', 'scale-100');
+                  uploadStatus.classList.remove('hidden');
+              }
+              reader.readAsDataURL(this.files[0]);
+          }
+      });
+  }
+
+  removePreviewBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      avatarInput.value = '';
+      avatarPreviewContainer.innerHTML = initialAvatarHtml;
+      this.classList.remove('opacity-100', 'scale-100');
+      this.classList.add('opacity-0', 'scale-0');
+      uploadStatus.classList.add('hidden');
+  });
+
+  // Loading state on submit
+  document.getElementById('profile-form').addEventListener('submit', function() {
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = `
+          <div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+          {% trans "Salvando..." %}
+      `;
+  });
+
+  // Global Outside Click
   document.querySelectorAll('.fixed').forEach(modal => {
     modal.addEventListener('click', e => {
       if (e.target === modal) modal.classList.add('hidden');

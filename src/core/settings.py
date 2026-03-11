@@ -85,8 +85,8 @@ LOGGING = {
         },
     },
     "root": {
-        "handlers": ["console", "file", "error_file"],
-        "level": LOG_LEVEL,
+        "handlers": ["console"],
+        "level": "ERROR" if "test" in sys.argv else LOG_LEVEL,
     },
     "loggers": {
         "django": {
@@ -95,8 +95,8 @@ LOGGING = {
             "propagate": False,
         },
         "django.request": {
-            "handlers": ["console", "file", "error_file"],
-            "level": "WARNING",
+            "handlers": ["console"],
+            "level": "ERROR" if "test" in sys.argv else "INFO",
             "propagate": False,
         },
     },
@@ -115,6 +115,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # Third-party apps
+    "storages",
     "widget_tweaks",
     "django_celery_beat",
     "axes",
@@ -174,29 +175,6 @@ TEMPLATES = [
 ]
 
 # ================================================================
-# DATABASES
-# ================================================================
-
-DATABASES = {
-    "default": {
-        "ENGINE": f"django.db.backends.{os.getenv('DB_ENGINE', 'sqlite3')}",
-        "NAME": os.getenv("DB_NAME", "db.sqlite3"),
-        "USER": os.getenv("DB_USER", ''),
-        "PASSWORD": os.getenv("DB_PASSWORD", ''),
-        "HOST": os.getenv("DB_HOST", ''),
-        "PORT": os.getenv("DB_PORT", ''),
-    }
-}
-
-if "test" in sys.argv:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": ":memory:",
-        }
-    }
-
-# ================================================================
 # AUTHENTICATION & PASSWORD VALIDATION
 # ================================================================
 AUTH_PASSWORD_VALIDATORS = [
@@ -249,7 +227,69 @@ MEDIA_ROOT = BASE_DIR / "media"
 STATIC_URL = "static/"
 STATIC_ROOT = os.environ.get("DJANGO_STATIC_ROOT", "/usr/share/nginx/html")
 
-STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
+    },
+}
+
+if os.getenv("USE_S3") == "TRUE":
+    AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
+    AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
+    AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME")
+    AWS_S3_REGION_NAME = os.environ.get("AWS_S3_REGION_NAME", "us-east-1")
+    AWS_S3_CUSTOM_DOMAIN = os.environ.get("AWS_S3_CUSTOM_DOMAIN")
+    
+    AWS_S3_FILE_OVERWRITE = False
+    AWS_S3_VERIFY = True
+    AWS_QUERYSTRING_AUTH = False
+    AWS_S3_SIGNATURE_VERSION = "s3v4"
+    
+    AWS_S3_OBJECT_PARAMETERS = {
+        "CacheControl": "max-age=86400",
+    }
+    
+    STORAGES["default"] = {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+        "OPTIONS": {
+            "bucket_name": AWS_STORAGE_BUCKET_NAME,
+            "region_name": AWS_S3_REGION_NAME,
+        }
+    }
+    if AWS_S3_CUSTOM_DOMAIN:
+        STORAGES["default"]["OPTIONS"]["custom_domain"] = AWS_S3_CUSTOM_DOMAIN
+        MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
+    else:
+        MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/"
+
+# ================================================================
+# DATABASES
+# ================================================================
+
+DATABASES = {
+    "default": {
+        "ENGINE": f"django.db.backends.{os.getenv('DB_ENGINE', 'sqlite3')}",
+        "NAME": os.getenv("DB_NAME", "db.sqlite3"),
+        "USER": os.getenv("DB_USER", ''),
+        "PASSWORD": os.getenv("DB_PASSWORD", ''),
+        "HOST": os.getenv("DB_HOST", ''),
+        "PORT": os.getenv("DB_PORT", ''),
+    }
+}
+
+if "test" in sys.argv:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": ":memory:",
+        }
+    }
+    STORAGES["staticfiles"] = {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    }
 
 # ================================================================
 # CELERY CONFIGURATION

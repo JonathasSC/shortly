@@ -66,8 +66,12 @@
           <div class="relative group">
             <div class="relative inline-flex items-center justify-center">
               <div class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center 
-                          cursor-pointer select-none shadow-sm">
-                {{ user.first_name|default:user.username|first|upper }}
+                          cursor-pointer select-none shadow-sm overflow-hidden">
+                {% if user.profile.avatar %}
+                  <img src="{{ user.profile.avatar.url }}" alt="avatar" class="w-full h-full object-cover">
+                {% else %}
+                  {{ user.first_name|default:user.username|first|upper }}
+                {% endif %}
               </div>
 
               {% if user.has_active_subscription %}
@@ -130,8 +134,12 @@
         <div class="flex gap-2">
           {% if user.is_authenticated %}
           <div class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center 
-                      select-none shadow-sm text-lg">
-            {{ user.first_name|default:user.username|first|upper }}
+                      select-none shadow-sm text-lg overflow-hidden">
+            {% if user.profile.avatar %}
+              <img src="{{ user.profile.avatar.url }}" alt="avatar" class="w-full h-full object-cover">
+            {% else %}
+              {{ user.first_name|default:user.username|first|upper }}
+            {% endif %}
           </div>
           {% endif %}
   

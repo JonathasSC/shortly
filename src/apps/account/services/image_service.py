@@ -1,6 +1,7 @@
 import io
-from PIL import Image
+
 from django.core.files.uploadedfile import SimpleUploadedFile
+from PIL import Image
 
 
 class ImageService:

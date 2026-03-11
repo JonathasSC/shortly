@@ -41,7 +41,7 @@ class UserDeletionSchedule(BaseModelAbstract):
 
 def user_avatar_upload_path(instance, filename):
     ext = filename.split(".")[-1].lower()
-    return f"users/{instance.user.id}/avatar/{uuid.uuid4().hex}.{ext}"
+    return f"avatars/{instance.user.id}/{uuid.uuid4().hex}.{ext}"
 
 
 class UserProfile(BaseModelAbstract):
