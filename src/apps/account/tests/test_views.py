@@ -1,7 +1,13 @@
-from django.test import TestCase
+from unittest.mock import patch
+
+from django.contrib.auth import get_user_model
+from django.test import Client, TestCase
 from django.urls import reverse
 
 from apps.account.models import User
+from apps.account.services.image_service import ImageService
+from apps.account.tests.mocks.mock_image_processor import MockImageProcessor
+from apps.account.tests.mocks.mock_s3 import MockS3Uploader
 from apps.common.utils import CommonUtils
 
 
@@ -104,3 +110,85 @@ class LogoutViewTests(TestCase):
         response = self.client.post(reverse("account:logout"))
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("account:login"))
+
+
+class AuthenticatedTestCase(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = self._create_user()
+        self.client.force_login(self.user)
+
+    def _create_user(self):
+        User = get_user_model()
+
+        return User.objects.create_user(
+            username="testuser",
+            email="test@example.com",
+            password="strong-pass"
+        )
+
+
+class UploadAvatarViewTests(AuthenticatedTestCase):
+    def setUp(self):
+        super().setUp()
+
+        self.url = reverse("account:upload_avatar")
+
+        self.image = ImageService.create_image()
+        self.mock_s3 = MockS3Uploader()
+        self.mock_processor = MockImageProcessor()
+
+    def _upload(self, file):
+        return self.client.post(
+            self.url,
+            {"image": file}
+        )
+
+    @patch("apps.account.views.upload_service")
+    def test_upload_avatar_returns_201_when_image_is_valid(self, upload_service_mock):
+        upload_service_mock.uploader = self.mock_s3
+        upload_service_mock.processor = self.mock_processor
+
+        response = self._upload(self.image)
+
+        self.assertEqual(response.status_code, 201)
+
+    @patch("apps.account.views.upload_service")
+    def test_upload_avatar_resizes_image_before_upload(self, upload_service_mock):
+        upload_service_mock.uploader = self.mock_s3
+        upload_service_mock.processor = self.mock_processor
+
+        self._upload(self.image)
+
+        self.assertTrue(self.mock_processor.resize_called)
+
+    @patch("apps.account.views.upload_service")
+    def test_upload_avatar_sends_file_to_s3(self, upload_service_mock):
+        upload_service_mock.uploader = self.mock_s3
+        upload_service_mock.processor = self.mock_processor
+
+        self._upload(self.image)
+
+        self.assertTrue(self.mock_s3.upload_called)
+
+    def test_upload_avatar_rejects_invalid_extension(self):
+
+        from django.core.files.uploadedfile import SimpleUploadedFile
+
+        invalid_file = SimpleUploadedFile(
+            "virus.exe",
+            b"malicious-content",
+            content_type="application/octet-stream"
+        )
+
+        response = self._upload(invalid_file)
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_upload_requires_authentication(self):
+
+        self.client.logout()
+
+        response = self._upload(self.image)
+
+        self.assertEqual(response.status_code, 302)

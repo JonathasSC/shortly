@@ -10,10 +10,9 @@ from apps.account.views.auth import (
     UserLogoutView,
     UserRegisterView,
 )
-from apps.account.views.profile import (
-    UserDeleteView,
-    UserProfileUpdateView,
-)
+from apps.account.views.upload_avatar_view import UploadAvatarView
+from apps.account.views.user_delete_view import UserDeleteView
+from apps.account.views.user_profile_update_view import UserProfileUpdateView
 
 app_name = "account"
 
@@ -25,6 +24,7 @@ urlpatterns = [
     # Profile
     path('profile/delete', UserDeleteView.as_view(), name='profile_delete'),
     path('profile/edit', UserProfileUpdateView.as_view(), name='profile_edit'),
+    path('profile/avatar', UploadAvatarView.as_view(), name='upload_avatar'),
     path("deactivate/", DeactivateAccount.as_view(), name="profile_deactivate"),
 
     # Recovery
