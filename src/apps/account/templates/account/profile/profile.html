@@ -36,7 +36,7 @@
             <div class="relative">
                 <div id="avatar-preview-container" class="w-24 h-24 rounded-full bg-zinc-100 flex items-center justify-center overflow-hidden border border-zinc-200">
                     {% if object.avatar %}
-                    <img id="avatar-image" src="{{ object.avatar.url }}" alt="avatar" class="w-full h-full object-cover">
+                    <img id="avatar-image" src="{% url 'account:avatar_view' user.id %}" alt="avatar" class="w-full h-full object-cover">
                     {% else %}
                     <span id="avatar-placeholder" class="text-3xl font-bold text-zinc-400">
                         {{ request.user.first_name|default:request.user.username|first|upper }}

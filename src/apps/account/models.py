@@ -1,4 +1,3 @@
-
 import uuid
 
 from django.contrib.auth.models import AbstractUser
@@ -7,6 +6,7 @@ from django.utils.translation import gettext_lazy as _
 
 from apps.billing.models import UserSubscription
 from apps.common.models import BaseModelAbstract
+from apps.common.storage_backends import PrivateS3Storage
 
 
 class User(BaseModelAbstract, AbstractUser):

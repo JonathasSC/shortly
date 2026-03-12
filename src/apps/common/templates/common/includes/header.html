@@ -68,7 +68,7 @@
               <div class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center 
                           cursor-pointer select-none shadow-sm overflow-hidden">
                 {% if user.profile.avatar %}
-                  <img src="{{ user.profile.avatar.url }}" alt="avatar" class="w-full h-full object-cover">
+                  <img src="{% url 'account:avatar_view' user.id %}" alt="avatar" class="w-full h-full object-cover">
                 {% else %}
                   {{ user.first_name|default:user.username|first|upper }}
                 {% endif %}
@@ -108,12 +108,17 @@
                 {% trans "Dashboard" %}
               </a>
 
-              {% if user|feature_enabled:"profile_available" %}
+              <a href="{% url 'account:profile_edit' %}" class="flex items-center gap-2 px-4 py-2 text-sm hover:bg-zinc-100">
+                <span class="material-symbols-outlined text-blue-500">person</span>
+                {% trans "My Account" %}
+              </a>
+
+              {% comment %} {% if user|feature_enabled:"profile_available" %}
                 <a href="{% url 'account:profile_edit' %}" class="flex items-center gap-2 px-4 py-2 text-sm hover:bg-zinc-100">
                   <span class="material-symbols-outlined text-blue-500">person</span>
                   {% trans "My Account" %}
                 </a>
-              {% endif %}
+              {% endif %} {% endcomment %}
 
               <div class="border-t border-zinc-200"></div>
 
@@ -136,7 +141,7 @@
           <div class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center 
                       select-none shadow-sm text-lg overflow-hidden">
             {% if user.profile.avatar %}
-              <img src="{{ user.profile.avatar.url }}" alt="avatar" class="w-full h-full object-cover">
+              <img src="{% url 'account:avatar_view' user.id %}" alt="avatar" class="w-full h-full object-cover">
             {% else %}
               {{ user.first_name|default:user.username|first|upper }}
             {% endif %}

@@ -16,24 +16,6 @@ class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_object(self, queryset=None):
         profile, created = UserProfile.objects.get_or_create(user=self.request.user)
-        
-        # DEBUG S3 RETRIEVAL
-        print("\n--- S3 DEBUG START ---")
-        print(f"User: {self.request.user.email} (ID: {self.request.user.id})")
-        if profile.avatar:
-            print(f"Avatar field value: {profile.avatar.name}")
-            try:
-                print(f"Avatar URL: {profile.avatar.url}")
-                exists = profile.avatar.storage.exists(profile.avatar.name)
-                print(f"File exists on S3: {exists}")
-                if exists:
-                    print(f"File size: {profile.avatar.size} bytes")
-            except Exception as e:
-                print(f"Error accessing S3: {str(e)}")
-        else:
-            print("No avatar associated with this profile.")
-        print("--- S3 DEBUG END ---\n")
-        
         return profile
 
     def get_form_kwargs(self):
