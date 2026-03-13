@@ -2,9 +2,9 @@
 {% load i18n %}
 
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="{{ request.LANGUAGE_CODE|default:'en' }}">
 <head>
-    <title>{% block title %}Encurtador de URL{% endblock %}</title>
+    <title>{% block title %}{% trans "Link Shortener" %}{% endblock %}</title>
     {% include "common/includes/builtin.html" %}
     {% block extrahead %}{% endblock %}
 </head>

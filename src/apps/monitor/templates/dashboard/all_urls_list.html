@@ -138,23 +138,23 @@
                 </p>
 
                 <div>
-                    <p class="text-xs text-zinc-400 mb-1">Short link</p>
+                    <p class="text-xs text-zinc-400 mb-1">{% trans "Short link" %}</p>
                     <p id="shortCodeMobile-{{ link.id }}" class="bg-zinc-100 px-2 py-1 rounded-md font-mono text-xs">
                         {{ request.scheme }}://{{ request.get_host }}/{{ link.short_code }}
                     </p>
                 </div>
 
                 <div class="flex justify-between text-xs text-zinc-500">
-                    <span>Acessos: <strong>{{ link.clicks|default:0 }}</strong></span>
+                    <span>{% trans "Clicks:" %} <strong>{{ link.clicks|default:0 }}</strong></span>
                     <span>{{ link.created_at|date:"d/m/Y" }}</span>
                 </div>
 
                 <div class="flex gap-2 pt-2">
                     <button class="action-btn action-edit flex-1 py-2 bg-amber-50 rounded-md text-amber-600 text-xs">
-                        Editar
+                        {% trans "Edit" %}
                     </button>
                     <button class="action-btn action-delete flex-1 py-2 bg-red-50 rounded-md text-red-600 text-xs">
-                        Excluir
+                        {% trans "Delete" %}
                     </button>
 
                     <input type="hidden" class="ajax-url-update" value="{% url 'update_link' link.id %}">

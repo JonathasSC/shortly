@@ -1,9 +1,10 @@
+{% load i18n %}
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="{{ LANGUAGE_CODE|default:'en' }}">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bem-vindo ao Sh0rtly!</title>
+    <title>{% trans "Welcome to Sh0rtly!" %}</title>
     <style>
       /* === Base === */
       body {
@@ -115,29 +116,27 @@
       </header>
 
       <main class="email__content">
-        <h1 class="email__title">Bem-vindo(a), {{ user.username }}! 👋</h1>
+        <h1 class="email__title">{% trans "Welcome," %} {{ user.username }}! 👋</h1>
 
         <p class="email__text">
-          Estamos muito felizes por ter você conosco no
-          <span class="email__text--highlight">Sh0rtly</span> — sua plataforma
-          simples e rápida para encurtar e gerenciar links.
+          {% trans "We are very happy to have you with us at" %}
+          <span class="email__text--highlight">Sh0rtly</span> — {% trans "your simple and fast platform to shorten and manage links." %}
         </p>
 
         <p class="email__text">
-          Agora você pode criar, acompanhar estatísticas e compartilhar seus
-          links personalizados com facilidade.
+          {% trans "Now you can create, track statistics, and share your personalized links with ease." %}
         </p>
 
         <div class="email__action">
           <a href="https://sh0rtly.com/dashboard" class="email__button">
-            Acessar meu painel
+            {% trans "Access my dashboard" %}
           </a>
         </div>
       </main>
 
       <footer class="email__footer">
-        <p>Este é um e-mail automático, por favor não responda.</p>
-        <p>© {{ current_year }} Sh0rtly — Todos os direitos reservados.</p>
+        <p>{% trans "This is an automatic email, please do not reply." %}</p>
+        <p>© {{ current_year }} Sh0rtly — {% trans "All rights reserved." %}</p>
       </footer>
     </div>
   </body>
