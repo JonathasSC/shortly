@@ -156,3 +156,5 @@ whitelist.conf
 rabbitmq.conf
 definitions.json
 .env
+
+compose.override.yml
