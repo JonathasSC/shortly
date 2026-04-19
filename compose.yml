@@ -1,15 +1,16 @@
 services:
   shortly:
     container_name: shortly
-    build: 
+    build:
       context: ./src
       dockerfile: Dockerfile
-    env_file:
-      - ${ENV_FILE} 
     restart: always
+    env_file:
+      - ./src/.env
     volumes:
       - ./src/logs:/usr/src/logs
       - static_volume:/usr/share/nginx/html
+      - media_volume:/usr/src/media
     networks:
       - shortly_net
     depends_on:
@@ -29,7 +30,7 @@ services:
       dockerfile: Dockerfile
     command: daphne -b 0.0.0.0 -p 8001 core.asgi:application
     env_file:
-      - ${ENV_FILE}
+      - ./src/.env
     volumes:
       - ./src/logs:/usr/src/logs
     depends_on:
@@ -40,19 +41,20 @@ services:
     restart: always
 
   nginx:
-    container_name: nginx
+    container_name: shortly-nginx
     build: 
       context: ./infra/nginx
       dockerfile: Dockerfile
     restart: always
     ports:
-      - "8080:80"
+      - "8081:80"
     volumes:
-      - ./infra/nginx/shortly.prod.conf:/etc/nginx/conf.d/default.conf
+      - ./infra/nginx/shortly.dev.conf:/etc/nginx/conf.d/default.conf
       - ./infra/nginx/whitelist.conf:/etc/nginx/whitelist.conf:ro
       - ./infra/nginx/maintenance.html:/usr/share/nginx/maintenance/maintenance.html:ro
       - ./infra/nginx/maintenance.flag:/usr/share/nginx/maintenance/maintenance.flag
       - static_volume:/usr/share/nginx/html
+      - media_volume:/usr/share/nginx/media
     depends_on:
       shortly:
         condition: service_healthy
@@ -64,14 +66,14 @@ services:
       context: ./src
       dockerfile: Dockerfile
     container_name: shortly-celery-worker
+    env_file:
+      - ./src/.env
     command: celery -A core.celery worker -l info 
     working_dir: /usr/src
     volumes:
       - ./src:/usr/src
     environment:
       - PYTHONPATH=/usr/src
-    env_file:
-      - ${ENV_FILE} 
     depends_on:
       shortly:
         condition: service_healthy
@@ -89,7 +91,7 @@ services:
     volumes:
       - ./src:/usr/src
     env_file:
-      - ${ENV_FILE} 
+      - ./src/.env
     depends_on:
       shortly:
         condition: service_healthy
@@ -103,12 +105,12 @@ services:
       dockerfile: Dockerfile
     container_name: shortly-flower
     env_file:
-      - ${ENV_FILE}
+      - ./src/.env
     command: >
       celery --app=core.celery flower --port=5555
       --basic_auth=${FLOWER_USER}:${FLOWER_PASSWORD}
     ports:
-      - "5555:5555"
+      - "5556:5555"
     working_dir: /usr/src
     depends_on:
       celery_worker:
@@ -122,13 +124,15 @@ services:
   redis:
     image: redis:7.0-alpine
     container_name: shortly-redis
+    env_file:
+      - ./src/.env
     restart: always
     command: >
       redis-server --appendonly yes
                   --maxmemory 256mb
                   --maxmemory-policy allkeys-lru
     ports:
-      - "6379:6379"
+      - "6380:6379"
     volumes:
       - redis_data:/data
     networks:
@@ -146,4 +150,5 @@ networks:
 
 volumes:
   static_volume:
+  media_volume:
   redis_data:

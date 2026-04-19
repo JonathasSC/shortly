@@ -132,6 +132,7 @@ class DashboardHomeView(LoginRequiredMixin, View):
 
         context = {
             "user_links": user_urls,
+            "recent_links": user_urls[:5],
             "total_links": total_urls,
             "total_accesses": total_access_events,
             "six_months_accesses": total_accesses_last_6_months,
@@ -210,7 +211,7 @@ class UserUrlsList(LoginRequiredMixin, ListView):
             .values("total_clicks")[:1]
         )
 
-        qs = Url.objects.filter(created_by=self.request.user).annotate(
+        qs = Url.objects.filter(created_by=self.request.user).select_related("metadata").annotate(
             clicks=Subquery(clicks_subquery)
         )
 

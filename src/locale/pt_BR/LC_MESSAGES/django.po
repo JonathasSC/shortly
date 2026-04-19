@@ -41,6 +41,9 @@ msgstr ""
 msgid "{updated} conta(s) foram encerradas com sucesso."
 msgstr ""
 
+msgid "Expired at"
+msgstr "Expira em"
+
 #: apps/account/admin.py:52
 msgid "Reativar contas selecionadas"
 msgstr ""

@@ -1,0 +1,185 @@
+{% extends 'common/base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ url.short_code }} – Detalhes{% endblock %}
+
+{% block content %}
+<div class="p-6 w-full max-w-[1440px] mx-auto space-y-6">
+
+    <!-- Cabeçalho -->
+    <div class="mb-8">
+        <a href="{% url 'converter:home' %}" class="text-sm text-zinc-400 hover:text-zinc-600 flex items-center gap-1 mb-4">
+            <span class="material-symbols-outlined text-base">arrow_back</span>
+            Voltar
+        </a>
+        <h1 class="text-2xl font-bold text-zinc-800">Detalhes do link</h1>
+        <p class="text-sm text-zinc-400 mt-1">Criado em {{ url.created_at|date:"d/m/Y" }}</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Coluna principal (2/3) -->
+        <div class="lg:col-span-2 flex flex-col gap-6">
+
+            <!-- Card: Link -->
+            <div class="bg-white border border-zinc-200 rounded-xl p-6 shadow-sm">
+                <h2 class="text-xs font-bold uppercase tracking-widest text-zinc-400 mb-4">Link encurtado</h2>
+
+                <div class="flex items-center gap-3 bg-zinc-50 border border-zinc-200 rounded-lg px-4 py-3 mb-3">
+                    <span class="material-symbols-outlined text-blue-500 shrink-0">link</span>
+                    <span id="short-url-text" class="text-blue-600 font-semibold text-sm truncate flex-1">{{ short_url }}</span>
+                    <button onclick="copyShortUrl()"
+                            class="shrink-0 text-zinc-400 hover:text-zinc-700 transition"
+                            title="Copiar">
+                        <span id="copy-icon" class="material-symbols-outlined text-base">content_copy</span>
+                    </button>
+                </div>
+
+                <div class="flex items-start gap-3 bg-zinc-50 border border-zinc-100 rounded-lg px-4 py-3">
+                    <span class="material-symbols-outlined text-zinc-400 shrink-0 mt-0.5 text-base">open_in_new</span>
+                    <a href="{{ url.original_url }}" target="_blank" rel="noopener noreferrer"
+                       class="text-xs text-zinc-500 break-all hover:text-blue-600 transition">
+                        {{ url.original_url }}
+                    </a>
+                </div>
+
+                <!-- Badges -->
+                <div class="flex flex-wrap gap-2 mt-4">
+                    {% if is_expired %}
+                    <span class="inline-flex items-center gap-1 text-xs bg-red-50 text-red-500 border border-red-200 rounded-full px-3 py-1">
+                        <span class="material-symbols-outlined text-sm">schedule</span> Expirado
+                    </span>
+                    {% elif metadata.is_permanent %}
+                    <span class="inline-flex items-center gap-1 text-xs bg-green-50 text-green-600 border border-green-200 rounded-full px-3 py-1">
+                        <span class="material-symbols-outlined text-sm">all_inclusive</span> Permanente
+                    </span>
+                    {% else %}
+                    <span class="inline-flex items-center gap-1 text-xs bg-yellow-50 text-yellow-600 border border-yellow-200 rounded-full px-3 py-1">
+                        <span class="material-symbols-outlined text-sm">schedule</span> Expira em {{ days_until_expiry }} dias
+                    </span>
+                    {% endif %}
+
+                    {% if metadata.is_direct %}
+                    <span class="inline-flex items-center gap-1 text-xs bg-blue-50 text-blue-600 border border-blue-200 rounded-full px-3 py-1">
+                        <span class="material-symbols-outlined text-sm">bolt</span> Redirect direto
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Card: Estatísticas -->
+            <div class="bg-white border border-zinc-200 rounded-xl p-6 shadow-sm">
+                <h2 class="text-xs font-bold uppercase tracking-widest text-zinc-400 mb-5">Estatísticas</h2>
+
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="bg-zinc-50 border border-zinc-100 rounded-lg p-4 text-center">
+                        <p class="text-3xl font-bold text-zinc-800">{{ total_clicks }}</p>
+                        <p class="text-xs text-zinc-400 mt-1">Cliques totais</p>
+                    </div>
+                    <div class="bg-zinc-50 border border-zinc-100 rounded-lg p-4 text-center">
+                        <p class="text-3xl font-bold text-zinc-800">{{ unique_visitors }}</p>
+                        <p class="text-xs text-zinc-400 mt-1">Visitantes únicos</p>
+                    </div>
+                </div>
+
+                <!-- Dispositivos -->
+                {% if device_counts %}
+                <div class="mb-6">
+                    <p class="text-xs font-semibold text-zinc-500 mb-3">Dispositivos</p>
+                    <div class="flex flex-col gap-2">
+                        {% for device in device_counts %}
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-zinc-400 text-sm w-5">
+                                {% if device.device_type == "Mobile" %}smartphone
+                                {% elif device.device_type == "Tablet" %}tablet
+                                {% else %}computer{% endif %}
+                            </span>
+                            <span class="text-sm text-zinc-600 w-16">{{ device.device_type }}</span>
+                            <div class="flex-1 bg-zinc-100 rounded-full h-2">
+                                <div class="bg-blue-500 h-2 rounded-full"
+                                     style="width: {% widthratio device.total total_clicks 100 %}%"></div>
+                            </div>
+                            <span class="text-xs text-zinc-400 w-8 text-right">{{ device.total }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Países -->
+                {% if top_countries %}
+                <div>
+                    <p class="text-xs font-semibold text-zinc-500 mb-3">Top países</p>
+                    <div class="flex flex-col gap-2">
+                        {% for country in top_countries %}
+                        <div class="flex items-center gap-3">
+                            <span class="text-sm font-medium text-zinc-700 w-8">{{ country.country }}</span>
+                            <div class="flex-1 bg-zinc-100 rounded-full h-2">
+                                <div class="bg-indigo-400 h-2 rounded-full"
+                                     style="width: {% widthratio country.total total_clicks 100 %}%"></div>
+                            </div>
+                            <span class="text-xs text-zinc-400 w-8 text-right">{{ country.total }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if not total_clicks %}
+                <p class="text-sm text-zinc-400 text-center py-4">Nenhum acesso registrado ainda.</p>
+                {% endif %}
+            </div>
+
+        </div>
+
+        <!-- Coluna lateral: QR Code -->
+        <div class="lg:col-span-1">
+            <div class="bg-white border border-zinc-200 rounded-xl p-6 shadow-sm sticky top-6 flex flex-col items-center text-center gap-4">
+                <h2 class="text-xs font-bold uppercase tracking-widest text-zinc-400">QR Code</h2>
+
+                <div class="p-3 border border-zinc-200 rounded-xl bg-white shadow-sm">
+                    <img src="{% url 'converter:url-qr' url.short_code %}"
+                         alt="QR Code para {{ short_url }}"
+                         class="w-48 h-48"
+                         loading="lazy">
+                </div>
+
+                <p class="text-xs text-zinc-400 leading-relaxed">
+                    Aponta para<br>
+                    <span class="font-medium text-zinc-600">{{ short_url }}</span>
+                </p>
+
+                <a href="{% url 'converter:url-qr' url.short_code %}"
+                   download="qr-{{ url.short_code }}.png"
+                   class="w-full flex items-center justify-center gap-2 bg-zinc-800 text-white text-sm font-semibold py-2.5 rounded-lg hover:bg-zinc-700 transition">
+                    <span class="material-symbols-outlined text-base">download</span>
+                    Baixar PNG
+                </a>
+
+                <a href="{{ short_url }}" target="_blank" rel="noopener noreferrer"
+                   class="w-full flex items-center justify-center gap-2 border border-zinc-200 text-zinc-600 text-sm font-semibold py-2.5 rounded-lg hover:bg-zinc-50 transition">
+                    <span class="material-symbols-outlined text-base">open_in_new</span>
+                    Testar link
+                </a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    function copyShortUrl() {
+        const text = document.getElementById('short-url-text').textContent.trim();
+        navigator.clipboard.writeText(text).then(() => {
+            const icon = document.getElementById('copy-icon');
+            icon.textContent = 'check';
+            icon.classList.add('text-green-500');
+            setTimeout(() => {
+                icon.textContent = 'content_copy';
+                icon.classList.remove('text-green-500');
+            }, 1800);
+        });
+    }
+</script>
+{% endblock %}

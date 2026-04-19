@@ -19,7 +19,7 @@ PROTOCOL = os.environ.get("DJANGO_PROTOCOL", '')
 # ================================================================
 # ENVIRONMENT VARIABLES
 # ================================================================
-loadenv(dotenv_path=BASE_DIR / ".env.dev")
+loadenv(dotenv_path=BASE_DIR / ".env")
 
 
 # ================================================================
@@ -221,7 +221,7 @@ LOCALE_PATHS = [
 # ================================================================
 # STATIC & MEDIA FILES
 # ================================================================
-MEDIA_URL = "media/"
+MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 STATIC_URL = "static/"
@@ -242,16 +242,16 @@ if os.getenv("USE_S3") == "TRUE":
     AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME")
     AWS_S3_REGION_NAME = os.environ.get("AWS_S3_REGION_NAME", "us-east-1")
     AWS_S3_CUSTOM_DOMAIN = os.environ.get("AWS_S3_CUSTOM_DOMAIN")
-    
+
     AWS_S3_FILE_OVERWRITE = False
     AWS_S3_VERIFY = True
     AWS_QUERYSTRING_AUTH = False
     AWS_S3_SIGNATURE_VERSION = "s3v4"
-    
+
     AWS_S3_OBJECT_PARAMETERS = {
         "CacheControl": "max-age=86400",
     }
-    
+
     STORAGES["default"] = {
         "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
         "OPTIONS": {

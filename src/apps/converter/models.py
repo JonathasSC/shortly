@@ -46,6 +46,13 @@ class Url(BaseModelAbstract):
     def is_expired(self) -> bool:
         return timezone.now() > self.created_at + timedelta(days=7)
 
+    @property
+    def expires_at(self):
+        metadata = getattr(self, "metadata", None)
+        if metadata and metadata.is_permanent:
+            return None
+        return self.created_at + timedelta(days=7)
+
     def __str__(self):
         return f"{self.short_code} -> {self.original_url}"
 

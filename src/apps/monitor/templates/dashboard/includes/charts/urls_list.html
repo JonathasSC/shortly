@@ -13,6 +13,7 @@
                     <th class="px-2 py-1 text-center text-sm text-zinc-600">{% trans "Clicks" %}</th>
                     <th class="px-2 py-1 text-center text-sm text-zinc-600">{% trans "Created at" %}</th>
                     <th class="px-2 py-1 text-center text-sm text-zinc-600">{% trans "Expires at" %}</th>
+                    <th class="px-2 py-1 text-center text-sm text-zinc-600"></th>
                 </tr>
             </thead>
 
@@ -60,6 +61,13 @@
 
                     <td class="px-3 py-2 text-center text-zinc-400">
                         {{ link.expires_at|date:"d/m/Y" }}
+                    </td>
+                    <td class="px-3 py-2 text-center">
+                        <a href="{% url 'converter:url-detail' link.short_code %}"
+                           class="w-8 h-8 inline-flex items-center justify-center rounded-md hover:bg-zinc-100 transition"
+                           title="Ver detalhes e QR Code">
+                            <span class="material-symbols-outlined text-xl text-zinc-500">qr_code</span>
+                        </a>
                     </td>
                 </tr>
 
@@ -128,6 +136,12 @@
                             {{ link.created_at|date:"d/m/Y" }}
                         </span>
                     </div>
+
+                    <a href="{% url 'converter:url-detail' link.short_code %}"
+                       class="flex items-center justify-center gap-1.5 mt-1 py-2 bg-zinc-50 border border-zinc-200 rounded-md text-zinc-600 text-xs font-medium hover:bg-zinc-100 transition">
+                        <span class="material-symbols-outlined text-base">qr_code</span>
+                        Detalhes e QR Code
+                    </a>
                 </div>
                 {% endfor %}
             </div>

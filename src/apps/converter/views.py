@@ -1,10 +1,14 @@
+import io
 import json
+import qrcode
 import secrets
 
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.http import HttpResponse, HttpResponseForbidden
+from django.db.models import Count
+from django.http import Http404, HttpResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -24,12 +28,11 @@ from apps.notification.models import Announcement
 
 user_request_util = UserRequestUtil()
 
+
 class MiddleView(View):
     def get(self, request, short_code) -> HttpResponse:
         url = get_object_or_404(Url, short_code=short_code)
         metadata = get_object_or_404(UrlMetadata, url=url)
-
-        # Tracking completo
         AccessEventService.track(request, url)
 
         if metadata.is_direct:
@@ -48,6 +51,7 @@ class MiddleView(View):
                 "redirect_url": reverse("converter:confirm-redirect") + f"?token={token}",
             },
         )
+
 
 class ConfirmRedirectView(View):
     def get(self, request):
@@ -74,7 +78,7 @@ class HomeView(View):
             "direct": PricingService.RULE_COSTS[PricingRule.DIRECT],
             "permanent": PricingService.RULE_COSTS[PricingRule.PERMANENT],
         }
-        
+
         now = timezone.now()
 
         queryset = Announcement.objects.filter(is_active=True, start_at__lte=now).filter(
@@ -105,10 +109,10 @@ class HomeView(View):
             {
                 "form": form,
                 "announcements": announcements,
-                "pricing": json.dumps(pricing), 
+                "pricing": json.dumps(pricing),
             },
         )
-        
+
     def post(self, request):
         form = UrlForm(request.POST)
         client_ip = user_request_util.get_client_ip(request)
@@ -126,7 +130,7 @@ class HomeView(View):
                 is_permanent=form.cleaned_data["is_permanent"],
                 create_new=request.POST.get("create_new") == "true"
             )
-            
+
         except ValidationError:
             messages.success(request, mark_safe(
                 render_to_string(
@@ -152,7 +156,7 @@ class HomeView(View):
 
         short_url = request.build_absolute_uri(
             f"/{url.short_code}").replace("http", "https")
-        
+
         metadata = UrlMetadata.objects.filter(url=url).first()
 
         messages.success(
@@ -169,3 +173,81 @@ class HomeView(View):
             ),
         )
         return redirect("converter:home")
+
+
+def _generate_qr_png(data: str) -> bytes:
+    qr = qrcode.QRCode(version=1, box_size=10, border=4)
+    qr.add_data(data)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="#18181b", back_color="white")
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    return buf.getvalue()
+
+
+class UrlDetailView(LoginRequiredMixin, View):
+    login_url = "/account/login/"
+
+    def get(self, request, short_code):
+        url = get_object_or_404(Url, short_code=short_code)
+        if url.created_by != request.user:
+            raise Http404
+
+        metadata = UrlMetadata.objects.filter(url=url).first()
+        events = url.accessevent_set.all()
+
+        total_clicks = events.count()
+        unique_visitors = events.values("ip_address").distinct().count()
+
+        top_countries = (
+            events.exclude(country__isnull=True)
+            .exclude(country="")
+            .values("country")
+            .annotate(total=Count("id"))
+            .order_by("-total")[:5]
+        )
+
+        device_counts = (
+            events.exclude(device_type__isnull=True)
+            .values("device_type")
+            .annotate(total=Count("id"))
+            .order_by("-total")
+        )
+
+        short_url = request.build_absolute_uri(
+            f"/{url.short_code}/").replace("http://", "https://")
+
+        is_expired = url.is_expired()
+        days_until_expiry = None
+        if not is_expired and metadata and not metadata.is_permanent:
+            delta = url.expires_at - timezone.now()
+            days_until_expiry = max(0, delta.days)
+
+        return render(request, "converter/url_detail.html", {
+            "url": url,
+            "metadata": metadata,
+            "short_url": short_url,
+            "total_clicks": total_clicks,
+            "unique_visitors": unique_visitors,
+            "top_countries": list(top_countries),
+            "device_counts": list(device_counts),
+            "is_expired": is_expired,
+            "days_until_expiry": days_until_expiry,
+        })
+
+
+class QrCodeImageView(LoginRequiredMixin, View):
+    login_url = "/account/login/"
+
+    def get(self, request, short_code):
+        url = get_object_or_404(Url, short_code=short_code)
+        if url.created_by != request.user:
+            raise Http404
+
+        short_url = request.build_absolute_uri(
+            f"/{url.short_code}/").replace("http://", "https://")
+        png = _generate_qr_png(short_url)
+        response = HttpResponse(png, content_type="image/png")
+        response["Content-Disposition"] = f'inline; filename="qr-{short_code}.png"'
+        response["Cache-Control"] = "private, max-age=3600"
+        return response

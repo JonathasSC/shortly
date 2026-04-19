@@ -78,6 +78,12 @@
 
                     <td class="px-3 py-3 text-center">
                         <div class="flex justify-center gap-2">
+                            <a href="{% url 'converter:url-detail' link.short_code %}"
+                               class="w-8 h-8 flex items-center justify-center rounded-md hover:bg-zinc-100 transition"
+                               title="Detalhes e QR Code">
+                                <span class="material-symbols-outlined text-zinc-500">qr_code</span>
+                            </a>
+
                             <button type="button"
                                 class="action-btn action-edit w-8 h-8 flex items-center justify-center rounded-md hover:bg-amber-100 transition"
                                 data-link-id="{{ link.id }}">
@@ -150,6 +156,11 @@
                 </div>
 
                 <div class="flex gap-2 pt-2">
+                    <a href="{% url 'converter:url-detail' link.short_code %}"
+                       class="flex-1 flex items-center justify-center gap-1 py-2 bg-zinc-50 border border-zinc-200 rounded-md text-zinc-600 text-xs font-medium hover:bg-zinc-100 transition">
+                        <span class="material-symbols-outlined text-sm">qr_code</span>
+                        QR Code
+                    </a>
                     <button class="action-btn action-edit flex-1 py-2 bg-amber-50 rounded-md text-amber-600 text-xs">
                         Editar
                     </button>

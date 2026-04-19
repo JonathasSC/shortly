@@ -1,52 +1,47 @@
+# syntax=docker/dockerfile:1.4
+
 # ===============
 # Step 1: Builder
 # ===============
 FROM python:3.11-slim AS builder
 
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
 WORKDIR /usr/src
 
-RUN apt-get update && apt-get install -y \
-    gcc \
-    default-libmysqlclient-dev \
-    curl \
-    libpq-dev \
-    pkg-config \
-    ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
-ADD https://astral.sh/uv/install.sh /uv-installer.sh
-
-RUN sh /uv-installer.sh && rm /uv-installer.sh
-
-ENV PATH="/root/.local/bin/:$PATH"
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get install -y --no-install-recommends \
+        gcc \
+        libpq-dev \
+        pkg-config
 
 COPY pyproject.toml ./
+RUN mkdir -p apps core && touch README.md apps/__init__.py core/__init__.py
 
-RUN uv pip install . --system --no-build-isolation
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv pip install --system --no-build-isolation .
 
 # ===============
 # Step 2: Runtime
 # ===============
 FROM python:3.11-slim AS runtime
 
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
 WORKDIR /usr/src
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libpq-dev \
-    default-libmysqlclient-dev \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get install -y --no-install-recommends \
+        curl
 
 COPY --from=builder /usr/local /usr/local
 
 COPY . /usr/src
-
-EXPOSE 8000
 
 CMD ["gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000", "--timeout", "60"]
