@@ -219,7 +219,7 @@ msgstr "Meu perfil"
 
 #: apps/account/templates/account/profile/profile.html:15
 msgid "Manage your personal information and account settings"
-msgstr ""
+msgstr "Gerencie suas informações pessoais e configurações de conta"
 
 #: apps/account/templates/account/profile/profile.html:39
 #: apps/common/templates/common/includes/header.html:71
@@ -228,16 +228,12 @@ msgid "Avatar"
 msgstr "Avatar"
 
 #: apps/account/templates/account/profile/profile.html:64
-#, fuzzy
-#| msgid "Save changes"
 msgid "Pending changes"
-msgstr "Salvar mudanças"
+msgstr "Alterações pendentes"
 
 #: apps/account/templates/account/profile/profile.html:79
-#, fuzzy
-#| msgid "Profile Information"
 msgid "Basic Information"
-msgstr "Informações do Perfil"
+msgstr "Informações Básicas"
 
 #: apps/account/templates/account/profile/profile.html:84
 msgid "First Name"
@@ -245,41 +241,35 @@ msgstr "Primeiro Nome"
 
 #: apps/account/templates/account/profile/profile.html:90
 msgid "Last Name"
-msgstr "Último Nome"
+msgstr "Sobrenome"
 
 #: apps/account/templates/account/profile/profile.html:97
 msgid "Date of Birth"
-msgstr ""
+msgstr "Data de Nascimento"
 
 #: apps/account/templates/account/profile/profile.html:107
-#, fuzzy
-#| msgid "About"
 msgid "About You"
-msgstr "Sobre"
+msgstr "Sobre Você"
 
 #: apps/account/templates/account/profile/profile.html:111
 msgid "Bio"
-msgstr ""
+msgstr "Bio"
 
 #: apps/account/templates/account/profile/profile.html:120
 msgid "Website / Link"
-msgstr ""
+msgstr "Website / Link"
 
 #: apps/account/templates/account/profile/profile.html:126
-#, fuzzy
-#| msgid "Actions"
 msgid "Location"
-msgstr "Ações"
+msgstr "Localização"
 
 #: apps/account/templates/account/profile/profile.html:137
 msgid "Back"
-msgstr ""
+msgstr "Voltar"
 
 #: apps/account/templates/account/profile/profile.html:141
-#, fuzzy
-#| msgid "Save changes"
 msgid "Save Changes"
-msgstr "Salvar mudanças"
+msgstr "Salvar Alterações"
 
 #: apps/account/templates/account/profile/profile.html:151
 msgid "Security"
@@ -287,21 +277,19 @@ msgstr "Segurança"
 
 #: apps/account/templates/account/profile/profile.html:153
 msgid "Keep your account protected by changing your password periodically."
-msgstr ""
+msgstr "Mantenha sua conta protegida alterando sua senha periodicamente."
 
 #: apps/account/templates/account/profile/profile.html:163
 msgid "Danger Zone"
 msgstr "Zona de Perigo"
 
 #: apps/account/templates/account/profile/profile.html:165
-#, fuzzy
-#| msgid "Deleting your account is permanent and cannot be undone."
 msgid "Account deletion is permanent and cannot be undone."
-msgstr "Deletando sua conta permanentemente não será possível reverter."
+msgstr "A exclusão da conta é permanente e não pode ser desfeita."
 
 #: apps/account/templates/account/profile/profile.html:214
 msgid "Preview"
-msgstr "Anterior"
+msgstr "Pré-visualização"
 
 #: apps/account/templates/account/profile/profile.html:238
 msgid "Saving..."
