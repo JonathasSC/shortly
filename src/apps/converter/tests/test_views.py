@@ -16,7 +16,7 @@ class UrlViewTests(TestCase):
         CommonUtils().disable_welcome_signal()
         self.client = Client()
         self.user = User.objects.create_user(
-            username='jonathas.cardoso', password='password')
+            username='jonathas.cardoso', email='jonathas@test.com', password='password')
         self.anonymous_ip = '123.123.123.123'
         self.url_data = {
             'original_url': 'https://example.com'
@@ -38,12 +38,12 @@ class QrCodeImageViewTests(TestCase):
     def setUp(self):
         CommonUtils().disable_welcome_signal()
         self.client = Client()
-        self.owner = User.objects.create_user(username='owner', password='pass')
-        self.other = User.objects.create_user(username='other', password='pass')
+        self.owner = User.objects.create_user(username='owner', email='owner@test.com', password='pass')
+        self.other = User.objects.create_user(username='other', email='other@test.com', password='pass')
         self.url = _make_url(self.owner)
 
     def test_returns_png_for_owner(self):
-        self.client.login(username='owner', password='pass')
+        self.client.force_login(self.owner)
         response = self.client.get(
             reverse('converter:url-qr', kwargs={'short_code': self.url.short_code})
         )
@@ -51,21 +51,21 @@ class QrCodeImageViewTests(TestCase):
         self.assertEqual(response['Content-Type'], 'image/png')
 
     def test_response_is_valid_png(self):
-        self.client.login(username='owner', password='pass')
+        self.client.force_login(self.owner)
         response = self.client.get(
             reverse('converter:url-qr', kwargs={'short_code': self.url.short_code})
         )
         self.assertTrue(response.content[:4] == b'\x89PNG')
 
     def test_cache_control_header(self):
-        self.client.login(username='owner', password='pass')
+        self.client.force_login(self.owner)
         response = self.client.get(
             reverse('converter:url-qr', kwargs={'short_code': self.url.short_code})
         )
         self.assertIn('max-age=3600', response.get('Cache-Control', ''))
 
     def test_content_disposition_is_inline(self):
-        self.client.login(username='owner', password='pass')
+        self.client.force_login(self.owner)
         response = self.client.get(
             reverse('converter:url-qr', kwargs={'short_code': self.url.short_code})
         )
@@ -79,14 +79,14 @@ class QrCodeImageViewTests(TestCase):
         self.assertRedirects(response, f'/account/login/?next=/url/{self.url.short_code}/qr.png')
 
     def test_returns_404_for_non_owner(self):
-        self.client.login(username='other', password='pass')
+        self.client.force_login(self.other)
         response = self.client.get(
             reverse('converter:url-qr', kwargs={'short_code': self.url.short_code})
         )
         self.assertEqual(response.status_code, 404)
 
     def test_returns_404_for_nonexistent_code(self):
-        self.client.login(username='owner', password='pass')
+        self.client.force_login(self.owner)
         response = self.client.get(
             reverse('converter:url-qr', kwargs={'short_code': 'nonexist'})
         )
@@ -97,8 +97,8 @@ class UrlDetailViewTests(TestCase):
     def setUp(self):
         CommonUtils().disable_welcome_signal()
         self.client = Client()
-        self.owner = User.objects.create_user(username='owner', password='pass')
-        self.other = User.objects.create_user(username='other', password='pass')
+        self.owner = User.objects.create_user(username='owner', email='owner@test.com', password='pass')
+        self.other = User.objects.create_user(username='other', email='other@test.com', password='pass')
         self.url = _make_url(self.owner)
 
     def _detail_url(self, url=None):
@@ -112,25 +112,25 @@ class UrlDetailViewTests(TestCase):
         )
 
     def test_returns_200_for_owner(self):
-        self.client.login(username='owner', password='pass')
+        self.client.force_login(self.owner)
         response = self.client.get(self._detail_url())
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'converter/url_detail.html')
 
     def test_returns_404_for_non_owner(self):
-        self.client.login(username='other', password='pass')
+        self.client.force_login(self.other)
         response = self.client.get(self._detail_url())
         self.assertEqual(response.status_code, 404)
 
     def test_returns_404_for_nonexistent_code(self):
-        self.client.login(username='owner', password='pass')
+        self.client.force_login(self.owner)
         response = self.client.get(
             reverse('converter:url-detail', kwargs={'short_code': 'nonexist'})
         )
         self.assertEqual(response.status_code, 404)
 
     def test_context_has_days_until_expiry(self):
-        self.client.login(username='owner', password='pass')
+        self.client.force_login(self.owner)
         response = self.client.get(self._detail_url())
         self.assertIn('days_until_expiry', response.context)
         days = response.context['days_until_expiry']
@@ -140,7 +140,7 @@ class UrlDetailViewTests(TestCase):
 
     def test_days_until_expiry_is_none_for_permanent_url(self):
         url = _make_url(self.owner, is_permanent=True)
-        self.client.login(username='owner', password='pass')
+        self.client.force_login(self.owner)
         response = self.client.get(self._detail_url(url))
         self.assertIsNone(response.context['days_until_expiry'])
 
@@ -148,7 +148,7 @@ class UrlDetailViewTests(TestCase):
         url = _make_url(self.owner)
         url.created_at = timezone.now() - timedelta(days=8)
         url.save()
-        self.client.login(username='owner', password='pass')
+        self.client.force_login(self.owner)
         response = self.client.get(self._detail_url(url))
         self.assertTrue(response.context['is_expired'])
         self.assertIsNone(response.context['days_until_expiry'])
@@ -157,17 +157,17 @@ class UrlDetailViewTests(TestCase):
         AccessEvent.objects.create(url=self.url, ip_address='1.1.1.1')
         AccessEvent.objects.create(url=self.url, ip_address='1.1.1.1')
         AccessEvent.objects.create(url=self.url, ip_address='2.2.2.2')
-        self.client.login(username='owner', password='pass')
+        self.client.force_login(self.owner)
         response = self.client.get(self._detail_url())
         self.assertEqual(response.context['total_clicks'], 3)
         self.assertEqual(response.context['unique_visitors'], 2)
 
     def test_context_has_metadata(self):
-        self.client.login(username='owner', password='pass')
+        self.client.force_login(self.owner)
         response = self.client.get(self._detail_url())
         self.assertIsNotNone(response.context['metadata'])
 
     def test_context_has_short_url(self):
-        self.client.login(username='owner', password='pass')
+        self.client.force_login(self.owner)
         response = self.client.get(self._detail_url())
         self.assertIn(self.url.short_code, response.context['short_url'])

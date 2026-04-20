@@ -45,9 +45,8 @@ class CustomRegisterForm(forms.ModelForm):
     def clean_password(self):
         password = self.cleaned_data.get('password')
         try:
-            auth_utils: AuthenticationUtils = AuthenticationUtils()
-            auth_utils.password_validation(password)
-        except Exception as error:
+            AuthenticationUtils.validate_password(password)
+        except ValueError as error:
             raise forms.ValidationError(error)
         return password
 
