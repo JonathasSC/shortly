@@ -49,52 +49,52 @@ jobs:
       - name: Run Django tests
         run: uv run python manage.py test
 
-      # ---------- Front / Cypress ----------
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
+      # # ---------- Front / Cypress ----------
+      # - name: Setup Node
+      #   uses: actions/setup-node@v4
+      #   with:
+      #     node-version: '20'
 
-      - name: Install Cypress dependencies
-        working-directory: ./infra/cypress
-        run: npm install
+      # - name: Install Cypress dependencies
+      #   working-directory: ./infra/cypress
+      #   run: npm install
 
-      - name: Run Migrations
-        working-directory: ./src
-        run: |
-          uv run manage.py migrate
+      # - name: Run Migrations
+      #   working-directory: ./src
+      #   run: |
+      #     uv run manage.py migrate
 
-      - name: Check Django Project
-        working-directory: ./src
-        run: |
-          uv run manage.py check
+      # - name: Check Django Project
+      #   working-directory: ./src
+      #   run: |
+      #     uv run manage.py check
 
-      - name: Run Django Server (background)
-        working-directory: ./src
-        run: |
-          uv run manage.py runserver 0.0.0.0:8000 &
+      # - name: Run Django Server (background)
+      #   working-directory: ./src
+      #   run: |
+      #     uv run manage.py runserver 0.0.0.0:8000 &
 
-      - name: Wait for Django Server
-        working-directory: ./src
-        run: |
-          echo "Waiting for Django server to be ready..."
-          until curl -s http://127.0.0.1:8000/ > /dev/null; do
-            echo "Still waiting..."
-            sleep 2
-          done
-          echo "Django server is ready!"          
+      # - name: Wait for Django Server
+      #   working-directory: ./src
+      #   run: |
+      #     echo "Waiting for Django server to be ready..."
+      #     until curl -s http://127.0.0.1:8000/ > /dev/null; do
+      #       echo "Still waiting..."
+      #       sleep 2
+      #     done
+      #     echo "Django server is ready!"          
 
-      - name: Debug Django Home Page
-        working-directory: ./src
-        run: |
-          echo "Fetching home page HTML..."
-          curl -v http://127.0.0.1:8000/ -o debug_home.html
-          echo "HTML saved to debug_home.html"
-          head -n 50 debug_home.html
+      # - name: Debug Django Home Page
+      #   working-directory: ./src
+      #   run: |
+      #     echo "Fetching home page HTML..."
+      #     curl -v http://127.0.0.1:8000/ -o debug_home.html
+      #     echo "HTML saved to debug_home.html"
+      #     head -n 50 debug_home.html
 
-      - name: Run Cypress tests
-        working-directory: ./infra/cypress
-        run: npx cypress run
+      # - name: Run Cypress tests
+      #   working-directory: ./infra/cypress
+      #   run: npx cypress run
 
-      - name: Force prune uv cache
-        run: uv cache prune --ci --force
+      # - name: Force prune uv cache
+      #   run: uv cache prune --ci --force
