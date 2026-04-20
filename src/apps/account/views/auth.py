@@ -36,6 +36,7 @@ class UserRegisterView(View):
     def post(self, request):
         if settings.DEBUG and request.headers.get("X-CYPRESS") == "true":
             User.objects.filter(email="cypress@test.com").delete()
+            User.objects.filter(username="cypress").delete()
 
         form = CustomRegisterForm(request.POST)
 

@@ -4,7 +4,7 @@ describe("Signin and Signup", () => {
       req.headers["X-CYPRESS"] = "true";
     }).as("signup");
 
-    cy.visit("http://localhost:8000/account/register");
+    cy.visit("/account/register/");
 
     cy.get('input[name="username"]').type("cypress");
     cy.get('input[name="email"]').type("cypress@test.com");
@@ -27,11 +27,11 @@ describe("Signin and Signup", () => {
       req.headers["X-CYPRESS"] = "true";
     }).as("signin");
 
-    cy.visit("http://localhost:8000/account/login");
+    cy.visit("/account/login/");
 
     cy.get('input[name="username"]').first().type("cypress");
     cy.get('input[name="password"]').type("Cypress@123456");
-    
+
     cy.get('button[type="submit"]')
       .contains(/Entrar|Signin/i)
       .click();

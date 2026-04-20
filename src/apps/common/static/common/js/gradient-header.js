@@ -1,5 +1,6 @@
 document.addEventListener("scroll", function () {
     const header = document.getElementById("main-header");
+    if (!header) return;
 
     if (window.scrollY > 10) {
         header.classList.add("bg-white", "backdrop-blur-md", "border-b");
