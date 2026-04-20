@@ -1,6 +1,8 @@
 from django import forms
 
 from apps.account.models import UserProfile
+from apps.account.services.image_processor_service import ImageProcessor
+from apps.account.services.image_validator_service import ImageValidator
 
 
 class ProfileForm(forms.ModelForm):
@@ -34,6 +36,21 @@ class ProfileForm(forms.ModelForm):
         if self.user:
             self.fields['first_name'].initial = self.user.first_name
             self.fields['last_name'].initial = self.user.last_name
+
+    def clean_avatar(self):
+        avatar = self.cleaned_data.get('avatar')
+        if not avatar or not hasattr(avatar, 'size'):
+            return avatar
+        try:
+            ImageValidator.validate_size(avatar)
+            ImageValidator.validate_extension(avatar.name)
+            ImageValidator.validate_image(avatar)
+            avatar.seek(0)
+        except ValueError as e:
+            raise forms.ValidationError(str(e))
+        processed = ImageProcessor().resize(avatar)
+        processed.name = avatar.name
+        return processed
 
     def save(self, commit=True):
         profile = super().save(commit=False)

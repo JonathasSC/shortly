@@ -22,8 +22,10 @@ class UploadAvatarView(LoginRequiredMixin, View):
 
         try:
 
+            ImageValidator.validate_size(image)
             ImageValidator.validate_extension(image.name)
             ImageValidator.validate_image(image)
+            image.seek(0)
 
             processor = ImageProcessor()
 
