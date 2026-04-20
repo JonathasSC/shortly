@@ -4,28 +4,28 @@
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     <div class="bg-white border flex flex-col gap-2 border-zinc-200 rounded p-4">
         <div class="flex items-center justify-between w-full">
-            <h2 class="text-md font-semibold">Meus Links</h2>
+            <h2 class="text-md font-semibold">{% trans "My Links" %}</h2>
             <span class="material-symbols-outlined text-zinc-400">link</span>
         </div>
         <p class="text-3xl font-extrabold">{{ total_links }}</p>
-        <p class="text-sm text-zinc-600">Links encurtados por você</p>
+        <p class="text-sm text-zinc-600">{% trans "Shortened links by you" %}</p>
     </div>
 
     <div class="bg-white border flex flex-col gap-2 border-zinc-200 rounded p-4">
         <div class="flex items-center justify-between w-full">
-            <h2 class="text-md font-semibold">Total de Acessos</h2>
+            <h2 class="text-md font-semibold">{% trans "Total Clicks" %}</h2>
             <span class="material-symbols-outlined text-zinc-400">ads_click</span>
         </div>
         <p class="text-3xl font-extrabold">{{ total_accesses }}</p>
-        <p class="text-sm text-zinc-600">Total de acessos de todos os seus links</p>
+        <p class="text-sm text-zinc-600">{% trans "Total clicks from all your links" %}</p>
     </div>
 
     <div class="bg-white border flex flex-col gap-2 border-zinc-200 rounded p-4">
         <div class="flex items-center justify-between w-full">
-            <h2 class="text-md font-semibold">Links Ativos</h2>
+            <h2 class="text-md font-semibold">{% trans "Active Links" %}</h2>
             <span class="material-symbols-outlined text-zinc-400">link</span>
         </div>
         <p class="text-3xl font-extrabold">{{ user_links|length }}</p>
-        <p class="text-sm text-zinc-600">Seus links encurtados e ativos</p>
+        <p class="text-sm text-zinc-600">{% trans "Your shortened and active links" %}</p>
     </div>
 </div>

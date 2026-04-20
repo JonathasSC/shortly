@@ -40,7 +40,7 @@
 <main class="min-h-screen w-full flex items-center justify-center px-4">
     <img class='w-full max-w-[992px] absolute blur-sm -z-10 opacity-5'
          src={% static '/common/svg/logo/without_bg_icon_blue.svg'%}
-         alt='logo do Shortly'>   
+         alt="{% trans 'Shortly logo' %}">   
 
     <div class="flex flex-col items-center gap-4 text-center">
 
@@ -49,16 +49,16 @@
         </span>
 
         <h1 class="text-2xl font-bold text-green-600">
-            Pagamento aprovado! 🎉
+            {% trans "Payment Approved! 🎉" %}
         </h1>
 
         <p class="text-base text-center text-slate-600 leading-relaxed">
-            Seus créditos já foram adicionados à sua carteira!<br>
-            Obrigado por confiar na Shortly.
+            {% trans "Your credits have been added to your wallet!" %}<br>
+            {% trans "Thank you for trusting Shortly." %}
         </p>
 
         <p class="bg-blue-100 mt-5 rounded-full px-3 p-2 text-xs text-blue-400 font-medium">
-            Você será redirecionado automaticamente
+            {% trans "You will be automatically redirected" %}
         </p>
     </div>
 </main>

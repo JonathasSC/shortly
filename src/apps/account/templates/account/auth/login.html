@@ -8,7 +8,7 @@
 <header class="fixed w-full bg-white z-50 ">
   <div class="border-box px-4 py-3 flex items-center justify-start">
     <a href="{% url 'converter:home' %}" class="text-2xl font-bold text-gray-800">
-      <img class='w-36' src="{% static '/common/svg/logo/without_bg_with_text_blue.svg' %}" alt='logo do shortly'>
+      <img class='w-36' src="{% static '/common/svg/logo/without_bg_with_text_blue.svg' %}" alt="{% trans 'Shortly logo' %}">
     </a>  
   </div>
 </header>
@@ -73,9 +73,9 @@
             </button>
 
             <p class="text-center mt-2 text-sm sm:text-base">
-                Ainda não possui uma conta?
-                <a href="{% url 'account:register' %}" class="text-blue-500">
-                    Clique aqui
+                {% trans "Don't have an account yet?" %}
+                <a href="{% url 'account:register' %}" class="text-blue-500 hover:underline">
+                    {% trans "Click here" %}
                 </a>
             </p>
         </form>

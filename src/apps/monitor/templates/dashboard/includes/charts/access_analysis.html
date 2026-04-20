@@ -5,24 +5,24 @@
 <div class="w-full justify-between gap-6 flex flex-col">
   <div class="w-full justify-between gap-2 flex flex-col lg:flex-row">
     <div class="bg-white w-full border border-zinc-200 rounded p-4">
-      <h2 class="text-md font-semibold">Análises de Cliques</h2>
+      <h2 class="text-md font-semibold">{% trans "Click Analysis" %}</h2>
       <p class="text-sm text-gray-700 mb-2">
-        Andamento das URLs nos últimos 6 meses
+        {% trans "URL performance in the last 6 months" %}
       </p>
 
       {% if line_data and line_data|length > 0 %}
         <canvas id="clicksChart" height="100"></canvas>
       {% else %}
         <div class="h-[250px] flex items-center justify-center text-gray-500 text-sm">
-          Ainda não há dados suficientes
+          {% trans "Not enough data yet" %}
         </div>
       {% endif %}
     </div>
 
     <div class="bg-white border border-zinc-200 rounded p-4">
-      <h2 class="text-md font-semibold">Proporção por URL</h2>
+      <h2 class="text-md font-semibold">{% trans "Proportion by URL" %}</h2>
       <p class="text-sm text-gray-700 mb-2">
-        Distribuição de cliques por link
+        {% trans "Click distribution by link" %}
       </p>
 
       {% if pie_data and pie_data|length > 0 %}
@@ -31,12 +31,12 @@
         </div>
       {% else %}
         <div class="h-[250px] flex items-center justify-center text-gray-500 text-sm">
-          Nenhuma distribuição disponível
+          {% trans "No distribution available" %}
         </div>
       {% endif %}
 
       <p class="text-sm text-gray-700 mt-4">
-        Total de cliques (6 meses):
+        {% trans "Total clicks (6 months):" %}
         <strong>{{ six_months_accesses }}</strong>
       </p>
     </div>
@@ -46,45 +46,45 @@
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     <div class="bg-white border border-zinc-200 rounded p-4">
-      <h2 class="font-semibold mb-2">🌍 Países</h2>
+      <h2 class="font-semibold mb-2">🌍 {% trans "Countries" %}</h2>
       {% if country_data and country_data|length > 0 %}
         <canvas id="countryChart"></canvas>
       {% else %}
         <div class="h-[200px] flex items-center justify-center text-gray-400 text-sm">
-          Sem dados geográficos
+          {% trans "No geographic data" %}
         </div>
       {% endif %}
     </div>
 
     <div class="bg-white border border-zinc-200 rounded p-4">
-      <h2 class="font-semibold mb-2">📱 Dispositivos</h2>
+      <h2 class="font-semibold mb-2">📱 {% trans "Devices" %}</h2>
       {% if device_data and device_data|length > 0 %}
         <canvas id="deviceChart"></canvas>
       {% else %}
         <div class="h-[200px] flex items-center justify-center text-gray-400 text-sm">
-          Sem dados de dispositivo
+          {% trans "No device data" %}
         </div>
       {% endif %}
     </div>
 
     <div class="bg-white border border-zinc-200 rounded p-4">
-      <h2 class="font-semibold mb-2">🌐 Navegadores</h2>
+      <h2 class="font-semibold mb-2">🌐 {% trans "Browsers" %}</h2>
       {% if browser_data and browser_data|length > 0 %}
         <canvas id="browserChart"></canvas>
       {% else %}
         <div class="h-[200px] flex items-center justify-center text-gray-400 text-sm">
-          Sem dados de navegador
+          {% trans "No browser data" %}
         </div>
       {% endif %}
     </div>
 
     <div class="bg-white border border-zinc-200 rounded p-4">
-      <h2 class="font-semibold mb-2">🤖 Humanos vs Bots</h2>
+      <h2 class="font-semibold mb-2">🤖 {% trans "Humans vs Bots" %}</h2>
       {% if bot_data and bot_data|length > 0 %}
         <canvas id="botChart"></canvas>
       {% else %}
         <div class="h-[200px] flex items-center justify-center text-gray-400 text-sm">
-          Sem dados suficientes
+          {% trans "Not enough data" %}
         </div>
       {% endif %}
     </div>
