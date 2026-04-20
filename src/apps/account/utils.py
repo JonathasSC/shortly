@@ -48,13 +48,13 @@ class AuthenticationUtils:
         return user
 
     @staticmethod
-    def password_validation(password: str):
+    def validate_password(password: str):
         if len(password) < 8:
-            raise ValueError(_("A senha deve ter pelo menos 8 caracteres."))
+            raise ValueError(_("The password must be at least 8 characters long."))
 
         if not any(char.isdigit() for char in password) or not any(char.isalpha() for char in password):
-            raise ValueError(_("A senha deve conter letras e números."))
+            raise ValueError(_("The password must contain both letters and numbers."))
 
         if not any(char in "!@#$%^&*()-_=+[]{}|;:,.<>?/" for char in password):
             raise ValueError(
-                _("A senha deve conter pelo menos um caractere especial."))
+                _("The password must contain at least one special character."))

@@ -8,7 +8,6 @@ from django.utils import timezone
 from apps.common.utils import CommonUtils
 from apps.converter.models import AccessEvent, Url, UrlMetadata
 
-
 User = get_user_model()
 
 

@@ -1,8 +1,8 @@
 import io
 import json
-import qrcode
 import secrets
 
+import qrcode
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError

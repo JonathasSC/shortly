@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-06 22:06-0300\n"
+"POT-Creation-Date: 2026-03-12 10:14-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -42,7 +42,7 @@ msgid "{updated} conta(s) foram encerradas com sucesso."
 msgstr ""
 
 msgid "Expired at"
-msgstr "Expira em"
+msgstr "Expira em:"
 
 #: apps/account/admin.py:52
 msgid "Reativar contas selecionadas"
@@ -57,9 +57,26 @@ msgstr ""
 msgid "Você não tem permissão para excluir usuários."
 msgstr ""
 
-#: apps/account/models.py:11
+#: apps/account/models.py:13
 msgid "email address"
 msgstr "endereço de e-mail"
+
+#: apps/account/templates/account/auth/login.html:11
+#: apps/account/templates/account/auth/password_reset.html:11
+#: apps/account/templates/account/auth/password_reset_complete.html:8
+#: apps/account/templates/account/auth/password_reset_confirm.html:9
+#: apps/account/templates/account/auth/password_reset_done.html:8
+#: apps/account/templates/account/auth/register.html:11
+#: apps/billing/templates/billing/payment/failure.html:19
+#: apps/billing/templates/billing/payment/pending.html:29
+#: apps/billing/templates/billing/payment/success.html:43
+#: apps/common/templates/common/includes/header.html:8
+#: apps/converter/templates/converter/home.html:11
+#: apps/security/templates/security/locked.html:15
+#, fuzzy
+#| msgid "Short link"
+msgid "Shortly logo"
+msgstr "Link curto"
 
 #: apps/account/templates/account/auth/login.html:25
 msgid "Welcome back!"
@@ -76,6 +93,17 @@ msgstr "Esqueceu sua senha?"
 #: apps/account/templates/account/auth/login.html:72
 msgid "Signin"
 msgstr "Entrar"
+
+#: apps/account/templates/account/auth/login.html:76
+#, fuzzy
+#| msgid "You don't have any transactions yet"
+msgid "Don't have an account yet?"
+msgstr "Você ainda não tem nenhuma transação"
+
+#: apps/account/templates/account/auth/login.html:78
+#: apps/account/templates/account/auth/register.html:54
+msgid "Click here"
+msgstr "Clique aqui"
 
 #: apps/account/templates/account/auth/password_reset.html:24
 msgid "Recover your account"
@@ -144,11 +172,8 @@ msgstr "Registrar"
 msgid "Already have an account?"
 msgstr "Já possui uma conta?"
 
-#: apps/account/templates/account/auth/register.html:54
-msgid "Click here"
-msgstr "Clique aqui"
-
 #: apps/account/templates/account/includes/change_password_modal.html:8
+#: apps/account/templates/account/profile/profile.html:156
 msgid "Change Password"
 msgstr "Alterar Senha"
 
@@ -175,7 +200,7 @@ msgid "Update"
 msgstr "Atualizar"
 
 #: apps/account/templates/account/includes/deactivate_account_modal.html:8
-#: apps/account/templates/account/profile/profile.html:97
+#: apps/account/templates/account/profile/profile.html:168
 msgid "Delete my account"
 msgstr "Apagar minha conta"
 
@@ -188,59 +213,155 @@ msgstr ""
 msgid "Deactivate"
 msgstr "Desativar"
 
-#: apps/account/templates/account/profile/profile.html:16
-msgid "Profile Information"
+#: apps/account/templates/account/profile/profile.html:14
+msgid "My Profile"
+msgstr "Meu perfil"
+
+#: apps/account/templates/account/profile/profile.html:15
+msgid "Manage your personal information and account settings"
+msgstr ""
+
+#: apps/account/templates/account/profile/profile.html:39
+#: apps/common/templates/common/includes/header.html:71
+#: apps/common/templates/common/includes/header.html:145
+msgid "Avatar"
+msgstr "Avatar"
+
+#: apps/account/templates/account/profile/profile.html:64
+#, fuzzy
+#| msgid "Save changes"
+msgid "Pending changes"
+msgstr "Salvar mudanças"
+
+#: apps/account/templates/account/profile/profile.html:79
+#, fuzzy
+#| msgid "Profile Information"
+msgid "Basic Information"
 msgstr "Informações do Perfil"
 
-#: apps/account/templates/account/profile/profile.html:22
-msgid "Email"
-msgstr "E-mail"
-
-#: apps/account/templates/account/profile/profile.html:32
+#: apps/account/templates/account/profile/profile.html:84
 msgid "First Name"
 msgstr "Primeiro Nome"
 
-#: apps/account/templates/account/profile/profile.html:39
+#: apps/account/templates/account/profile/profile.html:90
 msgid "Last Name"
 msgstr "Último Nome"
 
-#: apps/account/templates/account/profile/profile.html:51
-msgid "Save changes"
+#: apps/account/templates/account/profile/profile.html:97
+msgid "Date of Birth"
+msgstr ""
+
+#: apps/account/templates/account/profile/profile.html:107
+#, fuzzy
+#| msgid "About"
+msgid "About You"
+msgstr "Sobre"
+
+#: apps/account/templates/account/profile/profile.html:111
+msgid "Bio"
+msgstr ""
+
+#: apps/account/templates/account/profile/profile.html:120
+msgid "Website / Link"
+msgstr ""
+
+#: apps/account/templates/account/profile/profile.html:126
+#, fuzzy
+#| msgid "Actions"
+msgid "Location"
+msgstr "Ações"
+
+#: apps/account/templates/account/profile/profile.html:137
+msgid "Back"
+msgstr ""
+
+#: apps/account/templates/account/profile/profile.html:141
+#, fuzzy
+#| msgid "Save changes"
+msgid "Save Changes"
 msgstr "Salvar mudanças"
 
-#: apps/account/templates/account/profile/profile.html:61
+#: apps/account/templates/account/profile/profile.html:151
 msgid "Security"
 msgstr "Segurança"
 
-#: apps/account/templates/account/profile/profile.html:65
-msgid "Update your password to keep your account secure."
-msgstr "Atualize sua senha para manter sua conta segura."
+#: apps/account/templates/account/profile/profile.html:153
+msgid "Keep your account protected by changing your password periodically."
+msgstr ""
 
-#: apps/account/templates/account/profile/profile.html:75
-#, fuzzy
-#| msgid "Save new password"
-msgid "Change password"
-msgstr "Salvar nova senha"
-
-#: apps/account/templates/account/profile/profile.html:83
+#: apps/account/templates/account/profile/profile.html:163
 msgid "Danger Zone"
 msgstr "Zona de Perigo"
 
-#: apps/account/templates/account/profile/profile.html:87
-msgid "Deleting your account is permanent and cannot be undone."
+#: apps/account/templates/account/profile/profile.html:165
+#, fuzzy
+#| msgid "Deleting your account is permanent and cannot be undone."
+msgid "Account deletion is permanent and cannot be undone."
 msgstr "Deletando sua conta permanentemente não será possível reverter."
 
+#: apps/account/templates/account/profile/profile.html:214
+msgid "Preview"
+msgstr "Anterior"
+
+#: apps/account/templates/account/profile/profile.html:238
+msgid "Saving..."
+msgstr "Salvando..."
+
 #: apps/account/utils.py:53
-msgid "A senha deve ter pelo menos 8 caracteres."
-msgstr ""
+msgid "The password must be at least 8 characters long."
+msgstr "A senha deve ter pelo menos 8 caracteres."
 
 #: apps/account/utils.py:56
-msgid "A senha deve conter letras e números."
-msgstr ""
+msgid "The password must contain both letters and numbers"
+msgstr "A senha deve conter letras e números."
 
 #: apps/account/utils.py:60
-msgid "A senha deve conter pelo menos um caractere especial."
+msgid "The password must contain at least one special character."
+msgstr "A senha deve conter pelo menos um caractere especial"
+
+#: apps/billing/templates/billing/payment/failure.html:27
+msgid "Payment Not Approved"
+msgstr "Pagamento Não Aprovado"
+
+#: apps/billing/templates/billing/payment/failure.html:31
+msgid "The payment was declined or canceled."
+msgstr "O Pagamento foi devolvido ou cancelado."
+
+#: apps/billing/templates/billing/payment/failure.html:32
+msgid "No charge was made."
+msgstr "Nenhuma cobrança foi feita."
+
+#: apps/billing/templates/billing/payment/failure.html:36
+#: apps/billing/templates/billing/payment/pending.html:45
+#: apps/billing/templates/billing/payment/success.html:61
+#, fuzzy
+#| msgid "If you are not automatically redirected,"
+msgid "You will be automatically redirected"
+msgstr "Se você não for redirecionado automaticamente,"
+
+#: apps/billing/templates/billing/payment/pending.html:36
+msgid "Waiting for payment confirmation"
+msgstr "Aguardando confirmação do pagamento"
+
+#: apps/billing/templates/billing/payment/pending.html:40
+msgid "We are verifying approval with the bank."
 msgstr ""
+
+#: apps/billing/templates/billing/payment/pending.html:41
+msgid "This may take a few seconds."
+msgstr "Isso pode demorar alguns segundos."
+
+#: apps/billing/templates/billing/payment/success.html:52
+msgid "Payment Approved! 🎉"
+msgstr "Pagamento Aprovado! 🎉"
+
+#: apps/billing/templates/billing/payment/success.html:56
+msgid "Your credits have been added to your wallet!"
+msgstr "Seus créditos foram adicionado a sua carteira!"
+
+#: apps/billing/templates/billing/payment/success.html:57
+msgid "Thank you for trusting Shortly."
+msgstr "Obrigado por confiar no Shortly."
 
 #: apps/billing/templates/billing/wallet.html:11
 msgid "Buy Credits"
@@ -291,27 +412,27 @@ msgstr ""
 "aqui."
 
 #: apps/billing/templates/billing/wallet.html:136
-#: apps/dashboard/templates/dashboard/all_urls_list.html:169
+#: apps/monitor/templates/dashboard/all_urls_list.html:174
 msgid "First Page"
 msgstr "Primeira página"
 
 #: apps/billing/templates/billing/wallet.html:141
-#: apps/dashboard/templates/dashboard/all_urls_list.html:176
+#: apps/monitor/templates/dashboard/all_urls_list.html:181
 msgid "Previous Page"
 msgstr "Página anterior"
 
 #: apps/billing/templates/billing/wallet.html:160
-#: apps/dashboard/templates/dashboard/all_urls_list.html:195
+#: apps/monitor/templates/dashboard/all_urls_list.html:200
 msgid "of"
 msgstr "de"
 
 #: apps/billing/templates/billing/wallet.html:165
-#: apps/dashboard/templates/dashboard/all_urls_list.html:200
+#: apps/monitor/templates/dashboard/all_urls_list.html:205
 msgid "Next Page"
 msgstr "Próxima página"
 
 #: apps/billing/templates/billing/wallet.html:170
-#: apps/dashboard/templates/dashboard/all_urls_list.html:207
+#: apps/monitor/templates/dashboard/all_urls_list.html:212
 msgid "Last Page"
 msgstr "Última página"
 
@@ -328,27 +449,32 @@ msgstr "Desculpe, a página que você procura não existe."
 msgid "Back to Home"
 msgstr "Voltar para a página inicial"
 
-#: apps/common/templates/common/includes/aside.html:12
+#: apps/common/templates/common/base.html:7
+#: apps/converter/templates/converter/home.html:14
+msgid "Link Shortener"
+msgstr "Encurtador de Links"
+
+#: apps/common/templates/common/includes/aside.html:13
 #: apps/common/templates/common/includes/footer.html:18
 msgid "Home"
 msgstr "Início"
 
-#: apps/common/templates/common/includes/aside.html:16
+#: apps/common/templates/common/includes/aside.html:17
 msgid "About"
 msgstr "Sobre"
 
-#: apps/common/templates/common/includes/aside.html:20
+#: apps/common/templates/common/includes/aside.html:21
 msgid "Services"
 msgstr "Serviços"
 
-#: apps/common/templates/common/includes/aside.html:24
+#: apps/common/templates/common/includes/aside.html:25
 #: apps/common/templates/common/includes/footer.html:24
 msgid "Contact"
 msgstr "Contato"
 
-#: apps/common/templates/common/includes/aside.html:34
-#: apps/common/templates/common/includes/header.html:120
-#: apps/common/templates/common/includes/header.html:181
+#: apps/common/templates/common/includes/aside.html:35
+#: apps/common/templates/common/includes/header.html:130
+#: apps/common/templates/common/includes/header.html:195
 msgid "Logout"
 msgstr "Sair"
 
@@ -374,73 +500,135 @@ msgid "About Us"
 msgstr "Sobre Nós"
 
 #: apps/common/templates/common/includes/footer.html:44
+#: apps/notification/templates/notification/email/password_reset.html:143
+#: apps/notification/templates/notification/email/password_reset_email.html:143
+#: apps/notification/templates/notification/email/welcome.html:139
 msgid "All rights reserved."
 msgstr "Todos os direitos reservados."
 
 #: apps/common/templates/common/includes/header.html:49
-#: apps/common/templates/common/includes/header.html:165
+#: apps/common/templates/common/includes/header.html:179
 msgid "Login"
 msgstr "Entrar"
 
 #: apps/common/templates/common/includes/header.html:55
-#: apps/common/templates/common/includes/header.html:166
+#: apps/common/templates/common/includes/header.html:180
 msgid "Create Account"
 msgstr "Criar Conta"
 
-#: apps/common/templates/common/includes/header.html:104
-#: apps/common/templates/common/includes/header.html:170
+#: apps/common/templates/common/includes/header.html:108
+#: apps/common/templates/common/includes/header.html:184
+#: apps/manager/templates/manager/dashboard.html:12
 msgid "Dashboard"
 msgstr "Painel"
 
-#: apps/common/templates/common/includes/header.html:110
-#: apps/common/templates/common/includes/header.html:174
+#: apps/common/templates/common/includes/header.html:113
+#: apps/common/templates/common/includes/header.html:188
 #, fuzzy
 #| msgid "Create Account"
 msgid "My Account"
 msgstr "Minha Conta"
 
-#: apps/converter/forms.py:15 apps/converter/templates/converter/home.html:27
-#: apps/dashboard/templates/dashboard/all_urls_list.html:37
-#: apps/dashboard/templates/dashboard/includes/charts/urls_list.html:11
+#: apps/converter/admin.py:11
+msgid "Configurações de Redirecionamento"
+msgstr ""
+
+#: apps/converter/admin.py:50
+msgid "Informações Básicas"
+msgstr ""
+
+#: apps/converter/admin.py:53
+msgid "Rastreamento"
+msgstr ""
+
+#: apps/converter/admin.py:59
+#: apps/monitor/templates/dashboard/all_urls_list.html:38
+#: apps/monitor/templates/dashboard/includes/charts/urls_list.html:12
+msgid "Short Link"
+msgstr "Link curto"
+
+#: apps/converter/admin.py:64 apps/converter/forms.py:30
+#: apps/converter/templates/converter/home.html:39
+#: apps/monitor/templates/dashboard/all_urls_list.html:37
+#: apps/monitor/templates/dashboard/includes/charts/urls_list.html:11
 msgid "Original URL"
 msgstr "URL original"
 
-#: apps/converter/forms.py:16 apps/converter/templates/converter/home.html:39
+#: apps/converter/admin.py:72
+#, fuzzy
+#| msgid "Direct Link"
+msgid "Direct?"
+msgstr "Link Direto"
+
+#: apps/converter/admin.py:76
+msgid "Acessos"
+msgstr ""
+
+#: apps/converter/admin.py:140
+msgid "Informações Principais"
+msgstr ""
+
+#: apps/converter/admin.py:143
+msgid "Navegador / Dispositivo"
+msgstr ""
+
+#: apps/converter/admin.py:147
+msgid "Localização"
+msgstr ""
+
+#: apps/converter/admin.py:151
+msgid "Requisição"
+msgstr ""
+
+#: apps/converter/admin.py:155
+msgid "Controle"
+msgstr ""
+
+#: apps/converter/forms.py:10 apps/converter/templates/converter/home.html:52
 msgid "Direct Link"
 msgstr "Link Direto"
 
-#: apps/converter/forms.py:21
+#: apps/converter/forms.py:18
+#, fuzzy
+#| msgid "Direct Link"
+msgid "Permanent Link"
+msgstr "Link Direto"
+
+#: apps/converter/forms.py:36
 msgid "Type or Paste your URL here..."
 msgstr "Digite ou cole sua URL aqui..."
-
-#: apps/converter/services/url_shortening_service.py:31
-msgid "URL shortening"
-msgstr "Encurtamento de URL"
-
-#: apps/converter/templates/converter/home.html:14
-msgid "Link Shortener"
-msgstr "Encurtador de Links"
 
 #: apps/converter/templates/converter/home.html:16
 msgid "Turn long links into short, shareable URLs"
 msgstr "Transforme links longos em URLs curtas e compartilháveis"
 
-#: apps/converter/templates/converter/home.html:59
-msgid "Direct links cost 2 coins."
-msgstr "Links diretos custam 2 moedas."
+#: apps/converter/templates/converter/home.html:65
+msgid "Permanent"
+msgstr ""
 
-#: apps/converter/templates/converter/home.html:63
+#: apps/converter/templates/converter/home.html:83
 msgid "Shorten"
 msgstr "Encurtar"
 
-#: apps/converter/templates/converter/includes/messages/insufficient_balance.html:4
+#: apps/converter/templates/converter/home.html:118
+msgid "direct"
+msgstr ""
+
+#: apps/converter/templates/converter/home.html:123
+msgid "permanent"
+msgstr ""
+
+#: apps/converter/templates/converter/home.html:128
+msgid "This link will cost"
+msgstr ""
+
+#: apps/converter/templates/converter/home.html:129
+msgid "coins"
+msgstr ""
+
+#: apps/converter/templates/converter/includes/insufficient_balance.html:4
 msgid "Insufficient balance. Add more coins to shorten more URLs."
 msgstr "Saldo insuficiente! Adicione mais coins para encurtar mais URLs"
-
-#: apps/converter/templates/converter/includes/messages/url_created.html:5
-#: apps/dashboard/templates/dashboard/home.html:25
-msgid "Short URL"
-msgstr "URL encurtada"
 
 #: apps/converter/templates/converter/includes/url_already_exists_modal.html:5
 msgid "URL already shortened"
@@ -454,9 +642,14 @@ msgstr ""
 "Esta URL já foi encurtada e ainda está ativa. Deseja criar um novo link "
 "encurtado para o mesmo destino?"
 
-#: apps/converter/templates/converter/includes/url_already_exists_modal.html:18
+#: apps/converter/templates/converter/includes/url_already_exists_modal.html:19
 msgid "Create New"
 msgstr "Criar novo"
+
+#: apps/converter/templates/converter/includes/url_created.html:5
+#: apps/monitor/templates/dashboard/home.html:25
+msgid "Short URL"
+msgstr "URL encurtada"
 
 #: apps/converter/templates/converter/middle.html:12
 msgid "You will be redirected in..."
@@ -469,84 +662,6 @@ msgstr "Se você não for redirecionado automaticamente,"
 #: apps/converter/templates/converter/middle.html:21
 msgid "click here"
 msgstr "clique aqui"
-
-#: apps/dashboard/templates/dashboard/all_urls_list.html:13
-msgid "Search URL or Short Code..."
-msgstr "Pesquisar URL ou código curto..."
-
-#: apps/dashboard/templates/dashboard/all_urls_list.html:21
-msgid "Minimum clicks"
-msgstr "Mínimo de cliques"
-
-#: apps/dashboard/templates/dashboard/all_urls_list.html:29
-msgid "Filtrate"
-msgstr "Filtrar"
-
-#: apps/dashboard/templates/dashboard/all_urls_list.html:38
-#: apps/dashboard/templates/dashboard/includes/charts/urls_list.html:12
-msgid "Short Link"
-msgstr "Link curto"
-
-#: apps/dashboard/templates/dashboard/all_urls_list.html:39
-#: apps/dashboard/templates/dashboard/includes/charts/urls_list.html:13
-msgid "Clicks"
-msgstr "Cliques"
-
-#: apps/dashboard/templates/dashboard/all_urls_list.html:40
-#: apps/dashboard/templates/dashboard/includes/charts/urls_list.html:14
-msgid "Created at"
-msgstr "Criado em"
-
-#: apps/dashboard/templates/dashboard/all_urls_list.html:41
-msgid "Actions"
-msgstr "Ações"
-
-#: apps/dashboard/templates/dashboard/all_urls_list.html:109
-#: apps/dashboard/templates/dashboard/includes/charts/urls_list.html:70
-msgid "You haven't created any links yet"
-msgstr "Você não criou nenhum link ainda"
-
-#: apps/dashboard/templates/dashboard/all_urls_list.html:112
-#: apps/dashboard/templates/dashboard/includes/charts/urls_list.html:73
-msgid ""
-"Once you shorten a URL, it will appear here so you can track clicks and "
-"statistics."
-msgstr ""
-"Ao encurtar uma URL, ela vai aparecer aqui e você poderá ver os cliques e "
-"estatísticas."
-
-#: apps/dashboard/templates/dashboard/all_urls_list.html:118
-#: apps/dashboard/templates/dashboard/includes/charts/urls_list.html:79
-msgid "Create first link"
-msgstr "Crie o primeiro link"
-
-#: apps/dashboard/templates/dashboard/home.html:16
-msgid "Administrative Panel"
-msgstr "Painel Adminsitrativo"
-
-#: apps/dashboard/templates/dashboard/home.html:19
-msgid "View and manage all your shortened links"
-msgstr "Visualize e gerencie todos os seus links encurtados"
-
-#: apps/dashboard/templates/dashboard/includes/charts/urls_list.html:5
-msgid "My Recent Links"
-msgstr "Meus links recentes"
-
-#: apps/dashboard/templates/dashboard/includes/charts/urls_list.html:102
-#, fuzzy
-#| msgid "Short Link"
-msgid "Short link"
-msgstr "Link curto"
-
-#: apps/dashboard/templates/dashboard/includes/charts/urls_list.html:118
-#, fuzzy
-#| msgid "Clicks"
-msgid "Clicks:"
-msgstr "Cliques"
-
-#: apps/dashboard/templates/dashboard/includes/charts/urls_list.html:134
-msgid "View all"
-msgstr "Ver tudo"
 
 #: apps/institutional/templates/institutional/about-us.html:9
 msgid "About Shortly"
@@ -705,6 +820,370 @@ msgstr ""
 "o desempenho do site, fornecer conteúdo personalizado e aprimorar sua "
 "experiência geral na Shortly."
 
+#: apps/manager/templates/manager/dashboard.html:17
+msgid "Total Users"
+msgstr "Usuários Totais"
+
+#: apps/manager/templates/manager/dashboard.html:24
+msgid "Active Users"
+msgstr "Usuários Ativos"
+
+#: apps/manager/templates/manager/dashboard.html:31
+msgid "URLs created today"
+msgstr "Links criados hoje"
+
+#: apps/manager/templates/manager/dashboard.html:38
+#, fuzzy
+#| msgid "Clicks"
+msgid "Clicks Today"
+msgstr "Cliques Hoje"
+
+#: apps/manager/templates/manager/dashboard.html:45
+msgid "New Users Today"
+msgstr "Novos Usuários Hoje"
+
+#: apps/manager/templates/manager/dashboard.html:52
+msgid "Growth vs Yesterday"
+msgstr "Crescimento em relação a ontem"
+
+#: apps/manager/templates/manager/dashboard.html:63
+msgid "System Health"
+msgstr "Saúde do Sistema"
+
+#: apps/manager/templates/manager/dashboard.html:68
+msgid "Database Status"
+msgstr "Status do Banco de Dados"
+
+#: apps/manager/templates/manager/dashboard.html:73
+msgid "Metric"
+msgstr "Métrica"
+
+#: apps/manager/templates/manager/dashboard.html:74
+#: apps/manager/templates/manager/dashboard.html:170
+msgid "Value"
+msgstr "Valor"
+
+#: apps/manager/templates/manager/dashboard.html:75
+#: apps/manager/templates/manager/dashboard.html:171
+msgid "Status"
+msgstr "Status"
+
+#: apps/manager/templates/manager/dashboard.html:164
+msgid "Server Status"
+msgstr "Status do Servidor"
+
+#: apps/manager/templates/manager/dashboard.html:169
+msgid "Resource"
+msgstr "Recurso"
+
+#: apps/manager/templates/manager/dashboard.html:236
+msgid "Logs"
+msgstr "Logs" 
+
+#: apps/monitor/templates/dashboard/all_urls_list.html:13
+msgid "Search URL or Short Code..."
+msgstr "Pesquisar URL ou código curto..."
+
+#: apps/monitor/templates/dashboard/all_urls_list.html:21
+msgid "Minimum clicks"
+msgstr "Mínimo de cliques"
+
+#: apps/monitor/templates/dashboard/all_urls_list.html:29
+msgid "Filtrate"
+msgstr "Filtrar"
+
+#: apps/monitor/templates/dashboard/all_urls_list.html:39
+#: apps/monitor/templates/dashboard/includes/charts/urls_list.html:13
+msgid "Clicks"
+msgstr "Cliques"
+
+#: apps/monitor/templates/dashboard/all_urls_list.html:40
+#: apps/monitor/templates/dashboard/includes/charts/urls_list.html:14
+msgid "Created at"
+msgstr "Criado em"
+
+#: apps/monitor/templates/dashboard/all_urls_list.html:41
+#: apps/monitor/templates/dashboard/all_urls_list.html:42
+msgid "Actions"
+msgstr "Ações"
+
+#: apps/monitor/templates/dashboard/all_urls_list.html:114
+#: apps/monitor/templates/dashboard/includes/charts/urls_list.html:75
+msgid "You haven't created any links yet"
+msgstr "Você não criou nenhum link ainda"
+
+#: apps/monitor/templates/dashboard/all_urls_list.html:117
+#: apps/monitor/templates/dashboard/includes/charts/urls_list.html:78
+msgid ""
+"Once you shorten a URL, it will appear here so you can track clicks and "
+"statistics."
+msgstr ""
+"Ao encurtar uma URL, ela vai aparecer aqui e você poderá ver os cliques e "
+"estatísticas."
+
+#: apps/monitor/templates/dashboard/all_urls_list.html:123
+#: apps/monitor/templates/dashboard/includes/charts/urls_list.html:84
+msgid "Create first link"
+msgstr "Crie o primeiro link"
+
+#: apps/monitor/templates/dashboard/all_urls_list.html:141
+#: apps/monitor/templates/dashboard/includes/charts/urls_list.html:107
+msgid "Short link"
+msgstr "Link curto"
+
+#: apps/monitor/templates/dashboard/all_urls_list.html:148
+#: apps/monitor/templates/dashboard/includes/charts/urls_list.html:123
+#, fuzzy
+#| msgid "Clicks"
+msgid "Clicks:"
+msgstr "Cliques"
+
+#: apps/monitor/templates/dashboard/all_urls_list.html:154
+msgid "Edit"
+msgstr ""
+
+#: apps/monitor/templates/dashboard/all_urls_list.html:157
+msgid "Delete"
+msgstr "Apagar"
+
+#: apps/monitor/templates/dashboard/home.html:16
+msgid "Administrative Panel"
+msgstr "Painel Adminsitrativo"
+
+#: apps/monitor/templates/dashboard/home.html:19
+msgid "View and manage all your shortened links"
+msgstr "Visualize e gerencie todos os seus links encurtados"
+
+#: apps/monitor/templates/dashboard/includes/charts/access_analysis.html:8
+#, fuzzy
+#| msgid "Clicks"
+msgid "Click Analysis"
+msgstr "Cliques"
+
+#: apps/monitor/templates/dashboard/includes/charts/access_analysis.html:10
+msgid "URL performance in the last 6 months"
+msgstr "Performance nos ultimos 6 meses"
+
+#: apps/monitor/templates/dashboard/includes/charts/access_analysis.html:17
+msgid "Not enough data yet"
+msgstr ""
+
+#: apps/monitor/templates/dashboard/includes/charts/access_analysis.html:23
+msgid "Proportion by URL"
+msgstr "Proporção por URL" 
+
+#: apps/monitor/templates/dashboard/includes/charts/access_analysis.html:25
+msgid "Click distribution by link"
+msgstr "Destribuição de clique por link"
+
+#: apps/monitor/templates/dashboard/includes/charts/access_analysis.html:34
+msgid "No distribution available"
+msgstr "Nenhuma distribuição disponível"
+
+#: apps/monitor/templates/dashboard/includes/charts/access_analysis.html:39
+msgid "Total clicks (6 months):"
+msgstr "Total de cliques (6 meses):"
+
+#: apps/monitor/templates/dashboard/includes/charts/access_analysis.html:49
+msgid "Countries"
+msgstr "Paises"
+
+#: apps/monitor/templates/dashboard/includes/charts/access_analysis.html:54
+msgid "No geographic data"
+msgstr "Sem dados geográficos"
+
+#: apps/monitor/templates/dashboard/includes/charts/access_analysis.html:60
+#, fuzzy
+#| msgid "Services"
+msgid "Devices"
+msgstr "Serviços"
+
+#: apps/monitor/templates/dashboard/includes/charts/access_analysis.html:65
+msgid "No device data"
+msgstr "Sem dados de dispositivo"
+
+#: apps/monitor/templates/dashboard/includes/charts/access_analysis.html:71
+msgid "Browsers"
+msgstr "Navegadores"
+
+#: apps/monitor/templates/dashboard/includes/charts/access_analysis.html:76
+msgid "No browser data"
+msgstr "Sem dados de navegadores"
+
+#: apps/monitor/templates/dashboard/includes/charts/access_analysis.html:82
+msgid "Humans vs Bots"
+msgstr "Humanos vc Robos"
+
+#: apps/monitor/templates/dashboard/includes/charts/access_analysis.html:87
+msgid "Not enough data"
+msgstr ""
+
+#: apps/monitor/templates/dashboard/includes/charts/info_cards.html:7
+#, fuzzy
+#| msgid "My Recent Links"
+msgid "My Links"
+msgstr "Meus links recentes"
+
+#: apps/monitor/templates/dashboard/includes/charts/info_cards.html:11
+#, fuzzy
+#| msgid "Short link"
+msgid "Shortened links by you"
+msgstr "Link curto"
+
+#: apps/monitor/templates/dashboard/includes/charts/info_cards.html:16
+#, fuzzy
+#| msgid "Clicks"
+msgid "Total Clicks"
+msgstr "Cliques"
+
+#: apps/monitor/templates/dashboard/includes/charts/info_cards.html:20
+msgid "Total clicks from all your links"
+msgstr "Total de cliques de todos os seus links"
+
+#: apps/monitor/templates/dashboard/includes/charts/info_cards.html:25
+#, fuzzy
+#| msgid "Actions"
+msgid "Active Links"
+msgstr "Ações"
+
+#: apps/monitor/templates/dashboard/includes/charts/info_cards.html:29
+msgid "Your shortened and active links"
+msgstr "Seus links encurtados e ativos"
+
+#: apps/monitor/templates/dashboard/includes/charts/urls_list.html:5
+msgid "My Recent Links"
+msgstr "Meus links recentes"
+
+#: apps/monitor/templates/dashboard/includes/charts/urls_list.html:15
+msgid "Expires at"
+msgstr "Expira em"
+
+#: apps/monitor/templates/dashboard/includes/charts/urls_list.html:139
+msgid "View all"
+msgstr "Ver tudo"
+
+#: apps/notification/templates/notification/email/password_reset.html:7
+#: apps/notification/templates/notification/email/password_reset_email.html:7
+msgid "Password Recovery - Sh0rtly"
+msgstr "Recuperação de Senha - Sh0rtly"
+
+#: apps/notification/templates/notification/email/password_reset.html:112
+#: apps/notification/templates/notification/email/password_reset_email.html:112
+msgid "Password Recovery"
+msgstr "Recuperação de Senha"
+
+#: apps/notification/templates/notification/email/password_reset.html:115
+#: apps/notification/templates/notification/email/password_reset_email.html:115
+msgid "Hello,"
+msgstr "Olá,"
+
+#: apps/notification/templates/notification/email/password_reset.html:119
+#: apps/notification/templates/notification/email/password_reset_email.html:119
+#, fuzzy
+#| msgid "Your secure password"
+msgid "You requested a password reset on"
+msgstr "Sua senha segura"
+
+#: apps/notification/templates/notification/email/password_reset.html:124
+#: apps/notification/templates/notification/email/password_reset_email.html:124
+msgid "To create a new password, just click the button below:"
+msgstr "Para criar uma nova senha, basta clicar no botão abaixo:"
+
+#: apps/notification/templates/notification/email/password_reset.html:132
+#: apps/notification/templates/notification/email/password_reset_email.html:132
+msgid "Reset my password"
+msgstr "Salvar minha senha"
+
+#: apps/notification/templates/notification/email/password_reset.html:137
+#: apps/notification/templates/notification/email/password_reset_email.html:137
+msgid ""
+"If you did not request this action, just ignore this message. No changes "
+"will be made to your account."
+msgstr ""
+"Se você não solicitou esta ação, ignore esta mensagem. Nenhuma alteração"
+"será feita em sua conta."
+
+#: apps/notification/templates/notification/email/password_reset.html:142
+#: apps/notification/templates/notification/email/password_reset_email.html:142
+#: apps/notification/templates/notification/email/welcome.html:138
+msgid "This is an automatic email, please do not reply."
+msgstr "Este é um e-mail automático, por favor, não responda."
+
+#: apps/notification/templates/notification/email/welcome.html:7
+msgid "Welcome to Sh0rtly!"
+msgstr "Bem-vindo ao Sh0rtly!"
+
+#: apps/notification/templates/notification/email/welcome.html:119
+msgid "Welcome,"
+msgstr "Bem-vindo(a),"
+
+#: apps/notification/templates/notification/email/welcome.html:122
+msgid "We are very happy to have you with us at"
+msgstr "Estamos muito felizes em ter você conosco no"
+
+#: apps/notification/templates/notification/email/welcome.html:123
+msgid "your simple and fast platform to shorten and manage links."
+msgstr "sua plataforma simples e rápida para encurtar e gerenciar links."
+
+#: apps/notification/templates/notification/email/welcome.html:127
+msgid ""
+"Now you can create, track statistics, and share your personalized links with "
+"ease."
+msgstr ""
+"Agora você pode criar, acompanhar estatísticas e compartilhar seus links "
+"personalizados com facilidade."
+
+#: apps/notification/templates/notification/email/welcome.html:132
+msgid "Access my dashboard"
+msgstr "Acessar meu painel"
+
+#: apps/security/templates/security/locked.html:23
+msgid "Access temporarily blocked"
+msgstr "Acesso temporariamente bloqueado"
+
+#: apps/security/templates/security/locked.html:27
+msgid "We detected multiple unsuccessful login attempts."
+msgstr "Detectamos várias tentativas de login sem sucesso."
+
+#: apps/security/templates/security/locked.html:29
+msgid "For security reasons, your access has been temporarily blocked."
+msgstr "Por motivos de segurança, seu acesso foi bloqueado temporariamente."
+
+#: apps/security/templates/security/locked.html:33
+msgid "Please wait a few minutes and try again."
+msgstr "Por favor, aguarde alguns minutos e tente novamente."
+
+#: apps/security/templates/security/locked.html:35
+#, fuzzy
+#| msgid "Forgot your password?"
+msgid "If you forgot your password, use the "
+msgstr "Esqueceu sua senha?"
+
+#: apps/security/templates/security/locked.html:37
+msgid "password recovery"
+msgstr ""
+
+#: apps/security/templates/security/locked.html:42
+msgid "If you believe this is a mistake, please contact support."
+msgstr ""
+
+#~ msgid "Email"
+#~ msgstr "E-mail"
+
+#~ msgid "Update your password to keep your account secure."
+#~ msgstr "Atualize sua senha para manter sua conta segura."
+
+#, fuzzy
+#~| msgid "Save new password"
+#~ msgid "Change password"
+#~ msgstr "Salvar nova senha"
+
+#~ msgid "URL shortening"
+#~ msgstr "Encurtamento de URL"
+
+#~ msgid "Direct links cost 2 coins."
+#~ msgstr "Links diretos custam 2 moedas."
+
 #~ msgid "Username"
 #~ msgstr "Nome de usuário"
 
@@ -716,12 +1195,6 @@ msgstr ""
 
 #~ msgid "example@email.com"
 #~ msgstr "exemplo@email.com"
-
-#~ msgid "Password"
-#~ msgstr "Senha"
-
-#~ msgid "Your secure password"
-#~ msgstr "Sua senha segura"
 
 #~ msgid "Confirm password"
 #~ msgstr "Confirmar senha"
@@ -783,9 +1256,6 @@ msgstr ""
 #~ msgid "Personal Informations"
 #~ msgstr "Informações Pessoais"
 
-#~ msgid "My Profile"
-#~ msgstr "Meu perfil"
-
 #~ msgid ""
 #~ "Your profile is a record of your personal information that defines who "
 #~ "you are."
@@ -796,9 +1266,6 @@ msgstr ""
 #~ msgid "View and edit your account information"
 #~ msgstr "Veja e edite informações da sua conta"
 
-#~ msgid "Avatar"
-#~ msgstr "Avatar"
-
 #~ msgid "Password must be at least 8 characters long."
 #~ msgstr "A senha deve ter pelo menos 8 caracteres."
 
@@ -808,11 +1275,5 @@ msgstr ""
 #~ msgid "Password must contain at least one special character."
 #~ msgstr "A senha deve conter pelo menos um caractere especial."
 
-#~ msgid "The password must be at least 8 characters long."
-#~ msgstr "A senha deve ter pelo menos 8 caracteres."
-
 #~ msgid "The password must contain both letters and numbers."
 #~ msgstr "A senha deve conter letras e números."
-
-#~ msgid "The password must contain at least one special character."
-#~ msgstr "A senha deve conter pelo menos um caractere especial."
