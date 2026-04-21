@@ -1,0 +1,10 @@
+{% load i18n %}
+{% load static %}
+
+<div class="text-center text-sm bg-amber-50 border border-amber-200 px-4 py-3 rounded text-amber-700 flex flex-col gap-2">
+  <p>{% trans "You've reached the daily limit of 3 links for guests." %}</p>
+  <p>
+    <a href="{% url 'account:register' %}" class="font-semibold text-blue-600 hover:underline">{% trans "Create a free account" %}</a>
+    {% trans "to keep shortening links." %}
+  </p>
+</div>

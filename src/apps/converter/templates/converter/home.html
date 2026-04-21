@@ -9,7 +9,7 @@
 {% block content %}
 <main class="min-h-screen p-4 flex flex-col items-center justify-center">
     <img class='w-full max-w-[1080px] absolute blur-sm -z-10 opacity-5' src={% static 'common/svg/logo/without_bg_icon_blue.svg'%} alt="{% trans 'Shortly logo' %}">
-    <div class="flex flex-col w-full max-w-md justify-center gap-4">
+    <div class="flex flex-col mb-32 w-full max-w-md justify-center gap-4">
         <div class="flex flex-col justify-center text-center">
             <h1 class="text-xl sm:text-2xl font-bold mb-2 text-center">{% trans "Link Shortener" %}</h1>
             <p class="text-sm md:text-base text-zinc-500 text-center">
@@ -89,6 +89,247 @@
 
 {% include 'notification/includes/news_modal.html' %}
 {% include 'converter/includes/url_already_exists_modal.html' %}
+
+<!-- Como funciona -->
+<section class="w-full py-20 px-4 bg-white">
+    <div class="max-w-4xl mx-auto flex flex-col gap-12">
+        <div class="text-center">
+            <h2 class="text-2xl sm:text-3xl font-bold text-zinc-900">{% trans "How it works" %}</h2>
+            <p class="text-zinc-500 mt-2 text-sm sm:text-base">{% trans "Three simple steps to shorten and share your links" %}</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-8">
+            <div class="flex flex-col items-center text-center gap-4">
+                <div class="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-blue-500 text-2xl">content_paste</span>
+                </div>
+                <div class="w-full h-[2px] bg-zinc-100 sm:hidden"></div>
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-widest text-blue-400 mb-1">{% trans "Step 1" %}</p>
+                    <h3 class="font-semibold text-zinc-800 mb-1">{% trans "Paste your URL" %}</h3>
+                    <p class="text-sm text-zinc-500">{% trans "Copy the long link you want to shorten and paste it into the field above." %}</p>
+                </div>
+            </div>
+
+            <div class="flex flex-col items-center text-center gap-4">
+                <div class="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-blue-500 text-2xl">bolt</span>
+                </div>
+                <div class="w-full h-[2px] bg-zinc-100 sm:hidden"></div>
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-widest text-blue-400 mb-1">{% trans "Step 2" %}</p>
+                    <h3 class="font-semibold text-zinc-800 mb-1">{% trans "Generate the short link" %}</h3>
+                    <p class="text-sm text-zinc-500">{% trans "Click Shorten and instantly get a compact, shareable link." %}</p>
+                </div>
+            </div>
+
+            <div class="flex flex-col items-center text-center gap-4">
+                <div class="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-blue-500 text-2xl">share</span>
+                </div>
+                <div class="w-full h-[2px] bg-zinc-100 sm:hidden"></div>
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-widest text-blue-400 mb-1">{% trans "Step 3" %}</p>
+                    <h3 class="font-semibold text-zinc-800 mb-1">{% trans "Share anywhere" %}</h3>
+                    <p class="text-sm text-zinc-500">{% trans "Use your short link on social media, messages, emails, or print it as a QR code." %}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Funcionalidades -->
+<section class="w-full py-20 px-4 bg-blue-50 border-t border-zinc-100">
+    <div class="max-w-4xl mx-auto flex flex-col gap-12">
+        <div class="text-center">
+            <h2 class="text-2xl sm:text-3xl font-bold text-zinc-900">{% trans "Everything you need to manage your links" %}</h2>
+            <p class="text-zinc-500 mt-2 text-sm sm:text-base">{% trans "Simple tools with professional results" %}</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div class="bg-white rounded-xl border border-zinc-200 p-6 flex gap-4 items-start">
+                <div class="w-10 h-10 shrink-0 rounded-lg bg-blue-100 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-blue-500">link</span>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-zinc-800 mb-1">{% trans "Instant shortening" %}</h3>
+                    <p class="text-sm text-zinc-500">{% trans "Turn any long URL into a short, clean link in seconds. No sign-up required for basic use." %}</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl border border-zinc-200 p-6 flex gap-4 items-start">
+                <div class="w-10 h-10 shrink-0 rounded-lg bg-blue-100 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-blue-500">qr_code_2</span>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-zinc-800 mb-1">{% trans "Automatic QR Code" %}</h3>
+                    <p class="text-sm text-zinc-500">{% trans "Every shortened link comes with a ready-to-download QR code, perfect for print materials and campaigns." %}</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl border border-zinc-200 p-6 flex gap-4 items-start">
+                <div class="w-10 h-10 shrink-0 rounded-lg bg-blue-100 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-blue-500">bar_chart</span>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-zinc-800 mb-1">{% trans "Click analytics" %}</h3>
+                    <p class="text-sm text-zinc-500">{% trans "Track how many times your link was clicked, from which devices, browsers, and countries." %}</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl border border-zinc-200 p-6 flex gap-4 items-start">
+                <div class="w-10 h-10 shrink-0 rounded-lg bg-blue-100 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-blue-500">flash_on</span>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-zinc-800 mb-1">{% trans "Direct links" %}</h3>
+                    <p class="text-sm text-zinc-500">{% trans "Skip the redirect page and send users straight to the destination. Faster experience for your audience." %}</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl border border-zinc-200 p-6 flex gap-4 items-start">
+                <div class="w-10 h-10 shrink-0 rounded-lg bg-blue-100 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-blue-500">all_inclusive</span>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-zinc-800 mb-1">{% trans "Links without expiration" %}</h3>
+                    <p class="text-sm text-zinc-500">{% trans "Create links with no expiration date. Perfect for long-term campaigns, printed materials, and anything you want to last." %}</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl border border-zinc-200 p-6 flex gap-4 items-start">
+                <div class="w-10 h-10 shrink-0 rounded-lg bg-blue-100 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-blue-500">dashboard</span>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-zinc-800 mb-1">{% trans "Complete dashboard" %}</h3>
+                    <p class="text-sm text-zinc-500">{% trans "Manage all your links in one place. View stats, copy links, download QR codes, and organize your history." %}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Pacotes de créditos -->
+<section class="w-full py-20 px-4 bg-white border-t border-zinc-100">
+    <div class="max-w-4xl mx-auto flex flex-col gap-12">
+        <div class="text-center">
+            <h2 class="text-2xl sm:text-3xl font-bold text-zinc-900">{% trans "Credit Packages" %}</h2>
+            <p class="text-zinc-500 mt-2 text-sm sm:text-base">{% trans "Buy credits and use them to create links. No subscriptions, no surprises." %}</p>
+        </div>
+
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {% for pkg in packages %}
+            <div class="relative flex flex-col items-center gap-3 bg-white border {% if pkg.credits == 50 %}border-blue-500 shadow-md shadow-blue-100{% else %}border-zinc-200{% endif %} rounded-xl p-6 text-center">
+                {% if pkg.credits == 50 %}
+                <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">{% trans "Best value" %}</span>
+                {% endif %}
+
+                <div class="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center">
+                    <span class="text-blue-600 font-extrabold text-xl">{{ pkg.credits }}</span>
+                </div>
+
+                <div>
+                    <p class="font-bold text-zinc-800">{{ pkg.credits }} {% trans "credits" %}</p>
+                    <p class="text-2xl font-extrabold text-zinc-900 mt-1">R$ {{ pkg.price }}</p>
+                    <p class="text-xs text-zinc-400 mt-0.5">R$ {% widthratio pkg.price|floatformat:2 pkg.credits 1 %} / {% trans "credit" %}</p>
+                </div>
+
+                {% if request.user.is_authenticated %}
+                <a href="{% url 'buy_credits' pkg.credits %}"
+                   class="btn justify-center w-full {% if pkg.credits == 50 %}bg-blue-500 text-white hover:bg-blue-600{% else %}bg-zinc-100 text-zinc-700 hover:bg-zinc-200{% endif %} transition text-sm mt-auto">
+                    {% trans "Buy" %}
+                </a>
+                {% else %}
+                <a href="{% url 'account:register' %}"
+                   class="btn justify-center w-full {% if pkg.credits == 50 %}bg-blue-500 text-white hover:bg-blue-600{% else %}bg-zinc-100 text-zinc-700 hover:bg-zinc-200{% endif %} transition text-sm mt-auto">
+                    {% trans "Buy" %}
+                </a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <p class="text-center text-xs text-zinc-400">
+            {% trans "Credits do not expire. Each link costs 1 credit by default." %}
+            <a href="{% url 'terms-of-use' %}" class="text-blue-400 hover:underline">{% trans "See Terms of Use" %}</a>.
+        </p>
+    </div>
+</section>
+
+<!-- FAQ -->
+<section class="w-full py-20 px-4 bg-white border-t border-zinc-100">
+    <div class="max-w-3xl mx-auto flex flex-col gap-12">
+        <div class="text-center">
+            <h2 class="text-2xl sm:text-3xl font-bold text-zinc-900">{% trans "Frequently asked questions" %}</h2>
+            <p class="text-zinc-500 mt-2 text-sm sm:text-base">{% trans "Everything you need to know about Sh0rtly" %}</p>
+        </div>
+
+        <div class="flex flex-col divide-y divide-zinc-100" x-data="{ open: null }">
+
+            <div class="py-5">
+                <button @click="open = open === 1 ? null : 1" class="w-full flex items-center justify-between text-left gap-4">
+                    <span class="font-medium text-zinc-800">{% trans "Is Sh0rtly free to use?" %}</span>
+                    <span class="material-symbols-outlined text-zinc-400 shrink-0 transition-transform duration-200" :class="open === 1 ? 'rotate-180' : ''">expand_more</span>
+                </button>
+                <div x-show="open === 1" x-transition class="mt-3 text-sm text-zinc-500 leading-relaxed">
+                    {% trans "Yes. Basic link shortening is free with no account required. Creating an account unlocks more features like analytics, QR codes, link history, and access to premium plans." %}
+                </div>
+            </div>
+
+            <div class="py-5">
+                <button @click="open = open === 2 ? null : 2" class="w-full flex items-center justify-between text-left gap-4">
+                    <span class="font-medium text-zinc-800">{% trans "How long do shortened links last?" %}</span>
+                    <span class="material-symbols-outlined text-zinc-400 shrink-0 transition-transform duration-200" :class="open === 2 ? 'rotate-180' : ''">expand_more</span>
+                </button>
+                <div x-show="open === 2" x-transition class="mt-3 text-sm text-zinc-500 leading-relaxed">
+                    {% trans "Standard links have an expiration period defined by your plan. With the 'no expiration' option, your link stays active indefinitely." %}
+                </div>
+            </div>
+
+            <div class="py-5">
+                <button @click="open = open === 3 ? null : 3" class="w-full flex items-center justify-between text-left gap-4">
+                    <span class="font-medium text-zinc-800">{% trans "Can I track who clicks my links?" %}</span>
+                    <span class="material-symbols-outlined text-zinc-400 shrink-0 transition-transform duration-200" :class="open === 3 ? 'rotate-180' : ''">expand_more</span>
+                </button>
+                <div x-show="open === 3" x-transition class="mt-3 text-sm text-zinc-500 leading-relaxed">
+                    {% trans "Yes. Registered users have access to a dashboard with detailed analytics: total clicks, devices, browsers, countries, and performance over time." %}
+                </div>
+            </div>
+
+            <div class="py-5">
+                <button @click="open = open === 4 ? null : 4" class="w-full flex items-center justify-between text-left gap-4">
+                    <span class="font-medium text-zinc-800">{% trans "What is a direct link?" %}</span>
+                    <span class="material-symbols-outlined text-zinc-400 shrink-0 transition-transform duration-200" :class="open === 4 ? 'rotate-180' : ''">expand_more</span>
+                </button>
+                <div x-show="open === 4" x-transition class="mt-3 text-sm text-zinc-500 leading-relaxed">
+                    {% trans "A direct link skips the intermediate redirect page and sends the visitor straight to the destination URL. This provides a faster experience and is ideal for professional use." %}
+                </div>
+            </div>
+
+            <div class="py-5">
+                <button @click="open = open === 5 ? null : 5" class="w-full flex items-center justify-between text-left gap-4">
+                    <span class="font-medium text-zinc-800">{% trans "Is my data safe?" %}</span>
+                    <span class="material-symbols-outlined text-zinc-400 shrink-0 transition-transform duration-200" :class="open === 5 ? 'rotate-180' : ''">expand_more</span>
+                </button>
+                <div x-show="open === 5" x-transition class="mt-3 text-sm text-zinc-500 leading-relaxed">
+                    {% trans "We take privacy seriously. We only collect data necessary to operate the service. Analytics data is anonymized and we do not sell your information to third parties. Read our privacy policy for full details." %}
+                </div>
+            </div>
+
+            <div class="py-5">
+                <button @click="open = open === 6 ? null : 6" class="w-full flex items-center justify-between text-left gap-4">
+                    <span class="font-medium text-zinc-800">{% trans "How does the QR code work?" %}</span>
+                    <span class="material-symbols-outlined text-zinc-400 shrink-0 transition-transform duration-200" :class="open === 6 ? 'rotate-180' : ''">expand_more</span>
+                </button>
+                <div x-show="open === 6" x-transition class="mt-3 text-sm text-zinc-500 leading-relaxed">
+                    {% trans "Every link you create automatically gets a QR code pointing to it. You can download it as a PNG image and use it on flyers, business cards, product packaging, or anywhere else." %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
 
 {% endblock %}
 

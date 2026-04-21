@@ -17,7 +17,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as translate
 from django.views import View
 
-from apps.converter.enums import PricingRule
+from apps.converter.enums import AnonymousLimitExceeded, PricingRule
 from apps.converter.forms import UrlForm
 from apps.converter.models import Url, UrlMetadata
 from apps.converter.services.access_event_service import AccessEventService
@@ -103,6 +103,13 @@ class HomeView(View):
 
             request.session["announcement_seen"] = updated_seen
 
+        packages = [
+            {"credits": 10, "price": "5,99"},
+            {"credits": 20, "price": "10,99"},
+            {"credits": 50, "price": "24,99"},
+            {"credits": 100, "price": "39,99"},
+        ]
+
         return render(
             request,
             "converter/home.html",
@@ -110,6 +117,7 @@ class HomeView(View):
                 "form": form,
                 "announcements": announcements,
                 "pricing": json.dumps(pricing),
+                "packages": packages,
             },
         )
 
@@ -130,6 +138,12 @@ class HomeView(View):
                 is_permanent=form.cleaned_data["is_permanent"],
                 create_new=request.POST.get("create_new") == "true"
             )
+
+        except AnonymousLimitExceeded:
+            messages.error(request, mark_safe(
+                render_to_string("converter/includes/anonymous_limit.html")
+            ))
+            return redirect("converter:home")
 
         except ValidationError:
             messages.success(request, mark_safe(

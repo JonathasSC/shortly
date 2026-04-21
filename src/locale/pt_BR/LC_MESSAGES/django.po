@@ -577,10 +577,8 @@ msgid "Direct Link"
 msgstr "Link Direto"
 
 #: apps/converter/forms.py:18
-#, fuzzy
-#| msgid "Direct Link"
 msgid "Permanent Link"
-msgstr "Link Direto"
+msgstr "Link Indeterminado"
 
 #: apps/converter/forms.py:36
 msgid "Type or Paste your URL here..."
@@ -592,7 +590,7 @@ msgstr "Transforme links longos em URLs curtas e compartilháveis"
 
 #: apps/converter/templates/converter/home.html:65
 msgid "Permanent"
-msgstr ""
+msgstr "Indeterminado"
 
 #: apps/converter/templates/converter/home.html:83
 msgid "Shorten"
@@ -600,19 +598,19 @@ msgstr "Encurtar"
 
 #: apps/converter/templates/converter/home.html:118
 msgid "direct"
-msgstr ""
+msgstr "direto"
 
 #: apps/converter/templates/converter/home.html:123
 msgid "permanent"
-msgstr ""
+msgstr "indeterminado"
 
 #: apps/converter/templates/converter/home.html:128
 msgid "This link will cost"
-msgstr ""
+msgstr "Este link custará"
 
 #: apps/converter/templates/converter/home.html:129
 msgid "coins"
-msgstr ""
+msgstr "moedas"
 
 #: apps/converter/templates/converter/includes/insufficient_balance.html:4
 msgid "Insufficient balance. Add more coins to shorten more URLs."
@@ -899,6 +897,154 @@ msgstr "Ações"
 #: apps/monitor/templates/dashboard/includes/charts/urls_list.html:75
 msgid "You haven't created any links yet"
 msgstr "Você não criou nenhum link ainda"
+
+#: apps/converter/templates/converter/home.html
+msgid "How it works"
+msgstr "Como funciona"
+
+msgid "Three simple steps to shorten and share your links"
+msgstr "Três passos simples para encurtar e compartilhar seus links"
+
+msgid "Step 1"
+msgstr "Passo 1"
+
+msgid "Paste your URL"
+msgstr "Cole sua URL"
+
+msgid "Copy the long link you want to shorten and paste it into the field above."
+msgstr "Copie o link longo que deseja encurtar e cole no campo acima."
+
+msgid "Step 2"
+msgstr "Passo 2"
+
+msgid "Generate the short link"
+msgstr "Gere o link curto"
+
+msgid "Click Shorten and instantly get a compact, shareable link."
+msgstr "Clique em Encurtar e obtenha instantaneamente um link compacto e compartilhável."
+
+msgid "Step 3"
+msgstr "Passo 3"
+
+msgid "Share anywhere"
+msgstr "Compartilhe em qualquer lugar"
+
+msgid "Use your short link on social media, messages, emails, or print it as a QR code."
+msgstr "Use seu link curto nas redes sociais, mensagens, e-mails ou imprima como QR code."
+
+msgid "Everything you need to manage your links"
+msgstr "Tudo que você precisa para gerenciar seus links"
+
+msgid "Simple tools with professional results"
+msgstr "Ferramentas simples com resultados profissionais"
+
+msgid "Instant shortening"
+msgstr "Encurtamento instantâneo"
+
+msgid "Turn any long URL into a short, clean link in seconds. No sign-up required for basic use."
+msgstr "Transforme qualquer URL longa em um link curto e limpo em segundos. Sem cadastro para uso básico."
+
+msgid "Automatic QR Code"
+msgstr "QR Code automático"
+
+msgid "Every shortened link comes with a ready-to-download QR code, perfect for print materials and campaigns."
+msgstr "Todo link encurtado vem com um QR code pronto para download, ideal para materiais impressos e campanhas."
+
+msgid "Click analytics"
+msgstr "Análise de cliques"
+
+msgid "Track how many times your link was clicked, from which devices, browsers, and countries."
+msgstr "Acompanhe quantas vezes seu link foi clicado, de quais dispositivos, navegadores e países."
+
+msgid "Direct links"
+msgstr "Links diretos"
+
+msgid "Skip the redirect page and send users straight to the destination. Faster experience for your audience."
+msgstr "Pule a página de redirecionamento e envie os usuários diretamente ao destino. Experiência mais rápida para seu público."
+
+msgid "Links without expiration"
+msgstr "Links Indeterminados"
+
+msgid "Create links with no expiration date. Perfect for long-term campaigns, printed materials, and anything you want to last."
+msgstr "Crie links com prazo indeterminado. Perfeito para campanhas de longo prazo, materiais impressos e tudo que você quer que dure."
+
+msgid "Complete dashboard"
+msgstr "Dashboard completo"
+
+msgid "Manage all your links in one place. View stats, copy links, download QR codes, and organize your history."
+msgstr "Gerencie todos os seus links em um só lugar. Veja estatísticas, copie links, baixe QR codes e organize seu histórico."
+
+msgid "Frequently asked questions"
+msgstr "Perguntas frequentes"
+
+msgid "Everything you need to know about Sh0rtly"
+msgstr "Tudo que você precisa saber sobre o Sh0rtly"
+
+msgid "Is Sh0rtly free to use?"
+msgstr "O Sh0rtly é gratuito?"
+
+msgid "Yes. Basic link shortening is free with no account required. Creating an account unlocks more features like analytics, QR codes, link history, and access to premium plans."
+msgstr "Sim. O encurtamento básico é gratuito e não exige cadastro. Criar uma conta desbloqueia mais recursos como análises, QR codes, histórico de links e acesso a planos premium."
+
+msgid "How long do shortened links last?"
+msgstr "Por quanto tempo os links encurtados ficam ativos?"
+
+msgid "Standard links have an expiration period defined by your plan. With the 'no expiration' option, your link stays active indefinitely."
+msgstr "Links padrão têm um período de expiração definido pelo seu plano. Com a opção 'Indeterminado', seu link fica ativo por prazo indeterminado, conforme nossos Termos de Uso."
+
+msgid "Can I track who clicks my links?"
+msgstr "Posso rastrear quem clica nos meus links?"
+
+msgid "Yes. Registered users have access to a dashboard with detailed analytics: total clicks, devices, browsers, countries, and performance over time."
+msgstr "Sim. Usuários cadastrados têm acesso a um dashboard com análises detalhadas: total de cliques, dispositivos, navegadores, países e desempenho ao longo do tempo."
+
+msgid "What is a direct link?"
+msgstr "O que é um link direto?"
+
+msgid "A direct link skips the intermediate redirect page and sends the visitor straight to the destination URL. This provides a faster experience and is ideal for professional use."
+msgstr "Um link direto pula a página intermediária de redirecionamento e leva o visitante diretamente à URL de destino. Isso oferece uma experiência mais rápida e é ideal para uso profissional."
+
+msgid "Is my data safe?"
+msgstr "Meus dados estão seguros?"
+
+msgid "We take privacy seriously. We only collect data necessary to operate the service. Analytics data is anonymized and we do not sell your information to third parties. Read our privacy policy for full details."
+msgstr "Levamos a privacidade a sério. Coletamos apenas os dados necessários para operar o serviço. Os dados de análise são anonimizados e não vendemos suas informações a terceiros. Leia nossa política de privacidade para mais detalhes."
+
+msgid "How does the QR code work?"
+msgstr "Como o QR code funciona?"
+
+msgid "Every link you create automatically gets a QR code pointing to it. You can download it as a PNG image and use it on flyers, business cards, product packaging, or anywhere else."
+msgstr "Todo link que você cria ganha automaticamente um QR code apontando para ele. Você pode baixá-lo como imagem PNG e usá-lo em panfletos, cartões de visita, embalagens ou em qualquer outro lugar."
+
+msgid "Credit Packages"
+msgstr "Pacotes de Créditos"
+
+msgid "Buy credits and use them to create links. No subscriptions, no surprises."
+msgstr "Compre créditos e use para criar links. Sem assinaturas, sem surpresas."
+
+msgid "credits"
+msgstr "créditos"
+
+msgid "credit"
+msgstr "crédito"
+
+msgid "Credits do not expire. Each link costs 1 credit by default."
+msgstr "Créditos não expiram. Cada link custa 1 crédito por padrão."
+
+msgid "You've reached the daily limit of 3 links for guests."
+msgstr "Você atingiu o limite diário de 3 links para visitantes."
+
+msgid "Create a free account"
+msgstr "Crie uma conta gratuita"
+
+msgid "to keep shortening links."
+msgstr "para continuar encurtando links."
+
+msgid "See Terms of Use"
+msgstr "Ver Termos de Uso"
+
+msgid "Get started"
+msgstr "Começar agora"
 
 #: apps/monitor/templates/dashboard/all_urls_list.html:117
 #: apps/monitor/templates/dashboard/includes/charts/urls_list.html:78

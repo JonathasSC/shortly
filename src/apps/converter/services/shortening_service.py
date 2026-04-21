@@ -1,11 +1,12 @@
 from django.conf import settings
 from django.db import transaction
 from django.db.models import F
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as translate
 from hashids import Hashids
 
 from apps.billing.services.wallet_service import WalletService
-from apps.converter.enums import ShortenResult
+from apps.converter.enums import ANONYMOUS_DAILY_LIMIT, AnonymousLimitExceeded, ShortenResult
 from apps.converter.services.pricing_service import PricingService
 
 
@@ -38,6 +39,17 @@ class UrlShorteningService:
 
         if existing and not create_new:
             return existing, ShortenResult.EXISTS
+
+        if not user.is_authenticated:
+            today = timezone.now().date()
+            from apps.converter.models import Url
+            count = Url.objects.filter(
+                created_by=None,
+                created_by_ip=client_ip,
+                created_at__date=today,
+            ).count()
+            if count >= ANONYMOUS_DAILY_LIMIT:
+                raise AnonymousLimitExceeded()
 
         if user.is_authenticated:
             WalletService.debit(
