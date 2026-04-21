@@ -600,10 +600,6 @@ msgstr "Encurtar"
 msgid "direct"
 msgstr "direto"
 
-#: apps/converter/templates/converter/home.html:123
-msgid "permanent"
-msgstr "indeterminado"
-
 #: apps/converter/templates/converter/home.html:128
 msgid "This link will cost"
 msgstr "Este link custará"
