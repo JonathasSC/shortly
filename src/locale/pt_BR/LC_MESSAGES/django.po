@@ -577,7 +577,7 @@ msgid "Direct Link"
 msgstr "Link Direto"
 
 #: apps/converter/forms.py:18
-msgid "Permanent Link"
+msgid "Undetermined Link"
 msgstr "Link Indeterminado"
 
 #: apps/converter/forms.py:36
@@ -589,7 +589,7 @@ msgid "Turn long links into short, shareable URLs"
 msgstr "Transforme links longos em URLs curtas e compartilháveis"
 
 #: apps/converter/templates/converter/home.html:65
-msgid "Permanent"
+msgid "Undetermined"
 msgstr "Indeterminado"
 
 #: apps/converter/templates/converter/home.html:83

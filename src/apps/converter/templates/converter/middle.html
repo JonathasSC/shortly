@@ -7,21 +7,32 @@
 {% endblock %}
 
 {% block content %}
-<div class="flex flex-col items-center justify-center min-h-screen px-4 text-center">
-    <h1 class="text-3xl font-semibold text-gray-800 mb-4">
-        {% trans "You will be redirected in..." %}
-    </h1>
+<div class="flex flex-col items-center justify-center min-h-screen px-4 text-center gap-8">
+    <div class="flex flex-col items-center gap-2">
+        <h1 class="text-3xl font-semibold text-gray-800">
+            {% trans "You will be redirected in..." %}
+        </h1>
+        <div class="text-6xl font-bold text-blue-600" id="counter">5</div>
+        <p class="text-sm text-gray-500 mt-2">
+            <span id="manualLink" class="hidden">
+                {% trans "If you are not automatically redirected," %} <br>
+                <a href="{{ redirect_url }}" class="text-blue-600 underline">
+                    {% trans "click here" %}
+                </a>.
+            </span>
+        </p>
+    </div>
 
-    <div class="text-6xl font-bold text-blue-600" id="counter">5</div>
+    {% if not request.user.is_authenticated %}
+    {% include 'common/includes/ads/banner_728x90.html' %}
 
-    <p class="text-sm text-gray-500 mt-2">
-        <span id="manualLink" class="hidden">
-            {% trans "If you are not automatically redirected," %} <br>
-            <a href="{{ redirect_url }}" class="text-blue-600 underline">
-                {% trans "click here" %}
-            </a>.
-        </span>
-    </p>
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-6">
+        {% include 'common/includes/ads/banner_300x250.html' %}
+        <div class="hidden sm:block">
+            {% include 'common/includes/ads/banner_160x600.html' %}
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}
 

@@ -90,6 +90,10 @@
 {% include 'notification/includes/news_modal.html' %}
 {% include 'converter/includes/url_already_exists_modal.html' %}
 
+{% if not request.user.is_authenticated %}
+{% include 'common/includes/ads/banner_728x90.html' %}
+{% endif %}
+
 <!-- Como funciona -->
 <section class="w-full py-20 px-4 bg-white">
     <div class="max-w-4xl mx-auto flex flex-col gap-12">
@@ -209,6 +213,10 @@
         </div>
     </div>
 </section>
+
+{% if not request.user.is_authenticated %}
+{% include 'common/includes/ads/banner_300x250.html' %}
+{% endif %}
 
 <!-- Pacotes de créditos -->
 <section class="w-full py-20 px-4 bg-white border-t border-zinc-100">
