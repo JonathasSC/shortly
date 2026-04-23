@@ -91,7 +91,11 @@
 {% include 'converter/includes/url_already_exists_modal.html' %}
 
 {% if not request.user.is_authenticated %}
-{% include 'common/includes/ads/banner_728x90.html' %}
+<div class="w-full bg-zinc-50 border-t border-zinc-100 py-4">
+    <div class="max-w-4xl mx-auto px-4">
+        {% include 'common/includes/ads/banner_728x90.html' %}
+    </div>
+</div>
 {% endif %}
 
 <!-- Como funciona -->
@@ -215,7 +219,12 @@
 </section>
 
 {% if not request.user.is_authenticated %}
-{% include 'common/includes/ads/banner_300x250.html' %}
+<div class="w-full bg-zinc-50 border-t border-zinc-100 py-4">
+    <div class="max-w-4xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-center gap-6">
+        {% include 'common/includes/ads/banner_300x250.html' %}
+        {% include 'common/includes/ads/banner_300x250.html' %}
+    </div>
+</div>
 {% endif %}
 
 <!-- Pacotes de créditos -->
