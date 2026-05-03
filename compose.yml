@@ -16,6 +16,8 @@ services:
     depends_on:
       redis:
         condition: service_healthy
+      postgres:
+        condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8000 || exit 1"]
       interval: 10s
@@ -35,6 +37,8 @@ services:
       - ./src/logs:/usr/src/logs
     depends_on:
       redis:
+        condition: service_healthy
+      postgres:
         condition: service_healthy
     networks:
       - shortly_net
@@ -121,6 +125,29 @@ services:
       - shortly_net
     restart: always
 
+  postgres:
+    image: postgres:17
+    container_name: shortly-postgres
+    restart: always
+    env_file:
+      - ./src/.env
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - shortly_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
   redis:
     image: redis:7.0-alpine
     container_name: shortly-redis
@@ -152,3 +179,4 @@ volumes:
   static_volume:
   media_volume:
   redis_data:
+  postgres_data:
