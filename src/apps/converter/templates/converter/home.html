@@ -90,13 +90,21 @@
 {% include 'notification/includes/news_modal.html' %}
 {% include 'converter/includes/url_already_exists_modal.html' %}
 
-{% if not request.user.is_authenticated %}
+<div id="ad-after-shorten-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div class="relative bg-white rounded-xl shadow-xl p-6 flex flex-col items-center gap-4 max-w-sm w-full mx-4">
+        <button onclick="document.getElementById('ad-after-shorten-modal').classList.add('hidden')"
+                class="absolute top-3 right-3 text-zinc-400 hover:text-zinc-700 transition">
+            <span class="material-symbols-outlined text-xl">close</span>
+        </button>
+        {% include 'common/includes/ads/banner_300x250.html' %}
+    </div>
+</div>
+
 <div class="w-full bg-zinc-50 border-t border-zinc-100 py-4">
     <div class="max-w-4xl mx-auto px-4">
         {% include 'common/includes/ads/banner_728x90.html' %}
     </div>
 </div>
-{% endif %}
 
 <!-- Como funciona -->
 <section class="w-full py-20 px-4 bg-white">
@@ -218,14 +226,12 @@
     </div>
 </section>
 
-{% if not request.user.is_authenticated %}
 <div class="w-full bg-zinc-50 border-t border-zinc-100 py-4">
     <div class="max-w-4xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-center gap-6">
         {% include 'common/includes/ads/banner_300x250.html' %}
         {% include 'common/includes/ads/banner_300x250.html' %}
     </div>
 </div>
-{% endif %}
 
 <!-- Pacotes de créditos -->
 <section class="w-full py-20 px-4 bg-white border-t border-zinc-100">
@@ -351,6 +357,13 @@
 {% endblock %}
 
 {% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    if (document.getElementById('shortUrlWrapper')) {
+        document.getElementById('ad-after-shorten-modal').classList.remove('hidden');
+    }
+});
+</script>
 <script src="{% static 'converter/js/utilities.js' %}"></script>
 <script src="{% static 'converter/js/announcements.js' %}"></script>
 <script id="pricing-data" type="application/json">

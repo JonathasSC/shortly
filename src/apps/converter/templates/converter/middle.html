@@ -8,18 +8,14 @@
 
 {% block content %}
 <div class="flex flex-col min-h-screen">
-    {% if not request.user.is_authenticated %}
     <div class="flex justify-center lg:hidden">
         {% include 'common/includes/ads/banner_728x90.html' %}
     </div>
-    {% endif %}
 
     <div class="flex items-center justify-around flex-1 gap-6 px-4 py-8">
-        {% if not request.user.is_authenticated %}
         <div class="hidden lg:flex flex-shrink-0 items-center self-stretch">
             {% include 'common/includes/ads/banner_160x600.html' %}
         </div>
-        {% endif %}
 
         <div class="flex flex-col items-center text-center gap-2">
             <h1 class="text-3xl font-semibold text-gray-800">
@@ -36,11 +32,9 @@
             </p>
         </div>
 
-        {% if not request.user.is_authenticated %}
         <div class="hidden lg:flex flex-shrink-0 items-center self-stretch">
             {% include 'common/includes/ads/banner_300x250.html' %}
         </div>
-        {% endif %}
     </div>
 </div>
 {% endblock %}
