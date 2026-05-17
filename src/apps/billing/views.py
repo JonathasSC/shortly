@@ -14,6 +14,7 @@ from apps.billing.domain import Pricing
 from apps.billing.dto import CheckoutPreferenceDTO
 from apps.billing.models import Plan, UserWallet, WalletTransaction
 from apps.billing.services.mp_service import MercadoPagoService
+from apps.toggler.models import FeatureFlag
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +23,10 @@ class BuyCoinsView(LoginRequiredMixin, View):
     pricing = Pricing()
 
     def get(self, request, credit_amount, *args, **kwargs):
+        if not FeatureFlag.is_active("market_enabled", request.user):
+            logger.warning(f"[MERCADO DESABILITADO] User={request.user.id} tentou comprar coins.")
+            return redirect("wallet_page")
+
         price = self.pricing.get_package_price(credit_amount)
 
         logger.info(
@@ -127,6 +132,7 @@ class WalletPageView(View):
 
         active_subscription = request.user.active_subscription
         active_plan = active_subscription.plan if active_subscription else None
+        market_enabled = FeatureFlag.is_active("market_enabled", request.user)
 
         logger.debug(
             f"Usuário {request.user.id} possui {wallet.balance} coins e {transactions.count()} transações."
@@ -141,6 +147,7 @@ class WalletPageView(View):
                 "transactions": transactions_page,
                 "active_plan": active_plan,
                 "active_subscription": active_subscription,
+                "disabled": not market_enabled,
             },
         )
 

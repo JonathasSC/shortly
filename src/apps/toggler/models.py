@@ -27,6 +27,14 @@ class FeatureFlag(BaseModelAbstract):
     def __str__(self):
         return f"{self.name} - {'ON' if self.enabled else 'OFF'}"
 
+    @classmethod
+    def is_active(cls, name: str, user: Optional[AbstractBaseUser] = None) -> bool:
+        try:
+            flag = cls.objects.get(name=name)
+            return flag.is_active_for(user)
+        except cls.DoesNotExist:
+            return False
+
     def is_active_for(self, user: Optional[AbstractBaseUser]) -> bool:
 
         cache_key = f"feature_flag:{self.pk}:{user.pk if user else 'anon'}"
